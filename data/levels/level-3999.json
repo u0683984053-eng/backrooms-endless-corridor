@@ -1,0 +1,41 @@
+{
+  "id": "level-3999",
+  "name": "Level 3999 — 真核商场",
+  "number": 3999,
+  "category": "normal",
+  "difficultyClass": 0,
+  "environment": "mixed",
+  "aesthetic": "mallcore",
+  "light": "bright",
+  "sanDrain": 0,
+  "description": "一座巨大的商场：音乐、暖光、琳琅满目的货架。这里没有饥饿，没有恐惧，没有出口——除了大厅中央那颗红色按钮。按下它，一切重新开始。",
+  "palette": { "primary": "#e8d8b8", "secondary": "#c8b090", "accent": "#c03030", "light": "#f0e8d0" },
+  "terrain": {
+    "width": 34, "height": 34,
+    "roomCount": 22, "roomSizeMin": 5, "roomSizeMax": 12,
+    "corridorWidth": 3,
+    "wallStyle": "drywall", "floorStyle": "tile",
+    "extraFeatures": ["counters", "shelves", "fountain", "windows", "doors", "elevator"]
+  },
+  "spaceRules": ["euclidean"],
+  "entities": [
+    { "type": "faceling", "density": 0.01, "aggression": "passive" },
+    { "type": "partygoer", "density": 0.002, "aggression": "curious" }
+  ],
+  "items": ["almond-water", "royal-ration", "medkit", "battery", "flashlight", "crowbar", "note", "key"],
+  "itemDensity": 0.35,
+  "setPieces": [
+    { "type": "monolith", "position": "center", "text": "大厅中央的红色按钮，基座上刻着唯一的说明：『按下，你将回到一切开始的地方。』", "sanityEffect": 0, "note": "红色按钮。说明书只有一句话。你还没有按下它。" },
+    { "type": "writing", "position": "random", "text": "商场的告示栏贴满手写纸条：『今天是第 1043 天。』『第 2088 天。』『我忘了外面。』", "sanityEffect": -4, "note": "告示栏上的天数计数：有人在这里住了几千天。" },
+    { "type": "object", "position": "far-corner", "text": "玩具店的橱窗里，一只发条小熊独自转圈，音乐盒的旋律永远卡在最后一个音符前。", "sanityEffect": -2, "note": "发条小熊的音乐盒永远差一个音符。" }
+  ],
+  "soundscape": {
+    "ambient": ["商场背景音乐（永远循环同一首）", "电梯叮咚声", "喷泉声"],
+    "startles": ["背景音乐突然卡住一拍", "某家店的卷帘门自己放下", "广播：『顾客朋友们，本商场永不闭店。』"],
+    "silenceEvents": false
+  },
+  "exits": [
+    { "target": "level-0", "kind": "button", "hidden": false, "danger": false, "description": "红色按钮。按下它——你站在黄色墙纸和潮湿地毯之间，像第一天那样。日志还在，你记得一切。" },
+    { "target": "level-11", "kind": "noclip", "hidden": true, "danger": false, "description": "消防通道的门牌写着'出口'，推开门是 Level 11 的街灯。" }
+  ]
+}

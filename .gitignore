@@ -1,0 +1,7 @@
+﻿# 运行时产物（不入库）
+logs/
+proto/saves/
+*.log
+*.pid
+.DS_Store
+Thumbs.db

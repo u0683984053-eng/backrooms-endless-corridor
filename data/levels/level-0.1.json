@@ -1,0 +1,40 @@
+{
+  "id": "level-0.1",
+  "name": "Level 0.1 — 入侵者的楼梯间",
+  "number": 0.1,
+  "category": "sub",
+  "difficultyClass": 1,
+  "environment": "corridors",
+  "aesthetic": "dreamcore",
+  "light": "dim",
+  "sanDrain": 0.18,
+  "description": "一段永远向下的楼梯间。每一层都长得一样，但转角处偶尔会出现一扇不属于这里的门。据说有人在这里数到了第 1000 层，然后在第 1001 层遇到了自己。",
+  "palette": { "primary": "#8a8a7a", "secondary": "#6a6a5c", "accent": "#4a4a3a", "light": "#a8a890" },
+  "terrain": {
+    "width": 16, "height": 16,
+    "roomCount": 6, "roomSizeMin": 3, "roomSizeMax": 4,
+    "corridorWidth": 2,
+    "wallStyle": "concrete", "floorStyle": "concrete",
+    "extraFeatures": ["stairwell", "doors", "wires"]
+  },
+  "spaceRules": ["non-euclidean", "looping"],
+  "entities": [
+    { "type": "skin-stealer", "density": 0.01, "aggression": "curious" },
+    { "type": "moth", "density": 0.005, "aggression": "passive" }
+  ],
+  "items": ["battery", "note", "almond-water", "key"],
+  "itemDensity": 0.1,
+  "setPieces": [
+    { "type": "writing", "position": "random", "text": "楼梯扶手上缠着布条，每隔几层就有一条，上面写着：『第 3 次经过这里。』『第 5 次。』『第 12 次。』", "sanityEffect": -6, "note": "扶手上的布条计数：有人在同一个楼梯间来回经过了 12 次。" },
+    { "type": "object", "position": "center", "text": "某层转角放着一双摆得整整齐齐的鞋，鞋尖朝下楼梯的方向。", "sanityEffect": -4, "note": "一双朝下的鞋。" }
+  ],
+  "soundscape": {
+    "ambient": ["自己脚步的回声", "楼梯井深处的水滴", "管道里的风声"],
+    "startles": ["楼上传来一声脚步——但你没有下来过", "楼梯间门自己关上", "回声比你慢半拍"],
+    "silenceEvents": true
+  },
+  "exits": [
+    { "target": "level-1", "kind": "stairwell", "hidden": false, "danger": false, "description": "一段向上走的楼梯，尽头是仓库的灯光。" },
+    { "target": "level-0", "kind": "stairwell", "hidden": true, "danger": false, "description": "一段向下走的楼梯，尽头是黄色墙纸和地毯。你回到了起点——或者从没离开过。" }
+  ]
+}

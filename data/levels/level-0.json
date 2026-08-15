@@ -1,0 +1,41 @@
+{
+  "id": "level-0",
+  "name": "Level 0 — 教学关卡",
+  "number": 0,
+  "category": "normal",
+  "difficultyClass": 0,
+  "environment": "corridors",
+  "aesthetic": "weirdcore",
+  "light": "flickering",
+  "sanDrain": 0.05,
+  "description": "大多数人首次跌入的层级：无尽单调的黄色房间，潮湿的棕色地毯，嗡嗡作响的荧光灯。空气里弥漫着霉味，某种熟悉又陌生的不安。",
+  "palette": { "primary": "#c8b46a", "secondary": "#8a7a4e", "accent": "#5c5236", "light": "#e8e08a" },
+  "terrain": {
+    "width": 24, "height": 24,
+    "roomCount": 14, "roomSizeMin": 4, "roomSizeMax": 9,
+    "corridorWidth": 2,
+    "wallStyle": "wallpaper", "floorStyle": "carpet",
+    "extraFeatures": ["doors", "furniture", "puddles", "wires"]
+  },
+  "spaceRules": ["looping"],
+  "entities": [
+    { "type": "moth", "density": 0.015, "aggression": "passive" },
+    { "type": "smiler", "density": 0.004, "aggression": "curious" }
+  ],
+  "items": ["almond-water", "battery", "note", "flashlight"],
+  "itemDensity": 0.12,
+  "setPieces": [
+    { "type": "writing", "position": "random", "text": "这里没有出口。你只是……一直在走。", "sanityEffect": -3, "note": "墙上有模糊的字迹：『这里没有出口。』" },
+    { "type": "weird-room", "position": "far-corner", "text": "一间只有一把椅子面对墙壁的房间。椅背上搭着一件湿透的外套。", "sanityEffect": -5, "note": "发现一间怪异的房间：一把椅子、一面墙、一件湿外套。" },
+    { "type": "object", "position": "random", "text": "一个倒扣的纸杯，下面压着一张写满数字的便签。", "sanityEffect": -2, "note": "纸杯下压着写满数字的便签。" }
+  ],
+  "soundscape": {
+    "ambient": ["荧光灯持续嗡鸣", "远处地毯上的脚步声", "管道滴水"],
+    "startles": ["很近的咔哒声", "荧光灯突然变亮又熄灭", "墙壁内传来刮擦声"],
+    "silenceEvents": true
+  },
+  "exits": [
+    { "target": "level-1", "kind": "noclip", "hidden": true, "danger": false, "description": "一面墙纸微微闪烁的墙壁，像信号不好的屏幕。" },
+    { "target": "level-0", "kind": "noclip", "hidden": true, "danger": false, "description": "另一面闪烁的墙壁——它通往……另一个 Level 0。你记住了这个位置。" }
+  ]
+}

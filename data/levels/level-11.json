@@ -1,0 +1,43 @@
+{
+  "id": "level-11",
+  "name": "Level 11 — 无尽城市",
+  "number": 11,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "outdoors",
+  "aesthetic": "mallcore",
+  "light": "bright",
+  "sanDrain": 0.02,
+  "description": "一座无限延伸的城市：干净的街道、亮着的路灯、打烊的商店。没有车，没有风，没有昼夜。人们住在这里，假装这就是生活。",
+  "palette": { "primary": "#9aa0a8", "secondary": "#6a7078", "accent": "#d8a050", "light": "#e8e0c8" },
+  "terrain": {
+    "width": 40, "height": 40,
+    "roomCount": 24, "roomSizeMin": 6, "roomSizeMax": 14,
+    "corridorWidth": 3,
+    "wallStyle": "glass", "floorStyle": "concrete",
+    "extraFeatures": ["windows", "doors", "counters", "shelves", "furniture", "fountain"]
+  },
+  "spaceRules": ["euclidean"],
+  "entities": [
+    { "type": "faceling", "density": 0.015, "aggression": "passive" },
+    { "type": "clump", "density": 0.003, "aggression": "passive" },
+    { "type": "watcher", "density": 0.003, "aggression": "curious" }
+  ],
+  "items": ["almond-water", "royal-ration", "medkit", "battery", "flashlight", "note", "key"],
+  "itemDensity": 0.3,
+  "setPieces": [
+    { "type": "writing", "position": "random", "text": "24 小时便利店的门上贴着营业时间：『24 小时。永远。』收银台后站着一个不看你的店员。", "sanityEffect": -3, "note": "便利店的店员从不看你。" },
+    { "type": "mural", "position": "center", "text": "广场喷泉底座上刻着：『我们建立这座城市，是为了忘记自己在后室。』", "sanityEffect": 2, "note": "喷泉底座铭文：这里的人想忘记。" },
+    { "type": "weird-room", "position": "far-corner", "text": "一间'博物馆'，展柜里陈列着：一张现实世界的机票、一支铅笔、一片枯叶。标签写着：『前室的遗物。』", "sanityEffect": -5, "note": "博物馆里陈列着前室的遗物。枯叶来自哪里？" }
+  ],
+  "soundscape": {
+    "ambient": ["路灯电流声", "远处自动门开关声", "喷泉水声"],
+    "startles": ["公交车驶过——但马路上没有车", "某个橱窗的灯突然熄灭", "商店广播：『今晚打烊了，请回家。』"],
+    "silenceEvents": true
+  },
+  "exits": [
+    { "target": "level-1", "kind": "door", "hidden": false, "danger": false, "description": "地铁站入口的闸机，刷卡后进入的是仓库。" },
+    { "target": "level-37", "kind": "noclip", "hidden": true, "danger": false, "description": "一条死胡同尽头的墙面泛着水光——穿过去，你听到泳池的回声。" },
+    { "target": "level-5", "kind": "hole", "hidden": true, "danger": true, "description": "一处未完工的井盖，下面是旅馆走廊的红色地毯。" }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "backrooms-level-dna",
+  "title": "层级DNA v0.2",
+  "description": "《后室：无尽回廊》层级 DNA 规格。每个层级由一组参数定义其独特特征，程序化生成器据此产出可玩关卡。",
+  "type": "object",
+  "required": ["id", "name", "category", "difficultyClass", "environment", "light", "palette", "terrain", "entities", "items", "exits"],
+  "properties": {
+    "id": { "type": "string", "description": "唯一标识，如 level-0 / level-0.1 / level--1 / level-unknown-1" },
+    "name": { "type": "string", "description": "层级名" },
+    "number": { "type": ["integer", "null"], "description": "层级编号；隐秘层级为 null" },
+    "category": { "enum": ["normal", "sub", "enigmatic", "negative"], "description": "分类：普通/子/隐秘/负数" },
+    "difficultyClass": { "type": "integer", "minimum": 0, "maximum": 5, "description": "生存难度 Class 0-5" },
+    "environment": { "enum": ["corridors", "rooms", "outdoors", "mixed", "aquatic", "industrial", "void"] },
+    "aesthetic": { "type": "string", "description": "核类美学：weirdcore/dreamcore/poolcore/traumacore/mallcore 等" },
+    "light": { "enum": ["bright", "dim", "dark", "flickering", "pitch"] },
+    "sanDrain": { "type": "number", "minimum": 0, "description": "每回合理智基础侵蚀" },
+    "palette": {
+      "type": "object",
+      "required": ["primary", "secondary", "accent", "light"],
+      "properties": {
+        "primary": { "type": "string", "description": "主色（墙）hex" },
+        "secondary": { "type": "string", "description": "辅色（地）hex" },
+        "accent": { "type": "string", "description": "点缀色 hex" },
+        "light": { "type": "string", "description": "灯光色 hex" }
+      }
+    },
+    "terrain": {
+      "type": "object",
+      "required": ["width", "height", "wallStyle", "floorStyle"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 12, "maximum": 64 },
+        "height": { "type": "integer", "minimum": 12, "maximum": 64 },
+        "roomCount": { "type": "integer", "minimum": 1, "maximum": 40 },
+        "roomSizeMin": { "type": "integer", "minimum": 3, "maximum": 12 },
+        "roomSizeMax": { "type": "integer", "minimum": 3, "maximum": 24 },
+        "corridorWidth": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "wallStyle": { "enum": ["wallpaper", "tile", "concrete", "metal", "brick", "glass", "drywall"] },
+        "floorStyle": { "enum": ["carpet", "tile", "linoleum", "concrete", "grass", "water", "gravel", "wood"] },
+        "extraFeatures": { "type": "array", "items": { "enum": ["stairwell", "elevator", "fountain", "windows", "doors", "columns", "pipes", "wires", "puddles", "counters", "shelves", "furniture"] } }
+      }
+    },
+    "spaceRules": {
+      "type": "array",
+      "items": { "enum": ["euclidean", "looping", "non-euclidean", "gravity-anomaly", "time-anomaly"] },
+      "description": "空间规则：looping=边缘环绕；non-euclidean=传送式错位"
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "density"],
+        "properties": {
+          "type": { "enum": ["moth", "smiler", "hound", "partygoer", "skin-stealer", "clump", "faceling", "watcher", "duller", "insanity", "scratcher"] },
+          "density": { "type": "number", "minimum": 0, "maximum": 1, "description": "0-1，生成器按此比例放置" },
+          "aggression": { "enum": ["passive", "curious", "hostile"] }
+        }
+      }
+    },
+    "items": { "type": "array", "items": { "enum": ["almond-water", "royal-ration", "battery", "flashlight", "crowbar", "medkit", "note", "key", "liquid-pain"] } },
+    "itemDensity": { "type": "number", "minimum": 0, "maximum": 1, "description": "物品丰富度 0-1" },
+    "setPieces": {
+      "type": "array",
+      "description": "场景锚点（v0.2 核心）：手作内容，程序化层负责放置",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "enum": ["writing", "weird-room", "object", "corpse", "mural", "altar", "monolith", "elevator"] },
+          "position": { "enum": ["center", "random", "far-corner"] },
+          "text": { "type": "string", "description": "墙上文字/纸条内容（原创文本）" },
+          "sanityEffect": { "type": "integer", "description": "触碰时的理智效果（负=侵蚀，正=恢复）" },
+          "note": { "type": "string", "description": "写入探索日志的条目" }
+        }
+      }
+    },
+    "soundscape": {
+      "type": "object",
+      "properties": {
+        "ambient": { "type": "array", "items": { "type": "string" }, "description": "环境底噪描述，如 灯管嗡鸣" },
+        "startles": { "type": "array", "items": { "type": "string" }, "description": "突发音效池，如 远处脚步声" },
+        "silenceEvents": { "type": "boolean", "description": "是否启用'突然的寂静'切层" }
+      }
+    },
+    "exits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["target", "kind"],
+        "properties": {
+          "target": { "type": "string", "description": "目标层级 id" },
+          "kind": { "enum": ["noclip", "door", "stairwell", "elevator", "button", "hole", "light", "window"] },
+          "hidden": { "type": "boolean", "description": "是否需搜索才能发现" },
+          "danger": { "type": "boolean", "description": "是否危险过渡（通向更难层级）" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "description": { "type": "string", "description": "层级简介（进入时的展示文本，原创改写）" }
+  }
+}

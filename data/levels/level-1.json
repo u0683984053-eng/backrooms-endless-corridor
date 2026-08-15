@@ -1,0 +1,42 @@
+{
+  "id": "level-1",
+  "name": "Level 1 — 宜居地带",
+  "number": 1,
+  "category": "normal",
+  "difficultyClass": 0,
+  "environment": "mixed",
+  "aesthetic": "traumacore",
+  "light": "bright",
+  "sanDrain": 0.01,
+  "description": "一个巨大的仓库式空间，混凝土支柱林立，堆满板条箱与物资。这里是后室少数'可以活下去'的地方，也是许多流浪者的定居点。",
+  "palette": { "primary": "#b0a888", "secondary": "#7a7466", "accent": "#4a4a3a", "light": "#d8d0b8" },
+  "terrain": {
+    "width": 32, "height": 32,
+    "roomCount": 18, "roomSizeMin": 5, "roomSizeMax": 12,
+    "corridorWidth": 3,
+    "wallStyle": "concrete", "floorStyle": "concrete",
+    "extraFeatures": ["shelves", "counters", "columns", "doors", "furniture"]
+  },
+  "spaceRules": ["euclidean"],
+  "entities": [
+    { "type": "clump", "density": 0.003, "aggression": "curious" },
+    { "type": "faceling", "density": 0.004, "aggression": "passive" }
+  ],
+  "items": ["almond-water", "royal-ration", "medkit", "battery", "crowbar", "note"],
+  "itemDensity": 0.25,
+  "setPieces": [
+    { "type": "writing", "position": "random", "text": "M.E.G. 补给点指示牌：『杏仁水每三日在 C 区发放。别相信镜子里的自己。』", "sanityEffect": 2, "note": "发现 M.E.G. 补给指示牌。这里确实有人住过。" },
+    { "type": "mural", "position": "center", "text": "一面墙上用炭笔画满了小人，手拉手围成一圈，中间写着：我们曾经是一百个人。", "sanityEffect": -4, "note": "墙上的炭笔画：一百个小人手拉手。现在只剩下画。" },
+    { "type": "corpse", "position": "far-corner", "text": "一具蜷缩在板条箱后的遗体，怀里抱着一个空杏仁水瓶，口袋里有一张未寄出的信。", "sanityEffect": -6, "note": "发现一具遗体。信上写着：『如果我能回到 Level 0，我会重新开始。』" }
+  ],
+  "soundscape": {
+    "ambient": ["低沉的机械运转声", "远处板条箱被移动的声音", "通风管道的气流声"],
+    "startles": ["金属碰撞声", "脚步声突然逼近又远去"],
+    "silenceEvents": false
+  },
+  "exits": [
+    { "target": "level-2", "kind": "door", "hidden": false, "danger": false, "description": "一扇标着'2'的铁门，门缝里透出蒸汽。" },
+    { "target": "level-0", "kind": "noclip", "hidden": true, "danger": false, "description": "仓库角落一面发黄剥落的墙纸——穿过去，你回到了那个黄色世界。" },
+    { "target": "level-0.1", "kind": "stairwell", "hidden": false, "danger": false, "description": "一截通往地下的楼梯，阶梯数好像永远数不完。" }
+  ]
+}

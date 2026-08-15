@@ -1,0 +1,41 @@
+{
+  "id": "level--1",
+  "name": "Level -1 — 黑暗之地",
+  "number": -1,
+  "category": "negative",
+  "difficultyClass": 4,
+  "environment": "corridors",
+  "aesthetic": "weirdcore",
+  "light": "pitch",
+  "sanDrain": 0.5,
+  "description": "绝对黑暗的走廊。手电的光只能照亮眼前三米。声音在黑暗里变得巨大。这里没有墙纸，没有地毯，只有一种彻骨的、注视着你的寂静。",
+  "palette": { "primary": "#1a1a1a", "secondary": "#2a2a2a", "accent": "#3a3a3a", "light": "#6a6a5a" },
+  "terrain": {
+    "width": 24, "height": 24,
+    "roomCount": 8, "roomSizeMin": 3, "roomSizeMax": 6,
+    "corridorWidth": 2,
+    "wallStyle": "concrete", "floorStyle": "concrete",
+    "extraFeatures": ["pipes", "wires", "doors"]
+  },
+  "spaceRules": ["euclidean", "gravity-anomaly"],
+  "entities": [
+    { "type": "smiler", "density": 0.02, "aggression": "hostile" },
+    { "type": "clump", "density": 0.012, "aggression": "hostile" },
+    { "type": "insanity", "density": 0.01, "aggression": "curious" }
+  ],
+  "items": ["battery", "flashlight", "note"],
+  "itemDensity": 0.05,
+  "setPieces": [
+    { "type": "writing", "position": "random", "text": "黑暗中唯一的亮色：一行荧光颜料写的字，『光会引来它们。但黑暗会引来你。』", "sanityEffect": -9, "note": "荧光字：『光会引来它们。但黑暗会引来你。』" },
+    { "type": "object", "position": "center", "text": "走廊正中立着一面全身镜。你走近时，镜子里的人已经站了很久。", "sanityEffect": -12, "note": "黑暗中的全身镜。镜子里的人没有和你同时转身。" },
+    { "type": "corpse", "position": "far-corner", "text": "一具跪坐的遗体，双手合十，指尖嵌着一枚杏仁水瓶盖——像是握着最后的希望死的。", "sanityEffect": -8, "note": "一具祈祷姿势的遗体，握着杏仁水瓶盖。" }
+  ],
+  "soundscape": {
+    "ambient": ["自己的心跳", "极远处若有若无的嗡鸣", "黑暗中偶尔的叹息"],
+    "startles": ["黑暗中的低语（无法辨认语言）", "近在耳边的呼吸声", "手电电池跳电的噼啪声"],
+    "silenceEvents": true
+  },
+  "exits": [
+    { "target": "level-0", "kind": "noclip", "hidden": true, "danger": false, "description": "一段墙壁上有个刚好容纳一人的裂缝——挤过去，是荧光灯和黄色墙纸。你得救了。这一次。" }
+  ]
+}

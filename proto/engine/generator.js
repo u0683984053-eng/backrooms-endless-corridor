@@ -1,0 +1,630 @@
+// engine/generator.js
+// 确定性程序化生成器：房间 + 走廊 + 实体 + 物品 + 出口 + setPieces + 传送门。
+// 同 (dna.id, runSeed) 必须产出完全一致的 Level（可达性验证失败会用备用种子重试，最多 8 次，
+// 备用种子序列本身也是确定的，因此最终结果依旧确定）。
+
+import { mulberry32, hashString, randInt, pick, chance } from './rng.js';
+import { ENTITY_DEFS } from './entities.js';
+
+/** 可行走瓦片集合（'T' 为传送门瓦片，属额外扩展字符） */
+export const WALKABLE_TILES = new Set(['.', '~', 'D', 'S', 'E', 'I', 'T']);
+export const FLOOR_TILES = new Set(['.', '~', 'D', 'S', 'I', 'T']);
+
+const DIRS4 = [
+  { dx: 0, dy: -1 },
+  { dx: -1, dy: 0 },
+  { dx: 0, dy: 1 },
+  { dx: 1, dy: 0 },
+];
+
+function mod(n, m) {
+  return ((n % m) + m) % m;
+}
+
+/** 主入口：确定性生成一个层级 */
+export function generateLevel(dna, runSeed) {
+  const base = String(runSeed);
+  let last = null;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    // 备用种子序列确定：seed + id + attempt
+    const rng = mulberry32(hashString(`${base}|${dna.id}|${attempt}`));
+    const level = buildLevel(dna, rng);
+    last = level;
+    if (verifyReachable(level)) return level;
+  }
+  return last;
+}
+
+/** 生成单次布局（内部函数，调用方负责可达性验证） */
+function buildLevel(dna, rng) {
+  const T = dna.terrain;
+  const W = T.width;
+  const H = T.height;
+  const env = dna.environment || 'corridors';
+  const isOutdoors = env === 'outdoors';
+  const isAquatic = env === 'aquatic';
+  const isVoid = env === 'void';
+  const looping = dna.spaceRules.includes('looping');
+
+  const tiles = Array.from({ length: H }, () => Array(W).fill('#'));
+  const rooms = [];
+  const portals = [];
+  const exits = [];
+  const entities = [];
+  const itemList = [];
+  const setPieces = [];
+  const occupied = new Set(); // "x,y" —— 出生点/出口/传送门/实体/物品占用的瓦片
+
+  // ---------- 1. 放置房间矩形（不重叠） ----------
+  const roomCount = T.roomCount;
+  for (let i = 0; i < roomCount; i++) {
+    const rw = randInt(rng, T.roomSizeMin, T.roomSizeMax);
+    const rh = randInt(rng, T.roomSizeMin, T.roomSizeMax);
+    for (let t = 0; t < 50; t++) {
+      const x = randInt(rng, 1, Math.max(1, W - rw - 2));
+      const y = randInt(rng, 1, Math.max(1, H - rh - 2));
+      if (!overlaps(rooms, x, y, rw, rh)) {
+        rooms.push({ x, y, w: rw, h: rh });
+        carveRoom(tiles, x, y, rw, rh);
+        break;
+      }
+    }
+  }
+  if (rooms.length === 0) {
+    // 极端情况兜底：放一个居中的房间
+    const rw = Math.min(8, W - 2);
+    const rh = Math.min(8, H - 2);
+    rooms.push({ x: Math.floor((W - rw) / 2), y: Math.floor((H - rh) / 2), w: rw, h: rh });
+    carveRoom(tiles, rooms[0].x, rooms[0].y, rw, rh);
+  }
+
+  // ---------- 2. L 形走廊连接全部房间（保证全连通） ----------
+  const cw = T.corridorWidth || 2;
+  const connected = [0];
+  while (connected.length < rooms.length) {
+    let best = -1;
+    let bestFrom = -1;
+    let bestDist = Infinity;
+    for (const i of connected) {
+      for (let j = 0; j < rooms.length; j++) {
+        if (connected.includes(j)) continue;
+        const d = roomDist(rooms[i], rooms[j]);
+        if (d < bestDist) {
+          bestDist = d;
+          best = j;
+          bestFrom = i;
+        }
+      }
+    }
+    if (best < 0) break;
+    carveCorridor(tiles, rooms[bestFrom], rooms[best], rng, cw);
+    connected.push(best);
+  }
+
+  // ---------- 3. 环境覆盖层 ----------
+  if (isAquatic) {
+    // 水池：房间内部铺水瓦片池
+    for (const room of rooms) {
+      if (room.w >= 5 && room.h >= 5 && chance(rng, 0.75)) {
+        const pw = randInt(rng, 2, room.w - 3);
+        const ph = randInt(rng, 2, room.h - 3);
+        const px = room.x + randInt(rng, 1, room.w - pw - 1);
+        const py = room.y + randInt(rng, 1, room.h - ph - 1);
+        for (let yy = py; yy < py + ph; yy++) {
+          for (let xx = px; xx < px + pw; xx++) {
+            tiles[yy][xx] = '~';
+          }
+        }
+      }
+    }
+  }
+  if (isVoid) {
+    // 虚空：空旷为主，随机散布浮岛墙块
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        if (tiles[y][x] === '.' && chance(rng, 0.18)) tiles[y][x] = '#';
+      }
+    }
+  }
+  if (isOutdoors) {
+    // 户外：街区网格——把部分走廊加宽成"街道"，并开一些窗口
+    for (let y = 1; y < H - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        if (tiles[y][x] === '.' && tiles[y][x - 1] === '.' && tiles[y][x + 1] === '.') {
+          if (chance(rng, 0.1)) tiles[y][x] = '.'; // 轻微拓宽（视觉上的街道）
+        }
+      }
+    }
+  }
+
+  // 地形附赠特性：柱子/水洼/门/楼梯/管道/电线/喷泉 + 道具记录（供 web 端矢量绘制）
+  const extra = T.extraFeatures || [];
+  const props = []; // {x, y, kind} —— 12 种道具：counters/shelves/columns/furniture/doors/windows/fountain/pipes/wires/puddles/stairwell/elevator
+
+  if (extra.includes('columns')) {
+    for (const room of rooms) {
+      if (room.w >= 6 && room.h >= 6) {
+        const n = randInt(rng, 2, 4);
+        for (let i = 0; i < n; i++) {
+          const cx = room.x + randInt(rng, 1, room.w - 2);
+          const cy = room.y + randInt(rng, 1, room.h - 2);
+          if (tiles[cy][cx] === '.' && !(cx === room.x + Math.floor(room.w / 2) && cy === room.y + Math.floor(room.h / 2))) {
+            tiles[cy][cx] = '#';
+            props.push({ x: cx, y: cy, kind: 'column' });
+          }
+        }
+      }
+    }
+  }
+  if (extra.includes('puddles') || isAquatic) {
+    const n = randInt(rng, 3, 8);
+    for (let i = 0; i < n; i++) {
+      const x = randInt(rng, 1, W - 2);
+      const y = randInt(rng, 1, H - 2);
+      if (tiles[y][x] === '.') {
+        tiles[y][x] = '~';
+        props.push({ x, y, kind: 'puddle' });
+      }
+    }
+  }
+  if (extra.includes('doors') || isOutdoors) {
+    for (const room of rooms) {
+      if (!chance(rng, 0.7)) continue;
+      // 找一个房间边界上的地板格，改为门（户外层记录为窗户）
+      for (let t = 0; t < 30; t++) {
+        const edge = pick(rng, ['top', 'bottom', 'left', 'right']);
+        let px, py;
+        if (edge === 'top') {
+          px = room.x + randInt(rng, 0, room.w - 1);
+          py = room.y;
+        } else if (edge === 'bottom') {
+          px = room.x + randInt(rng, 0, room.w - 1);
+          py = room.y + room.h - 1;
+        } else if (edge === 'left') {
+          px = room.x;
+          py = room.y + randInt(rng, 0, room.h - 1);
+        } else {
+          px = room.x + room.w - 1;
+          py = room.y + randInt(rng, 0, room.h - 1);
+        }
+        if (px < 1 || py < 1 || px >= W - 1 || py >= H - 1) continue;
+        if (tiles[py][px] === '.') {
+          tiles[py][px] = 'D';
+          props.push({ x: px, y: py, kind: isOutdoors ? 'window' : 'door' });
+          break;
+        }
+      }
+    }
+  }
+  if (extra.includes('stairwell') || extra.includes('elevator')) {
+    const n = randInt(rng, 1, 3);
+    const walkables = collectWalkable(tiles);
+    for (let i = 0; i < n && walkables.length > 0; i++) {
+      const p = pick(rng, walkables);
+      if (tiles[p.y][p.x] === '.') {
+        tiles[p.y][p.x] = 'S';
+        props.push({ x: p.x, y: p.y, kind: chance(rng, 0.5) ? 'elevator' : 'stairwell' });
+      }
+    }
+  }
+  if (extra.includes('furniture') || extra.includes('shelves') || extra.includes('counters')) {
+    const kinds = [];
+    if (extra.includes('furniture')) kinds.push('furniture');
+    if (extra.includes('shelves')) kinds.push('shelves');
+    if (extra.includes('counters')) kinds.push('counters');
+    for (const room of rooms) {
+      if (room.w >= 5 && room.h >= 5 && chance(rng, 0.5)) {
+        const n = randInt(rng, 1, 3);
+        for (let i = 0; i < n; i++) {
+          const cx = room.x + randInt(rng, 1, room.w - 2);
+          const cy = room.y + randInt(rng, 1, room.h - 2);
+          if (tiles[cy][cx] === '.') {
+            tiles[cy][cx] = '#';
+            props.push({ x: cx, y: cy, kind: pick(rng, kinds) });
+          }
+        }
+      }
+    }
+  }
+  if (extra.includes('pipes')) {
+    // 管道：沿墙绘制（记录靠走廊的墙瓦片）
+    const n = randInt(rng, 4, 9);
+    const wallTiles = [];
+    for (let y = 1; y < H - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        if (tiles[y][x] !== '#') continue;
+        const nearFloor =
+          tiles[y - 1][x] !== '#' ||
+          tiles[y + 1][x] !== '#' ||
+          tiles[y][x - 1] !== '#' ||
+          tiles[y][x + 1] !== '#';
+        if (nearFloor) wallTiles.push({ x, y });
+      }
+    }
+    const used = new Set();
+    for (let i = 0; i < n && wallTiles.length > 0; i++) {
+      const p = pick(rng, wallTiles);
+      const k = p.x + ',' + p.y;
+      if (used.has(k)) continue;
+      used.add(k);
+      props.push({ x: p.x, y: p.y, kind: 'pipes' });
+    }
+  }
+  if (extra.includes('wires')) {
+    const n = randInt(rng, 3, 7);
+    const floors = collectWalkable(tiles);
+    for (let i = 0; i < n && floors.length > 0; i++) {
+      const p = pick(rng, floors);
+      props.push({ x: p.x, y: p.y, kind: 'wires' });
+    }
+  }
+  if (extra.includes('fountain')) {
+    // 喷泉：最大房间中心附近
+    let best = rooms[0];
+    for (const r of rooms) if (r.w * r.h > best.w * best.h) best = r;
+    const fx = best.x + Math.floor(best.w / 2);
+    const fy = best.y + Math.floor(best.h / 2);
+    const pos = tiles[fy] && tiles[fy][fx] === '.' ? { x: fx, y: fy } : nearestWalkable(tiles, fx, fy);
+    props.push({ x: pos.x, y: pos.y, kind: 'fountain' });
+  }
+
+  if (looping) {
+    // 环面层：让"从一边走出去、从另一边走进来"真的可行 ——
+    // 保证至少一条"贯通行"（左右边界同时开口）与一条"贯通列"（上下边界同时开口），
+    // 再随机开若干边界缺口。
+    const yr = randInt(rng, 2, Math.max(2, H - 3));
+    if (tiles[yr][0] === '#') tiles[yr][0] = '.';
+    if (tiles[yr][W - 1] === '#') tiles[yr][W - 1] = '.';
+    const xc = randInt(rng, 2, Math.max(2, W - 3));
+    if (tiles[0][xc] === '#') tiles[0][xc] = '.';
+    if (tiles[H - 1][xc] === '#') tiles[H - 1][xc] = '.';
+    const extraOpen = randInt(rng, 4, 8);
+    for (let i = 0; i < extraOpen; i++) {
+      const edge = randInt(rng, 0, 3); // 0 上 / 1 下 / 2 左 / 3 右
+      let ox, oy;
+      if (edge === 0) {
+        ox = randInt(rng, 1, W - 2);
+        oy = 0;
+      } else if (edge === 1) {
+        ox = randInt(rng, 1, W - 2);
+        oy = H - 1;
+      } else if (edge === 2) {
+        ox = 0;
+        oy = randInt(rng, 1, H - 2);
+      } else {
+        ox = W - 1;
+        oy = randInt(rng, 1, H - 2);
+      }
+      if (tiles[oy][ox] === '#') tiles[oy][ox] = '.';
+    }
+  }
+
+  // ---------- 4. 出生点：第一间房间的中心 ----------
+  const r0 = rooms[0];
+  const spawn = { x: r0.x + Math.floor(r0.w / 2), y: r0.y + Math.floor(r0.h / 2) };
+  if (!WALKABLE_TILES.has(tiles[spawn.y][spawn.x])) {
+    // 兜底：找最近的可行走格
+    const p = nearestWalkable(tiles, spawn.x, spawn.y);
+    spawn.x = p.x;
+    spawn.y = p.y;
+  }
+  occupied.add(key(spawn.x, spawn.y));
+
+  // ---------- 5. 传送门（non-euclidean 空间规则） ----------
+  if (dna.spaceRules.includes('non-euclidean')) {
+    const pairCount = randInt(rng, 2, 4);
+    const walkables = collectWalkable(tiles).filter((p) => !occupied.has(key(p.x, p.y)));
+    for (let i = 0; i < pairCount; i++) {
+      let a = null;
+      let b = null;
+      for (let t = 0; t < 60; t++) {
+        const ca = pick(rng, walkables);
+        const cb = pick(rng, walkables);
+        if (ca === cb) continue;
+        if (occupied.has(key(ca.x, ca.y)) || occupied.has(key(cb.x, cb.y))) continue;
+        const d = Math.abs(ca.x - cb.x) + Math.abs(ca.y - cb.y);
+        if (d < Math.max(8, Math.floor((W + H) / 4))) continue;
+        a = ca;
+        b = cb;
+        break;
+      }
+      if (a) {
+        tiles[a.y][a.x] = 'T';
+        tiles[b.y][b.x] = 'T';
+        occupied.add(key(a.x, a.y));
+        occupied.add(key(b.x, b.y));
+        portals.push([{ x: a.x, y: a.y }, { x: b.x, y: b.y }]);
+      }
+    }
+  }
+
+  // ---------- 6. 出口：每个 DNA exit → 一个 E 瓦片 ----------
+  const walkablesNow = collectWalkable(tiles).filter((p) => !occupied.has(key(p.x, p.y)));
+  for (const ex of dna.exits) {
+    const kind = ex.kind || 'noclip';
+    let pos = null;
+    if (kind === 'button') {
+      // 红色按钮类出口：放到最接近地图中心的可行走格
+      pos = nearestWalkable(tiles, Math.floor(W / 2), Math.floor(H / 2));
+      if (occupied.has(key(pos.x, pos.y))) {
+        pos = findFreeNear(tiles, occupied, pos.x, pos.y);
+      }
+    } else {
+      // 隐藏出口放远一些（≥8 格），普通出口 ≥6 格
+      const minDist = ex.hidden ? 8 : 6;
+      for (let t = 0; t < 60; t++) {
+        const c = pick(rng, walkablesNow);
+        if (occupied.has(key(c.x, c.y))) continue;
+        const d = Math.abs(c.x - spawn.x) + Math.abs(c.y - spawn.y);
+        if (d < minDist) continue;
+        pos = c;
+        break;
+      }
+      if (!pos) pos = pick(rng, walkablesNow);
+    }
+    if (!pos) pos = findFreeNear(tiles, occupied, spawn.x, spawn.y);
+    if (tiles[pos.y][pos.x] === '#') tiles[pos.y][pos.x] = '.';
+    tiles[pos.y][pos.x] = 'E';
+    occupied.add(key(pos.x, pos.y));
+    exits.push({
+      x: pos.x,
+      y: pos.y,
+      target: ex.target,
+      kind,
+      hidden: !!ex.hidden,
+      danger: !!ex.danger,
+      description: ex.description || '',
+    });
+  }
+
+  // ---------- 7. 实体：按 density × 可行走格数放置，至少 1 只（密度>0 时） ----------
+  const spawnDist = looping ? 6 : 6;
+  for (const spec of dna.entities) {
+    if (!spec || !spec.density || spec.density <= 0) continue;
+    const def = ENTITY_DEFS[spec.type];
+    if (!def) continue;
+    const count = Math.max(1, Math.floor(spec.density * collectWalkable(tiles).length));
+    let placed = 0;
+    for (let i = 0; i < count * 3 && placed < count; i++) {
+      const c = placeAway(rng, tiles, occupied, spawn, spawnDist);
+      if (!c) break;
+      occupied.add(key(c.x, c.y));
+      const stealthy = spec.type === 'skin-stealer' || spec.type === 'scratcher';
+      entities.push({
+        x: c.x,
+        y: c.y,
+        type: spec.type,
+        aggression: spec.aggression || 'curious',
+        hp: def.hp,
+        state: 'idle',
+        visible: !stealthy,
+        alert: false,
+        wait: randInt(rng, 0, 3),
+        revealed: false,
+      });
+      placed++;
+    }
+  }
+
+  // ---------- 8. 物品：itemDensity × 可行走格数 ----------
+  if (dna.itemDensity > 0 && dna.items.length > 0) {
+    const count = Math.max(1, Math.floor(dna.itemDensity * collectWalkable(tiles).length));
+    for (let i = 0; i < count; i++) {
+      const c = pick(rng, walkablesNow);
+      if (!c || occupied.has(key(c.x, c.y))) continue;
+      occupied.add(key(c.x, c.y));
+      itemList.push({ x: c.x, y: c.y, type: pick(rng, dna.items) });
+    }
+  }
+
+  // ---------- 9. setPieces：center / random / far-corner ----------
+  for (const sp of dna.setPieces) {
+    if (!sp || !sp.type) continue;
+    let pos = null;
+    if (sp.position === 'center') {
+      pos = nearestWalkable(tiles, Math.floor(W / 2), Math.floor(H / 2));
+    } else if (sp.position === 'far-corner') {
+      const corner = pick(rng, [
+        [1, 1],
+        [W - 2, 1],
+        [1, H - 2],
+        [W - 2, H - 2],
+      ]);
+      pos = nearestWalkable(tiles, corner[0], corner[1]);
+    } else {
+      pos = pick(rng, walkablesNow) || nearestWalkable(tiles, spawn.x, spawn.y);
+    }
+    if (!pos) continue;
+    setPieces.push({
+      x: pos.x,
+      y: pos.y,
+      type: sp.type,
+      text: sp.text || '',
+      sanityEffect: sp.sanityEffect || 0,
+      note: sp.note || '',
+    });
+  }
+
+  return {
+    id: dna.id,
+    name: dna.name,
+    number: dna.number,
+    category: dna.category,
+    difficultyClass: dna.difficultyClass,
+    environment: env,
+    aesthetic: dna.aesthetic,
+    description: dna.description,
+    terrain: dna.terrain,
+    width: W,
+    height: H,
+    tiles,
+    spawn,
+    exits,
+    entities,
+    items: itemList,
+    setPieces,
+    props,
+    portals,
+    palette: dna.palette,
+    light: dna.light,
+    spaceRules: dna.spaceRules,
+    sanDrain: dna.sanDrain,
+    soundscape: dna.soundscape,
+  };
+}
+
+// ---------- 几何工具 ----------
+
+function key(x, y) {
+  return x + ',' + y;
+}
+
+function overlaps(rooms, x, y, w, h) {
+  for (const r of rooms) {
+    if (x <= r.x + r.w && x + w >= r.x && y <= r.y + r.h && y + h >= r.y) return true;
+  }
+  return false;
+}
+
+function carveRoom(tiles, x, y, w, h) {
+  for (let yy = y; yy < y + h; yy++) {
+    for (let xx = x; xx < x + w; xx++) {
+      tiles[yy][xx] = '.';
+    }
+  }
+}
+
+function roomDist(a, b) {
+  const ax = a.x + a.w / 2;
+  const ay = a.y + a.h / 2;
+  const bx = b.x + b.w / 2;
+  const by = b.y + b.h / 2;
+  return Math.abs(ax - bx) + Math.abs(ay - by);
+}
+
+function carveCorridor(tiles, a, b, rng, width) {
+  const ax = a.x + Math.floor(a.w / 2);
+  const ay = a.y + Math.floor(a.h / 2);
+  const bx = b.x + Math.floor(b.w / 2);
+  const by = b.y + Math.floor(b.h / 2);
+  const horizontalFirst = chance(rng, 0.5);
+  if (horizontalFirst) {
+    carveLine(tiles, ax, ay, bx, ay, width);
+    carveLine(tiles, bx, ay, bx, by, width);
+  } else {
+    carveLine(tiles, ax, ay, ax, by, width);
+    carveLine(tiles, ax, by, bx, by, width);
+  }
+}
+
+function carveLine(tiles, x1, y1, x2, y2, width) {
+  const w = Math.max(1, width);
+  const H = tiles.length;
+  const W = tiles[0].length;
+  const step = w % 2 === 0 ? w / 2 : Math.floor(w / 2);
+  if (x1 === x2) {
+    const y0 = Math.min(y1, y2);
+    const y1b = Math.max(y1, y2);
+    for (let y = y0; y <= y1b; y++) {
+      for (let o = -step; o <= step; o++) {
+        const xx = x1 + o;
+        if (xx >= 0 && xx < W && y >= 0 && y < H) tiles[y][xx] = '.';
+      }
+    }
+  } else {
+    const x0 = Math.min(x1, x2);
+    const x1b = Math.max(x1, x2);
+    for (let x = x0; x <= x1b; x++) {
+      for (let o = -step; o <= step; o++) {
+        const yy = y1 + o;
+        if (yy >= 0 && yy < H && x >= 0 && x < W) tiles[yy][x] = '.';
+      }
+    }
+  }
+}
+
+function collectWalkable(tiles) {
+  const out = [];
+  for (let y = 0; y < tiles.length; y++) {
+    for (let x = 0; x < tiles[y].length; x++) {
+      if (WALKABLE_TILES.has(tiles[y][x])) out.push({ x, y });
+    }
+  }
+  return out;
+}
+
+/** 最近可行走格（用于 center/far-corner 定位） */
+function nearestWalkable(tiles, tx, ty) {
+  let best = null;
+  let bestD = Infinity;
+  for (let y = 0; y < tiles.length; y++) {
+    for (let x = 0; x < tiles[y].length; x++) {
+      if (!WALKABLE_TILES.has(tiles[y][x])) continue;
+      const d = Math.abs(x - tx) + Math.abs(y - ty);
+      if (d < bestD) {
+        bestD = d;
+        best = { x, y };
+      }
+    }
+  }
+  return best || { x: 1, y: 1 };
+}
+
+/** 距离出生点尽量远的可行走格（带重试） */
+function placeAway(rng, tiles, occupied, spawn, minDist) {
+  const walkables = collectWalkable(tiles).filter((p) => !occupied.has(key(p.x, p.y)));
+  if (walkables.length === 0) return null;
+  for (let t = 0; t < 30; t++) {
+    const c = pick(rng, walkables);
+    const d = Math.abs(c.x - spawn.x) + Math.abs(c.y - spawn.y);
+    if (d >= minDist) return c;
+  }
+  return pick(rng, walkables);
+}
+
+/** 从某点附近找一个未占用的可行走格（按钮出口兜底） */
+function findFreeNear(tiles, occupied, x, y) {
+  for (let r = 1; r <= 4; r++) {
+    for (let dy = -r; dy <= r; dy++) {
+      for (let dx = -r; dx <= r; dx++) {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (nx < 0 || ny < 0 || ny >= tiles.length || nx >= tiles[0].length) continue;
+        if (occupied.has(key(nx, ny))) continue;
+        if (WALKABLE_TILES.has(tiles[ny][nx])) return { x: nx, y: ny };
+      }
+    }
+  }
+  return { x: 1, y: 1 };
+}
+
+/** 可达性验证：出生点 BFS 可达所有出口（looping 层按环面处理） */
+export function verifyReachable(level) {
+  const { tiles, width: W, height: H, spawn, exits } = level;
+  if (!WALKABLE_TILES.has(tiles[spawn.y][spawn.x])) return false;
+  const looping = level.spaceRules.includes('looping');
+  const seen = new Set([key(spawn.x, spawn.y)]);
+  const queue = [[spawn.x, spawn.y]];
+  let head = 0;
+  while (head < queue.length) {
+    const [x, y] = queue[head++];
+    for (const d of DIRS4) {
+      let nx = x + d.dx;
+      let ny = y + d.dy;
+      if (looping) {
+        nx = mod(nx, W);
+        ny = mod(ny, H);
+      } else if (nx < 0 || ny < 0 || nx >= W || ny >= H) {
+        continue;
+      }
+      const k = key(nx, ny);
+      if (seen.has(k)) continue;
+      const t = tiles[ny][nx];
+      if (t === '#') continue;
+      seen.add(k);
+      queue.push([nx, ny]);
+    }
+  }
+  if (exits.length === 0) return seen.size > 1;
+  return exits.every((e) => seen.has(key(e.x, e.y)));
+}

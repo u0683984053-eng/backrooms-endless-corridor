@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>后室：无尽回廊</title>
+  <link rel="stylesheet" href="/web/style.css" />
+</head>
+<body>
+  <div id="app" class="app">
+    <!-- HUD -->
+    <header id="hud">
+      <div class="hud-left">
+        <div class="bar-row">
+          <span class="bar-label">生命</span>
+          <div class="bar hp"><div class="bar-fill" id="hp-fill"></div></div>
+          <span class="bar-num" id="hp-num"></span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">理智</span>
+          <div class="bar san"><div class="bar-fill" id="san-fill"></div></div>
+          <span class="bar-num" id="san-num"></span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">体力</span>
+          <div class="bar sta"><div class="bar-fill" id="sta-fill"></div></div>
+          <span class="bar-num" id="sta-num"></span>
+        </div>
+      </div>
+      <div class="hud-center">
+        <div id="level-name" class="level-name"></div>
+        <div id="level-meta" class="level-meta"></div>
+      </div>
+      <div class="hud-right">
+        <div id="turn-info" class="hud-chip"></div>
+        <div id="light-info" class="hud-chip"></div>
+        <div id="inv" class="inv"></div>
+      </div>
+    </header>
+
+    <!-- 主舞台 -->
+    <main id="stage-wrap">
+      <div id="stage">
+        <div id="view">
+          <canvas id="game-canvas" width="640" height="640"></canvas>
+          <!-- 理智失真闪烁层（假实体闪现） -->
+          <div id="fake-flash-layer"></div>
+        </div>
+        <div id="event-log"></div>
+      </div>
+    </main>
+
+    <footer id="controls-hint">
+      WASD / 方向键 移动 · Shift+方向 奔跑 · E 搜索/交互 · F 手电 · 空格 休息 ·
+      1-9 使用物品 · X 卡出 · J 日志 · M 地图 · H 帮助
+    </footer>
+
+    <!-- 出口提示（靠近已发现出口时显示） -->
+    <div id="exit-hint" class="exit-hint hidden">✨ 附近有卡出点 —— 按 X 卡出</div>
+
+    <!-- 触屏按钮（可选） -->
+    <div id="touch-pad">
+      <div class="pad-grid">
+        <button data-dir="up" class="pad-btn">▲</button>
+        <button data-dir="left" class="pad-btn">◀</button>
+        <button data-act="rest" class="pad-btn">休</button>
+        <button data-dir="right" class="pad-btn">▶</button>
+        <button data-dir="down" class="pad-btn">▼</button>
+        <button data-act="search" class="pad-btn">搜</button>
+        <button data-act="light" class="pad-btn">灯</button>
+        <button data-act="log" class="pad-btn">志</button>
+        <button data-act="exit" class="pad-btn">卡</button>
+      </div>
+    </div>
+
+    <!-- 层级过渡遮罩（故障效果 + 打字机展示） -->
+    <div id="transition-overlay" class="overlay hidden">
+      <div class="glitch-layer"></div>
+      <div class="overlay-box" id="transition-text"></div>
+    </div>
+
+    <!-- 幻觉闪现条（理智低落时的假消息） -->
+    <div id="hallucination" class="hallucination hidden"></div>
+
+    <!-- 日志弹窗 -->
+    <div id="log-modal" class="modal hidden">
+      <div class="modal-box">
+        <h2>探索日志</h2>
+        <div id="log-body" class="modal-body"></div>
+        <button class="modal-close" data-close="log-modal">关闭 (J)</button>
+      </div>
+    </div>
+
+    <!-- 地图弹窗 -->
+    <div id="map-modal" class="modal hidden">
+      <div class="modal-box">
+        <h2>本层地图</h2>
+        <canvas id="map-canvas" width="480" height="480"></canvas>
+        <div class="map-legend">P 你 · ▓ 已探索 · E 出口（E 为隐藏出口已发现时显示）</div>
+        <button class="modal-close" data-close="map-modal">关闭 (M)</button>
+      </div>
+    </div>
+
+    <!-- 帮助弹窗 -->
+    <div id="help-modal" class="modal hidden">
+      <div class="modal-box">
+        <h2>操作帮助</h2>
+        <div class="modal-body">
+          <p><b>移动</b>：WASD / 方向键；按住 Shift 奔跑（会发出声响，引来猎犬）</p>
+          <p><b>E 搜索/交互</b>：搜索相邻格可发现隐藏出口；站在物品上时拾取</p>
+          <p><b>F 手电</b>：开关。视野 +2，引来"电灯"，吓退"笑魇"；每 20 回合耗 1 电池</p>
+          <p><b>空格 休息</b>：+30 体力；光亮处 +8 理智</p>
+          <p><b>1-9</b>：使用对应物品栏物品</p>
+          <p><b>J 日志</b>：完整探索日志（含自动记录与你的笔记）</p>
+          <p><b>M 地图</b>：本层已探索地图</p>
+          <p><b>X 卡出</b>：站在出口旁按 X 离开当前层级；隐藏出口需先按 E 搜索发现（提示条出现后再按 X）</p>
+          <p class="hint">理智低于 30 视野会失真；低于 15 你会失控。喝杏仁水，或在光亮处休息。</p>
+        </div>
+        <button class="modal-close" data-close="help-modal">关闭 (H)</button>
+      </div>
+    </div>
+
+    <!-- 死亡结算 -->
+    <div id="death-modal" class="modal hidden">
+      <div class="modal-box death-box">
+        <h2 id="death-title"></h2>
+        <div id="death-body" class="modal-body"></div>
+        <div class="death-actions">
+          <button id="btn-death-new">再次跌落</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 开始界面 -->
+    <div id="start-screen" class="overlay">
+      <div class="start-box">
+        <h1>后室：无尽回廊</h1>
+        <p class="tagline">你醒来时，黄色的墙纸和潮湿的地毯围绕着你。<br />找到出口，活下去。别让理智归零。</p>
+        <button id="btn-continue" class="start-btn">继续上次冒险</button>
+        <button id="btn-new" class="start-btn primary">新的旅程</button>
+        <button id="btn-wild" class="start-btn wild">进入野性层级</button>
+        <p class="wild-line">『据说 Level 0 的某个墙缝后面，还有别的墙缝。』</p>
+        <p class="codex-line" id="start-codex"></p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/web/app.js"></script>
+</body>
+</html>
