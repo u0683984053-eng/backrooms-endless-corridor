@@ -37,11 +37,13 @@ backrooms-labyrinth/
 
 ## 快速开始（原型）
 
+**在线版（GitHub Pages）**：https://u0683984053-eng.github.io/backrooms-endless-corridor/proto/web/
+
 ```powershell
 # 终端版
 node proto\cli.js
 
-# 网页版
+# 网页版（本地）
 node proto\server.js
 # 浏览器打开 http://127.0.0.1:4173/
 ```

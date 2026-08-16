@@ -115,9 +115,20 @@ function syncCodexFromGame() {
 try {
   levels = await loadLevels({
     fetch: async (p) => {
-      const res = await fetch('/' + p);
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${p}`);
-      return await res.text();
+      // 多候选路径：本地 server.js 映射 /data/ → 项目 data/；
+      // GitHub Pages 部署在子路径下时用相对路径 ../../data/ 回退。
+      const candidates = ['/' + p, '../../' + p, '../' + p];
+      let lastErr = null;
+      for (const c of candidates) {
+        try {
+          const res = await fetch(c);
+          if (res.ok) return await res.text();
+          lastErr = `HTTP ${res.status}: ${c}`;
+        } catch (e) {
+          lastErr = `${e.message || e}: ${c}`;
+        }
+      }
+      throw new Error(lastErr);
     },
   });
   // 恢复之前生成的野性层级（跨会话可继续）
