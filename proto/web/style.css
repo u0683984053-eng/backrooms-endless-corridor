@@ -204,6 +204,7 @@ body {
   gap: 14px;
   align-items: stretch;
   height: 100%;
+  width: 100%;
   padding: 12px;
 }
 
@@ -212,9 +213,7 @@ body {
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 80px rgba(200, 180, 106, 0.05);
   image-rendering: pixelated;
   background: #000;
-  max-height: calc(100vh - 140px);
-  max-width: calc(100vw - 340px);
-  aspect-ratio: 1 / 1;
+  /* 尺寸由 JS resizeCanvas() 全权控制（像素 = 容器像素，铺满可用区域、不变形、无黑边） */
 }
 
 #event-log {
@@ -281,6 +280,11 @@ body {
 /* ---------- 理智视觉 ---------- */
 #view {
   position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #view #game-canvas {
@@ -648,10 +652,6 @@ body {
   #event-log {
     display: none;
   }
-
-  #game-canvas {
-    max-width: 92vw;
-  }
 }
 
 /* 进入游戏后，任何设备都显示触控键（桌面鼠标也可点击） */
@@ -659,27 +659,52 @@ body.in-game #touch-pad {
   display: block;
 }
 
-/* 手机横屏：画布撑满可用区域（矩形视口，画面最大化）、HUD 紧凑、触屏键半透明悬浮 */
+/* 手机横屏：HUD 压缩成单行、画布铺满（尺寸由 JS 控制）、触屏键半透明悬浮 */
 @media (max-height: 560px) and (orientation: landscape) {
   #hud {
-    padding: 6px 10px;
-    gap: 8px;
+    padding: 3px 10px;
+    gap: 10px;
   }
 
   .hud-left {
     min-width: 0;
+    flex-direction: row;
+    gap: 12px;
+    flex: 1;
+  }
+
+  .hud-left .bar-row {
+    flex: 1;
+    gap: 4px;
+  }
+
+  .hud-left .bar-label {
+    width: auto;
+    font-size: 11px;
+  }
+
+  .hud-left .bar-num {
+    width: auto;
+    font-size: 11px;
+  }
+
+  .hud-right {
+    min-width: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .vol-slider {
+    display: none;
+  }
+
+  .level-name {
+    font-size: 14px;
   }
 
   #controls-hint {
     display: none;
-  }
-
-  #game-canvas {
-    max-height: none;
-    max-width: none;
-    width: 100%;
-    height: 100%;
-    aspect-ratio: auto;
   }
 
   #event-log {
@@ -687,7 +712,7 @@ body.in-game #touch-pad {
   }
 
   #stage {
-    padding: 6px;
+    padding: 4px;
     gap: 8px;
   }
 

@@ -47,9 +47,9 @@ const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://localhost');
     let pathname = url.pathname;
-    // 根路径重定向到 /web/：保证页面基准 URL 与 GitHub Pages 一致（相对资源解析相同）
+    // 根路径重定向到 /web/：保证页面基准 URL 与 GitHub Pages 一致（相对资源解析相同），并保留 query
     if (pathname === '/') {
-      res.writeHead(302, { Location: '/web/' });
+      res.writeHead(302, { Location: '/web/' + (url.search || '') });
       res.end();
       return;
     }

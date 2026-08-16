@@ -1235,13 +1235,23 @@ function drawGame() {
   const W = canvas.width;
   const H = canvas.height;
   const radius = viewRadiusOf(level, player);
-  // 矩形视口：按画布宽高计算行列（横屏时水平显示更多瓦片，画面不再被压缩成小方块）
-  const tile = 48;
+  // 矩形视口：瓦片目标 48px、下限 24px（小屏保清晰度）；高度受限时裁剪视野行，
+  // 横向可显示远超最小视野的列数（横屏无限世界探索视野更大），画面铺满画布且不变形
   const minView = radius * 2 + 1;
+  const target = 48;
+  const minTile = 24;
+  let vr = Math.max(minView, Math.floor(H / target));
+  let tile = H / vr;
+  if (tile < minTile) {
+    vr = Math.max(7, Math.floor(H / minTile));
+    tile = H / vr;
+  }
   const viewCols = Math.max(minView, Math.floor(W / tile));
-  const viewRows = Math.max(minView, Math.floor(H / tile));
+  const viewRows = vr;
+  tile = Math.min(W / viewCols, H / viewRows);
   const ox = (W - viewCols * tile) / 2;
   const oy = (H - viewRows * tile) / 2;
+  document.body.dataset.view = viewCols + 'x' + viewRows + ' t=' + tile.toFixed(1) + ' ox=' + ox.toFixed(0) + ' oy=' + oy.toFixed(0);
   const halfCols = Math.floor(viewCols / 2);
   const halfRows = Math.floor(viewRows / 2);
   const looping = level.spaceRules.includes('looping') && !level.infinite;
@@ -1701,22 +1711,23 @@ function renderBestiary(c) {
   return `<div class="codex-summary"><div class="cs-title">实体图鉴（${keys.length}/13）</div>${lines}</div>`;
 }
 
-/** 画布自适应：按可用区域调整分辨率（横屏时矩形视口，画面最大化且不变形） */
+/** 画布自适应：canvas 像素 = 父容器(#view)像素，显示 1:1 铺满可用区域（任何设备都不变形、不留黑边） */
 let lastCanvasSize = '';
 function resizeCanvas() {
   const c = $('game-canvas');
-  const wrap = $('stage-wrap');
-  if (!c || !wrap) return;
-  const availW = wrap.clientWidth || c.width;
-  const availH = wrap.clientHeight || c.height;
+  const view = $('view');
+  if (!c || !view) return;
+  const availW = Math.floor(view.clientWidth || c.width);
+  const availH = Math.floor(view.clientHeight || c.height);
   if (availW < 80 || availH < 80) return;
-  const cols = Math.max(9, Math.floor(availW / 48));
-  const rows = Math.max(9, Math.floor(availH / 48));
-  const key = cols + 'x' + rows;
+  const key = availW + 'x' + availH;
   if (key === lastCanvasSize) return;
   lastCanvasSize = key;
-  c.width = cols * 48;
-  c.height = rows * 48;
+  c.width = availW;
+  c.height = availH;
+  c.style.width = availW + 'px';
+  c.style.height = availH + 'px';
+  document.body.dataset.csize = availW + 'x' + availH;
 }
 
 function renderAll() {
@@ -2350,3 +2361,24 @@ window.addEventListener('pointerdown', () => audioInitSafe());
 
 wireButtons();
 animate();
+
+// 深链调试：?autostart=1 自动开局（无头浏览器截图/自动化测试用；对普通玩家无影响）
+try {
+  if (new URLSearchParams(location.search).get('autostart') === '1') {
+    document.body.dataset.autostart = 'queued';
+    setTimeout(() => {
+      document.body.dataset.autostart = 'running';
+      try {
+        newGame();
+        document.body.classList.add('in-game');
+        renderAll();
+        document.body.dataset.autostart = 'done';
+      } catch (err) {
+        document.body.dataset.autostart = 'error:' + (err && err.message ? err.message : err);
+        showFatal('autostart: ' + (err && err.message ? err.message : err));
+      }
+    }, 50);
+  }
+} catch (err) {
+  document.body.dataset.autostart = 'outer:' + (err && err.message ? err.message : err);
+}
