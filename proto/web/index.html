@@ -2,9 +2,9 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
   <title>后室：无尽回廊</title>
-  <link rel="stylesheet" href="./style.css?v=3" />
+  <link rel="stylesheet" href="./style.css?v=4" />
 </head>
 <body>
   <div id="app" class="app">
@@ -58,18 +58,24 @@
     <!-- 出口提示（靠近已发现出口时显示） -->
     <div id="exit-hint" class="exit-hint hidden">✨ 附近有卡出点 —— 按 X 卡出</div>
 
-    <!-- 触屏按钮（可选） -->
+    <!-- 触屏控制（手机）：十字方向键 + 动作键 -->
     <div id="touch-pad">
-      <div class="pad-grid">
+      <div id="dpad">
+        <span class="dpad-slot"></span>
         <button data-dir="up" class="pad-btn">▲</button>
+        <span class="dpad-slot"></span>
         <button data-dir="left" class="pad-btn">◀</button>
-        <button data-act="rest" class="pad-btn">休</button>
+        <button data-act="search" class="pad-btn dpad-center">搜</button>
         <button data-dir="right" class="pad-btn">▶</button>
+        <span class="dpad-slot"></span>
         <button data-dir="down" class="pad-btn">▼</button>
-        <button data-act="search" class="pad-btn">搜</button>
+        <span class="dpad-slot"></span>
+      </div>
+      <div id="action-pad">
         <button data-act="light" class="pad-btn">灯</button>
-        <button data-act="log" class="pad-btn">志</button>
+        <button data-act="rest" class="pad-btn">休</button>
         <button data-act="exit" class="pad-btn">卡</button>
+        <button data-act="log" class="pad-btn">志</button>
       </div>
     </div>
 
@@ -145,6 +151,6 @@
     </div>
   </div>
 
-  <script type="module" src="./app.js?v=3"></script>
+  <script type="module" src="./app.js?v=4"></script>
 </body>
 </html>

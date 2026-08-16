@@ -30,6 +30,7 @@ body {
 
 .app {
   height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   background:
@@ -539,34 +540,74 @@ body {
   color: var(--text-dim);
 }
 
-/* 触屏按钮 */
+/* 触屏控制（手机）：十字方向键 + 动作键 */
 #touch-pad {
   position: fixed;
-  right: 12px;
-  bottom: 46px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 40;
   display: none;
+  pointer-events: none;
 }
 
-.pad-grid {
+/* 十字方向键（左下） */
+#dpad {
+  position: absolute;
+  left: 14px;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   display: grid;
-  grid-template-columns: repeat(3, 44px);
-  gap: 6px;
+  grid-template-columns: repeat(3, 56px);
+  grid-template-rows: repeat(3, 56px);
+  gap: 5px;
+  pointer-events: auto;
+}
+
+.dpad-slot {
+  visibility: hidden;
+}
+
+/* 动作键（右下） */
+#action-pad {
+  position: absolute;
+  right: 14px;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  display: grid;
+  grid-template-columns: repeat(2, 54px);
+  gap: 9px;
+  pointer-events: auto;
 }
 
 .pad-btn {
-  width: 44px;
-  height: 44px;
+  width: 56px;
+  height: 56px;
   background: rgba(30, 26, 18, 0.85);
   border: 1px solid #4a4230;
-  border-radius: 8px;
+  border-radius: 12px;
   color: var(--text);
-  font-size: 15px;
+  font-size: 17px;
+  font-weight: 600;
   cursor: pointer;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .pad-btn:active {
   background: #4a4230;
+}
+
+#dpad .dpad-center {
+  background: rgba(200, 180, 106, 0.22);
+  border-color: #8a7a3a;
+}
+
+#action-pad .pad-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  font-size: 15px;
 }
 
 @keyframes fadeIn {
@@ -578,7 +619,7 @@ body {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px), (max-height: 560px) {
   #event-log {
     display: none;
   }
@@ -589,6 +630,54 @@ body {
 
   #touch-pad {
     display: block;
+  }
+}
+
+/* 手机横屏：画布撑满、HUD 紧凑、方向键/动作键收拢 */
+@media (max-height: 560px) and (orientation: landscape) {
+  #hud {
+    padding: 6px 10px;
+    gap: 8px;
+  }
+
+  .hud-left {
+    min-width: 0;
+  }
+
+  #controls-hint {
+    display: none;
+  }
+
+  #game-canvas {
+    max-height: calc(100dvh - 92px);
+    max-width: calc(100vw - 220px);
+  }
+
+  #event-log {
+    max-height: calc(100dvh - 92px);
+  }
+
+  #dpad {
+    left: 10px;
+    grid-template-columns: repeat(3, 48px);
+    grid-template-rows: repeat(3, 48px);
+    gap: 4px;
+  }
+
+  #dpad .pad-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 15px;
+  }
+
+  #action-pad {
+    right: 10px;
+  }
+
+  #action-pad .pad-btn {
+    width: 46px;
+    height: 46px;
+    font-size: 14px;
   }
 }
 

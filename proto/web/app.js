@@ -1656,23 +1656,41 @@ function wireButtons() {
     btn.addEventListener('click', () => hideOverlay(btn.dataset.close));
   });
 
-  // 触屏按钮
+  // 触屏控制：十字方向键（按下即走 + 长按连续移动）+ 动作键（点击）
   document.querySelectorAll('#touch-pad .pad-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      if (btn.dataset.dir) {
-        const d = { up: { dx: 0, dy: -1 }, down: { dx: 0, dy: 1 }, left: { dx: -1, dy: 0 }, right: { dx: 1, dy: 0 } }[btn.dataset.dir];
-        safeRun(() => doAction({ type: 'move', dx: d.dx, dy: d.dy }));
-      } else if (btn.dataset.act) {
-        const acts = { rest: { type: 'rest' }, search: { type: 'interact' }, light: { type: 'light' }, log: { type: 'log' }, exit: { type: 'exit' } };
-        const a = acts[btn.dataset.act];
+    // 长按不弹系统菜单
+    btn.addEventListener('contextmenu', (e) => e.preventDefault());
+    if (btn.dataset.dir) {
+      const DIRS = { up: { dx: 0, dy: -1 }, down: { dx: 0, dy: 1 }, left: { dx: -1, dy: 0 }, right: { dx: 1, dy: 0 } };
+      const d = DIRS[btn.dataset.dir];
+      let holdTimer = null;
+      const move = () => safeRun(() => doAction({ type: 'move', dx: d.dx, dy: d.dy }));
+      const stopHold = () => {
+        if (holdTimer) {
+          clearInterval(holdTimer);
+          holdTimer = null;
+        }
+      };
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        move();
+        holdTimer = setInterval(move, 170);
+      });
+      btn.addEventListener('pointerup', stopHold);
+      btn.addEventListener('pointerleave', stopHold);
+      btn.addEventListener('pointercancel', stopHold);
+    } else if (btn.dataset.act) {
+      const acts = { rest: { type: 'rest' }, search: { type: 'interact' }, light: { type: 'light' }, log: { type: 'log' }, exit: { type: 'exit' } };
+      const a = acts[btn.dataset.act];
+      btn.addEventListener('click', () => {
         if (a.type === 'log') {
           fillLogModal();
           showOverlay('log-modal');
         } else {
           safeRun(() => doAction(a));
         }
-      }
-    });
+      });
+    }
   });
 
   // 开始界面 Codex 摘要
