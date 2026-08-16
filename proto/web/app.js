@@ -2009,6 +2009,7 @@ function handleKey(e) {
 }
 
 /** 统一的动作入口：E 交互 = 站在物品上则拾取，否则搜索 */
+let autosaveCounter = 0;
 function doAction(action) {
   if (!game || game.over) return;
   if (action.type === 'interact') {
@@ -2039,7 +2040,17 @@ function doAction(action) {
 
   renderHud();
   drawGame();
-  saveGame();
+  // 自动保存节流：每 5 回合全量存档（层级切换/死亡立即保存，避免每回合序列化开销）
+  if (game.levelId !== prevLevelId || game.over) {
+    autosaveCounter = 0;
+    saveGame();
+  } else {
+    autosaveCounter++;
+    if (autosaveCounter >= 5) {
+      autosaveCounter = 0;
+      saveGame();
+    }
+  }
 
   // 每回合结算：理智跨阶段检测 + 危险实体心跳检测
   audioCheckSanity();
