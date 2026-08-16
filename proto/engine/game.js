@@ -43,6 +43,7 @@ export function createGame({ levels, seed }) {
     fear: false,
     lastNoise: { level: 0, x: 0, y: 0 },
     pendingExit: null,
+    unlockedDoors: new Set(), // 已用钥匙解锁的门（"层级ID:配对索引"）
     rng: mulberry32(hashString('game:' + String(runSeed))),
   };
   enterLevel(state, 'level-0', { initial: true });
@@ -397,6 +398,7 @@ export function serializeState(state) {
     explored: setsToArrays(state.explored),
     discoveredExits: setsToArrays(state.discoveredExits),
     seenSetPieces: setsToArrays(state.seenSetPieces),
+    unlockedDoors: [...(state.unlockedDoors || [])],
   };
 }
 
@@ -415,6 +417,7 @@ export function deserializeState(state, data) {
   state.explored = arraysToSets(data.explored);
   state.discoveredExits = arraysToSets(data.discoveredExits);
   state.seenSetPieces = arraysToSets(data.seenSetPieces);
+  state.unlockedDoors = new Set(data.unlockedDoors || []);
   enterLevel(state, data.levelId || 'level-0', { keepPlayer: true });
   if (data.player) Object.assign(state.player, data.player);
   return state;

@@ -703,6 +703,7 @@ function buildLevel(dna, rng) {
   // ---------- 10. 门配对（同层非欧传送） ----------
   // 门的定位：室内层级内通往"另一间房"的通道——配对后穿过门 = 传送到配对的另一扇门。
   // 排序后"前半 × 后半"配对 → 保证配对门相距很远（后室非欧特性）。
+  // 约 15% 的配对是锁着的（需要钥匙，钥匙可在层级中拾取）。
   const doorLinks = [];
   {
     const doorProps = props.filter((p) => p.kind === 'door');
@@ -712,7 +713,8 @@ function buildLevel(dna, rng) {
       for (let i = 0; i < half; i++) {
         const a = sorted[i];
         const b = sorted[i + half];
-        doorLinks.push({ x1: a.x, y1: a.y, x2: b.x, y2: b.y });
+        const locked = chance(rng, 0.15);
+        doorLinks.push({ x1: a.x, y1: a.y, x2: b.x, y2: b.y, locked });
       }
     }
   }

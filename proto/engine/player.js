@@ -14,8 +14,8 @@ export const ITEM_META = {
   crowbar: { name: '撬棍', emoji: '🔧', desc: '战斗伤害提升至 20-30（体力消耗 20/次）。' },
   medkit: { name: '医疗包', emoji: '🩹', desc: '恢复 40 生命。' },
   note: { name: '便签', emoji: '📝', desc: '一张泛黄的便签，读后会写进探索日志。' },
-  key: { name: '钥匙', emoji: '🗝️', desc: '一把不知用途的钥匙。（预留）' },
-  'liquid-pain': { name: '痛苦之液', emoji: '🧪', desc: '来历不明的液体。（预留）' },
+  key: { name: '钥匙', emoji: '🗝️', desc: '一把旧钥匙。锁着的门也许用得上。' },
+  'liquid-pain': { name: '痛苦之液', emoji: '🧪', desc: '来历不明的镇痛液：+15 生命，但 -20 理智。' },
 };
 
 /** 创建玩家 */
@@ -310,23 +310,43 @@ function tryMove(state, world, dx, dy, events, opts) {
 
     // 门（配对传送）：同层内通往"另一间房"——穿过门即传送到配对的另一扇门（非欧特性）
     if (!teleported && tile === 'D') {
-      const link = (level.doorLinks || []).find(
+      const links = level.doorLinks || [];
+      const linkIdx = links.findIndex(
         (l) =>
           (l.x1 === player.x && l.y1 === player.y) || (l.x2 === player.x && l.y2 === player.y)
       );
-      if (link) {
-        const destIsFirst = link.x1 === player.x && link.y1 === player.y;
-        const tx = destIsFirst ? link.x2 : link.x1;
-        const ty = destIsFirst ? link.y2 : link.y1;
-        const blocked = state.entities.some((e) => e.x === tx && e.y === ty && e.hp > 0);
-        if (!blocked && level.tiles[ty] && level.tiles[ty][tx] !== '#') {
-          player.x = tx;
-          player.y = ty;
-          teleported = true;
-          player.sanity = Math.max(0, player.sanity - 2);
-          events.push({ text: '你推开一扇门……门后竟是另一个房间。', kind: 'level' });
+      if (linkIdx >= 0) {
+        const link = links[linkIdx];
+        const unlockKey = `${state.levelId}:${linkIdx}`;
+        if (link.locked && !state.unlockedDoors.has(unlockKey)) {
+          const keyIdx = player.inventory.indexOf('key');
+          if (keyIdx < 0) {
+            events.push({ text: '门锁着。你需要一把钥匙。', kind: 'system' });
+          } else {
+            player.inventory.splice(keyIdx, 1);
+            state.unlockedDoors.add(unlockKey);
+            events.push({ text: '钥匙咔哒一声，门开了。', kind: 'item' });
+            const destIsFirst = link.x1 === player.x && link.y1 === player.y;
+            player.x = destIsFirst ? link.x2 : link.x1;
+            player.y = destIsFirst ? link.y2 : link.y1;
+            teleported = true;
+            player.sanity = Math.max(0, player.sanity - 2);
+            events.push({ text: '你推开一扇门……门后竟是另一个房间。', kind: 'level' });
+          }
         } else {
-          events.push({ text: '门吱呀作响，但另一侧被堵住了。', kind: 'system' });
+          const destIsFirst = link.x1 === player.x && link.y1 === player.y;
+          const tx = destIsFirst ? link.x2 : link.x1;
+          const ty = destIsFirst ? link.y2 : link.y1;
+          const blocked = state.entities.some((e) => e.x === tx && e.y === ty && e.hp > 0);
+          if (!blocked && level.tiles[ty] && level.tiles[ty][tx] !== '#') {
+            player.x = tx;
+            player.y = ty;
+            teleported = true;
+            player.sanity = Math.max(0, player.sanity - 2);
+            events.push({ text: '你推开一扇门……门后竟是另一个房间。', kind: 'level' });
+          } else {
+            events.push({ text: '门吱呀作响，但另一侧被堵住了。', kind: 'system' });
+          }
         }
       }
     }
@@ -532,9 +552,17 @@ function useItem(state, world, events, itemName, invIdx) {
       events.push({ text: '你读了一张泛黄的便签，字迹潦草。', kind: 'item' });
       break;
     }
-    case 'key':
+    case 'key': {
+      // 钥匙：留在背包，用于解锁锁着的门（穿过门时自动消耗）
+      events.push({ text: '一把旧钥匙。锁着的门也许用得上。', kind: 'system' });
+      break;
+    }
     case 'liquid-pain': {
-      events.push({ text: '你还不知道它的用途。（预留物品）', kind: 'system' });
+      // 痛苦之液（Fandom：镇痛但侵蚀理智）
+      player.inventory.splice(invIdx, 1);
+      player.hp = Math.min(100, player.hp + 15);
+      player.sanity = Math.max(0, player.sanity - 20);
+      events.push({ text: '液体灼烧你的喉咙，疼痛消失了——但有什么东西也跟着消失了。（+15 生命 / -20 理智）', kind: 'sanity' });
       break;
     }
     default:

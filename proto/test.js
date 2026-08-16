@@ -483,6 +483,34 @@ section('8. Level 0 房间模式：大小多样 + 全联通 + 门可通行');
   const l11 = generateLevel(levels['level-11'], 5);
   const doorProps11 = (l11.props || []).filter((p) => p.kind === 'door').length;
   check('户外层（Level 11）无门', doorProps11 === 0, `${doorProps11} 扇`);
+  // 锁门机制：锁着的门无钥匙挡路、有钥匙通过并消耗
+  {
+    let tested = false;
+    for (let s = 1; s <= 10 && !tested; s++) {
+      const st = createGame({ levels, seed: s });
+      const links = st.level.doorLinks || [];
+      const li = links.findIndex((l) => l.locked);
+      if (li < 0) continue;
+      tested = true;
+      const l = links[li];
+      const nx = l.x1 > 0 ? l.x1 - 1 : l.x1 + 1;
+      if (st.level.tiles[l.y1][nx] === '#') continue;
+      st.player.x = nx;
+      st.player.y = l.y1;
+      step(st, { type: 'move', dx: l.x1 - nx, dy: 0 });
+      const blocked = !(st.player.x === l.x2 && st.player.y === l.y2);
+      check('无钥匙时锁门挡住玩家', blocked);
+      st.player.inventory.push('key');
+      step(st, { type: 'move', dx: l.x1 - st.player.x, dy: l.y1 - st.player.y });
+      check(
+        '有钥匙时通过并消耗钥匙',
+        st.player.x === l.x2 && st.player.y === l.y2 && !st.player.inventory.includes('key'),
+        `(${st.player.x},${st.player.y})`
+      );
+      break;
+    }
+    check('存在锁着的门（10 个种子内至少 1 扇）', tested);
+  }
   // 门必须是"墙上的真开口"：每扇门至少 2 个可走邻居（房间侧 + 外侧），且本身在墙位
   const doorOnWall = (l0.props || [])
     .filter((p) => p.kind === 'door')

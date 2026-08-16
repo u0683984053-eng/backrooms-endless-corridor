@@ -1272,8 +1272,17 @@ function drawGame() {
     if (!visible.has(e.x + ',' + e.y)) continue;
     const tex = vc.entities.get(e.type);
     if (!tex) continue;
-    const bob = Math.sin(now * 0.003 + hashString(e.type + e.x + ',' + e.y) % 628) * tile * 0.05;
-    ctx.drawImage(tex, ox + dx * tile, oy + dy * tile + bob, tile, tile);
+    const bob = Math.sin(now * 0.003 + (hashString(e.type + e.x + ',' + e.y) % 628)) * tile * 0.05;
+    // 呼吸缩放：阈限空间的"活物感"；警觉时起伏更急促
+    const amp = e.alert ? 0.05 : 0.02;
+    const breath = 1 + Math.sin(now * 0.004 + e.x * 3 + e.y * 5) * amp;
+    const cx = ox + dx * tile + tile / 2;
+    const cy = oy + dy * tile + tile / 2 + bob;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(breath, breath);
+    ctx.drawImage(tex, -tile / 2, -tile / 2, tile, tile);
+    ctx.restore();
   }
 
   // ---- 玩家 ----
