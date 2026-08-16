@@ -627,10 +627,11 @@ body {
   #game-canvas {
     max-width: 92vw;
   }
+}
 
-  #touch-pad {
-    display: block;
-  }
+/* 进入游戏后，任何设备都显示触控键（桌面鼠标也可点击） */
+body.in-game #touch-pad {
+  display: block;
 }
 
 /* 手机横屏：画布撑满、HUD 紧凑、方向键/动作键收拢 */

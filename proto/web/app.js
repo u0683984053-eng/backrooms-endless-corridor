@@ -180,6 +180,7 @@ function newGame() {
   mergeCodexIntoGame();
   lastLevelId = game.levelId;
   hideOverlay('start-screen');
+  document.body.classList.add('in-game');
   rebuildVisuals();
   renderAll();
   saveGame();
@@ -201,6 +202,7 @@ function continueGame() {
   mergeCodexIntoGame();
   lastLevelId = game.levelId;
   hideOverlay('start-screen');
+  document.body.classList.add('in-game');
   rebuildVisuals();
   renderAll();
   saveGame();
@@ -220,6 +222,7 @@ function enterWild() {
   const prev = game.levelId;
   enterLevel(game, dna.id, { keepPlayer: true });
   rebuildVisuals();
+  document.body.classList.add('in-game');
   if (game.levelId !== prev) {
     showTransition(`你挤进一道墙缝……\n${dna.name}\n${dna.description}`, 3400);
   }
@@ -1671,14 +1674,21 @@ function wireButtons() {
           holdTimer = null;
         }
       };
-      btn.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
+      // 事件兼容：新浏览器用 PointerEvent；旧浏览器回退 touchstart/mousedown
+      const hasPointer = typeof window.PointerEvent !== 'undefined';
+      const hasTouch = 'ontouchstart' in window;
+      const downEv = hasPointer ? 'pointerdown' : hasTouch ? 'touchstart' : 'mousedown';
+      const upEvs = hasPointer
+        ? ['pointerup', 'pointerleave', 'pointercancel']
+        : hasTouch
+          ? ['touchend', 'touchcancel']
+          : ['mouseup', 'mouseleave'];
+      btn.addEventListener(downEv, (e) => {
+        if (e.preventDefault) e.preventDefault();
         move();
         holdTimer = setInterval(move, 170);
       });
-      btn.addEventListener('pointerup', stopHold);
-      btn.addEventListener('pointerleave', stopHold);
-      btn.addEventListener('pointercancel', stopHold);
+      for (const ev of upEvs) btn.addEventListener(ev, stopHold);
     } else if (btn.dataset.act) {
       const acts = { rest: { type: 'rest' }, search: { type: 'interact' }, light: { type: 'light' }, log: { type: 'log' }, exit: { type: 'exit' } };
       const a = acts[btn.dataset.act];
