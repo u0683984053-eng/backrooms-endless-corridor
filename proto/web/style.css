@@ -757,3 +757,8 @@ body {
   0%, 100% { box-shadow: 0 0 4px rgba(216, 192, 96, 0.4); }
   50% { box-shadow: 0 0 14px rgba(216, 192, 96, 0.9); }
 }
+
+/* 出口提示条隐藏态（补充规则：.hidden 无通用定义） */
+.exit-hint.hidden {
+  display: none;
+}

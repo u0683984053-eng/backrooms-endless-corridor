@@ -51,6 +51,30 @@ function saveJSON(key, value) {
   }
 }
 
+/** 全局错误可见化：任何运行异常都在屏幕底部展示（线上诊断用） */
+function showFatal(msg) {
+  let el = document.getElementById('fatal-banner');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'fatal-banner';
+    el.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#7a1e1e;color:#ffd9d9;padding:10px 14px;font:12px/1.5 monospace;white-space:pre-wrap;';
+    document.body.appendChild(el);
+  }
+  el.textContent = '⚠ 运行异常（请截图反馈）：' + msg;
+}
+window.addEventListener('error', (e) => showFatal(e.message || '未知错误'));
+window.addEventListener('unhandledrejection', (e) => showFatal(String((e.reason && e.reason.message) || e.reason)));
+
+/** 安全执行：按钮回调统一入口，异常不静默吞掉 */
+function safeRun(fn) {
+  try {
+    fn();
+  } catch (err) {
+    console.error(err);
+    showFatal(err && err.message ? err.message : String(err));
+  }
+}
+
 let codex = loadJSON(CODEX_KEY, { levels: {}, deaths: [], notes: [] });
 let wildRegistry = loadJSON(WILD_KEY, {}); // { wildId: { baseId, seed } }
 
@@ -147,7 +171,7 @@ function saveGame() {
   if (!game) return;
   syncCodexFromGame();
   if (!game.over) saveJSON(SAVE_KEY, serializeState(game));
-  else localStorage.removeItem(SAVE_KEY);
+  else { try { localStorage.removeItem(SAVE_KEY); } catch { /* 忽略 */ } }
 }
 
 function newGame() {
@@ -1621,12 +1645,12 @@ function fakeFlashLoop() {
 
 // ---------- 开始界面 & 按钮 ----------
 function wireButtons() {
-  $('btn-new').addEventListener('click', newGame);
-  $('btn-continue').addEventListener('click', continueGame);
-  $('btn-wild').addEventListener('click', enterWild);
+  $('btn-new').addEventListener('click', () => safeRun(newGame));
+  $('btn-continue').addEventListener('click', () => safeRun(continueGame));
+  $('btn-wild').addEventListener('click', () => safeRun(enterWild));
   $('btn-death-new').addEventListener('click', () => {
     hideOverlay('death-modal');
-    newGame();
+    safeRun(newGame);
   });
   document.querySelectorAll('.modal-close').forEach((btn) => {
     btn.addEventListener('click', () => hideOverlay(btn.dataset.close));
@@ -1637,7 +1661,7 @@ function wireButtons() {
     btn.addEventListener('click', () => {
       if (btn.dataset.dir) {
         const d = { up: { dx: 0, dy: -1 }, down: { dx: 0, dy: 1 }, left: { dx: -1, dy: 0 }, right: { dx: 1, dy: 0 } }[btn.dataset.dir];
-        doAction({ type: 'move', dx: d.dx, dy: d.dy });
+        safeRun(() => doAction({ type: 'move', dx: d.dx, dy: d.dy }));
       } else if (btn.dataset.act) {
         const acts = { rest: { type: 'rest' }, search: { type: 'interact' }, light: { type: 'light' }, log: { type: 'log' }, exit: { type: 'exit' } };
         const a = acts[btn.dataset.act];
@@ -1645,7 +1669,7 @@ function wireButtons() {
           fillLogModal();
           showOverlay('log-modal');
         } else {
-          doAction(a);
+          safeRun(() => doAction(a));
         }
       }
     });
