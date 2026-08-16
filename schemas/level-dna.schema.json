@@ -34,6 +34,7 @@
         "roomCount": { "type": "integer", "minimum": 1, "maximum": 40 },
         "roomSizeMin": { "type": "integer", "minimum": 3, "maximum": 12 },
         "roomSizeMax": { "type": "integer", "minimum": 3, "maximum": 24 },
+        "hallwayGrid": { "type": "boolean", "description": "走廊网格布局（经典 Level 0 无尽联通、无死角）；宽高需为 8 的倍数" },
         "corridorWidth": { "type": "integer", "minimum": 1, "maximum": 3 },
         "wallStyle": { "enum": ["wallpaper", "tile", "concrete", "metal", "brick", "glass", "drywall"] },
         "floorStyle": { "enum": ["carpet", "tile", "linoleum", "concrete", "grass", "water", "gravel", "wood"] },

@@ -2,6 +2,15 @@
 // 确定性程序化生成器：房间 + 走廊 + 实体 + 物品 + 出口 + setPieces + 传送门。
 // 同 (dna.id, runSeed) 必须产出完全一致的 Level（可达性验证失败会用备用种子重试，最多 8 次，
 // 备用种子序列本身也是确定的，因此最终结果依旧确定）。
+//
+// ── 连通性优先生成算法（可复用，未来 B/C 类层级沿用）──
+// 1. 骨架全连通：hallwayGrid 模式用纵横走廊网格做骨架（无死角，天然全连通）；
+//    常规模式用「房间 + L 形走廊 MST」连接全部房间。
+// 2. 房间挂接：房间通过门（'D'，可通行）挂到骨架上；门按概率散布（氛围），
+//    并有「每区块 ≥1 门」的保底修复，防止整块无门。
+// 3. 容差校验：生成后做 BFS 可达性验证（出口必须可达；连通率目标 ≥98%，
+//    游戏内环绕视角 100%）。校验失败用备用种子重试。
+// 4. 确定性纪律：所有随机来自 mulberry32(seed)，绝不使用 Math.random。`
 
 import { mulberry32, hashString, randInt, pick, chance } from './rng.js';
 import { ENTITY_DEFS } from './entities.js';
@@ -35,6 +44,84 @@ export function generateLevel(dna, runSeed) {
   return last;
 }
 
+/** 经典 Level 0 走廊网格：纵横贯通的走廊 + 5×5 房间 + 门。
+ *  走廊形成完整网格（配合 looping 环绕 = 无尽联通、无死角），
+ *  门开在"一侧邻走廊、另一侧邻房间"的墙上（含环绕边界墙，全连通），
+ *  玩家永远不会被困。 */
+function buildHallwayGrid(tiles, W, H, rng, props) {
+  const stride = 8;
+  const isCorridor = (x, y) => x % stride === 4 || y % stride === 4;
+  const isWall = (x, y) => {
+    const xm = x % stride;
+    const ym = y % stride;
+    return (xm === 3 || xm === 5 || ym === 3 || ym === 5) && !isCorridor(x, y);
+  };
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (isCorridor(x, y)) tiles[y][x] = '.';
+      else if (isWall(x, y)) tiles[y][x] = '#';
+      else tiles[y][x] = '.';
+    }
+  }
+  // 门：通用扫描 —— 墙瓦片若一侧邻走廊、另一侧邻房间，则按概率打通（'D' 可通行）。
+  // 这种方式天然覆盖环绕边界墙（x=3/y=3 列行），保证房间与走廊全连通、无死角。
+  const isRoomTile = (t) => t === '.' || t === '~';
+  for (let y = 1; y < H - 1; y++) {
+    for (let x = 1; x < W - 1; x++) {
+      if (tiles[y][x] !== '#') continue;
+      let hasCorridor = false;
+      let hasRoom = false;
+      const nb = [
+        [x - 1, y],
+        [x + 1, y],
+        [x, y - 1],
+        [x, y + 1],
+      ];
+      for (const [nx, ny] of nb) {
+        if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+        if (isCorridor(nx, ny) && tiles[ny][nx] !== '#') hasCorridor = true;
+        else if (isRoomTile(tiles[ny][nx])) hasRoom = true;
+      }
+      if (hasCorridor && hasRoom && chance(rng, 0.24)) {
+        tiles[y][x] = 'D';
+        props.push({ x, y, kind: 'door' });
+      }
+    }
+  }
+  // 保障修复：每个区块（5×5 房间）至少 1 扇门 —— 防止整块无门导致玩家被困。
+  // 确定性：不消耗 rng，按固定顺序找第一面合法墙强制打通。
+  for (let by = 0; by < Math.floor(H / stride); by++) {
+    for (let bx = 0; bx < Math.floor(W / stride); bx++) {
+      const roomCols = [bx * stride + 6, bx * stride + 7, bx * stride + 9, bx * stride + 10];
+      const roomRows = [by * stride + 6, by * stride + 7, by * stride + 9, by * stride + 10];
+      const wallTiles = [];
+      // 水平墙：y = by*stride+5 / +11，x 取房间列
+      for (const wy of [by * stride + 5, by * stride + 11]) for (const wx of roomCols) wallTiles.push([wx, wy]);
+      // 垂直墙：x = bx*stride+5 / +11，y 取房间行
+      for (const wx of [bx * stride + 5, bx * stride + 11]) for (const wy of roomRows) wallTiles.push([wx, wy]);
+      const hasDoor = wallTiles.some(
+        ([x, y]) => y >= 1 && y < H - 1 && x >= 1 && x < W - 1 && tiles[y][x] === 'D'
+      );
+      if (hasDoor) continue;
+      for (const [x, y] of wallTiles) {
+        if (x < 1 || y < 1 || x >= W - 1 || y >= H - 1) continue;
+        if (tiles[y][x] !== '#') continue;
+        let c = false;
+        let r = false;
+        for (const [nx, ny] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]) {
+          if (isCorridor(nx, ny) && tiles[ny][nx] !== '#') c = true;
+          else if (isRoomTile(tiles[ny][nx])) r = true;
+        }
+        if (c && r) {
+          tiles[y][x] = 'D';
+          props.push({ x, y, kind: 'door' });
+          break;
+        }
+      }
+    }
+  }
+}
+
 /** 生成单次布局（内部函数，调用方负责可达性验证） */
 function buildLevel(dna, rng) {
   const T = dna.terrain;
@@ -54,51 +141,62 @@ function buildLevel(dna, rng) {
   const itemList = [];
   const setPieces = [];
   const occupied = new Set(); // "x,y" —— 出生点/出口/传送门/实体/物品占用的瓦片
+  const props = []; // {x, y, kind} —— 道具记录（供 web 端矢量绘制与门通道）
 
-  // ---------- 1. 放置房间矩形（不重叠） ----------
-  const roomCount = T.roomCount;
-  for (let i = 0; i < roomCount; i++) {
-    const rw = randInt(rng, T.roomSizeMin, T.roomSizeMax);
-    const rh = randInt(rng, T.roomSizeMin, T.roomSizeMax);
-    for (let t = 0; t < 50; t++) {
-      const x = randInt(rng, 1, Math.max(1, W - rw - 2));
-      const y = randInt(rng, 1, Math.max(1, H - rh - 2));
-      if (!overlaps(rooms, x, y, rw, rh)) {
-        rooms.push({ x, y, w: rw, h: rh });
-        carveRoom(tiles, x, y, rw, rh);
-        break;
-      }
-    }
-  }
-  if (rooms.length === 0) {
-    // 极端情况兜底：放一个居中的房间
-    const rw = Math.min(8, W - 2);
-    const rh = Math.min(8, H - 2);
-    rooms.push({ x: Math.floor((W - rw) / 2), y: Math.floor((H - rh) / 2), w: rw, h: rh });
-    carveRoom(tiles, rooms[0].x, rooms[0].y, rw, rh);
-  }
-
-  // ---------- 2. L 形走廊连接全部房间（保证全连通） ----------
-  const cw = T.corridorWidth || 2;
-  const connected = [0];
-  while (connected.length < rooms.length) {
-    let best = -1;
-    let bestFrom = -1;
-    let bestDist = Infinity;
-    for (const i of connected) {
-      for (let j = 0; j < rooms.length; j++) {
-        if (connected.includes(j)) continue;
-        const d = roomDist(rooms[i], rooms[j]);
-        if (d < bestDist) {
-          bestDist = d;
-          best = j;
-          bestFrom = i;
+  // ---------- 1. 布局模式 ----------
+  // hallwayGrid（经典 Level 0）：纵横贯通的走廊网格 + 房间 + 门，全连通无死角
+  // 规则（stride=8，需 W/H 为 8 的倍数，配合 looping 环绕实现无尽联通）：
+  //   走廊线：x%8===4 或 y%8===4
+  //   墙   ：x%8∈{3,5} 或 y%8∈{3,5}（非走廊处）
+  //   房间 ：其余（5×5 的区块）
+  if (T.hallwayGrid) {
+    buildHallwayGrid(tiles, W, H, rng, props);
+  } else {
+    // 常规模式：房间矩形（不重叠）+ L 形走廊连接全部房间（保证全连通）
+    const roomCount = T.roomCount;
+    for (let i = 0; i < roomCount; i++) {
+      const rw = randInt(rng, T.roomSizeMin, T.roomSizeMax);
+      const rh = randInt(rng, T.roomSizeMin, T.roomSizeMax);
+      for (let t = 0; t < 50; t++) {
+        const x = randInt(rng, 1, Math.max(1, W - rw - 2));
+        const y = randInt(rng, 1, Math.max(1, H - rh - 2));
+        if (!overlaps(rooms, x, y, rw, rh)) {
+          rooms.push({ x, y, w: rw, h: rh });
+          carveRoom(tiles, x, y, rw, rh);
+          break;
         }
       }
     }
-    if (best < 0) break;
-    carveCorridor(tiles, rooms[bestFrom], rooms[best], rng, cw);
-    connected.push(best);
+    if (rooms.length === 0) {
+      // 极端情况兜底：放一个居中的房间
+      const rw = Math.min(8, W - 2);
+      const rh = Math.min(8, H - 2);
+      rooms.push({ x: Math.floor((W - rw) / 2), y: Math.floor((H - rh) / 2), w: rw, h: rh });
+      carveRoom(tiles, rooms[0].x, rooms[0].y, rw, rh);
+    }
+
+    // ---------- 2. L 形走廊连接全部房间（保证全连通） ----------
+    const cw = T.corridorWidth || 2;
+    const connected = [0];
+    while (connected.length < rooms.length) {
+      let best = -1;
+      let bestFrom = -1;
+      let bestDist = Infinity;
+      for (const i of connected) {
+        for (let j = 0; j < rooms.length; j++) {
+          if (connected.includes(j)) continue;
+          const d = roomDist(rooms[i], rooms[j]);
+          if (d < bestDist) {
+            bestDist = d;
+            best = j;
+            bestFrom = i;
+          }
+        }
+      }
+      if (best < 0) break;
+      carveCorridor(tiles, rooms[bestFrom], rooms[best], rng, cw);
+      connected.push(best);
+    }
   }
 
   // ---------- 3. 环境覆盖层 ----------
@@ -139,7 +237,6 @@ function buildLevel(dna, rng) {
 
   // 地形附赠特性：柱子/水洼/门/楼梯/管道/电线/喷泉 + 道具记录（供 web 端矢量绘制）
   const extra = T.extraFeatures || [];
-  const props = []; // {x, y, kind} —— 12 种道具：counters/shelves/columns/furniture/doors/windows/fountain/pipes/wires/puddles/stairwell/elevator
 
   if (extra.includes('columns')) {
     for (const room of rooms) {
@@ -191,6 +288,18 @@ function buildLevel(dna, rng) {
         if (tiles[py][px] === '.') {
           tiles[py][px] = 'D';
           props.push({ x: px, y: py, kind: isOutdoors ? 'window' : 'door' });
+          // 门是真正的通道：向外打通一格（如果邻格是墙），避免"装饰门"假承诺
+          const out = {
+            top: [px, py - 1],
+            bottom: [px, py + 1],
+            left: [px - 1, py],
+            right: [px + 1, py],
+          }[edge];
+          const ox = out[0];
+          const oy = out[1];
+          if (ox >= 1 && oy >= 1 && ox < W - 1 && oy < H - 1 && tiles[oy][ox] === '#') {
+            tiles[oy][ox] = '.';
+          }
           break;
         }
       }
@@ -299,9 +408,14 @@ function buildLevel(dna, rng) {
     }
   }
 
-  // ---------- 4. 出生点：第一间房间的中心 ----------
+  // ---------- 4. 出生点：第一间房间的中心（网格模式取地图中心最近的可行走格） ----------
   const r0 = rooms[0];
-  const spawn = { x: r0.x + Math.floor(r0.w / 2), y: r0.y + Math.floor(r0.h / 2) };
+  let spawn;
+  if (r0) {
+    spawn = { x: r0.x + Math.floor(r0.w / 2), y: r0.y + Math.floor(r0.h / 2) };
+  } else {
+    spawn = { x: Math.floor(W / 2), y: Math.floor(H / 2) };
+  }
   if (!WALKABLE_TILES.has(tiles[spawn.y][spawn.x])) {
     // 兜底：找最近的可行走格
     const p = nearestWalkable(tiles, spawn.x, spawn.y);

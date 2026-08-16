@@ -11,7 +11,8 @@
   "description": "大多数人首次跌入的层级：无尽单调的黄色房间，潮湿的棕色地毯，嗡嗡作响的荧光灯。空气里弥漫着霉味，某种熟悉又陌生的不安。",
   "palette": { "primary": "#c8b46a", "secondary": "#8a7a4e", "accent": "#5c5236", "light": "#e8e08a" },
   "terrain": {
-    "width": 24, "height": 24,
+    "width": 48, "height": 48,
+    "hallwayGrid": true,
     "roomCount": 14, "roomSizeMin": 4, "roomSizeMax": 9,
     "corridorWidth": 2,
     "wallStyle": "wallpaper", "floorStyle": "carpet",

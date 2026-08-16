@@ -305,6 +305,81 @@ section('6. wild 变异：确定性 + 10 个随机种子全部生成可达');
   check('10 个随机种子全部成功', allOk);
 }
 
+// ---------- 7. 走廊网格（Level 0 无尽联通、门通道） ----------
+section('7. hallwayGrid：全连通无死角 + 门可通行');
+{
+  const WALK = new Set(['.', '~', 'D', 'S', 'E', 'I', 'T']);
+  const bfsReach = (level) => {
+    const seen = new Set([level.spawn.x + ',' + level.spawn.y]);
+    const q = [[level.spawn.x, level.spawn.y]];
+    while (q.length) {
+      const [x, y] = q.pop();
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (nx < 0 || ny < 0 || nx >= level.width || ny >= level.height) continue;
+        const k = nx + ',' + ny;
+        if (seen.has(k)) continue;
+        if (!WALK.has(level.tiles[ny][nx])) continue;
+        seen.add(k);
+        q.push([nx, ny]);
+      }
+    }
+    return seen;
+  };
+  const l0 = generateLevel(levels['level-0'], 42);
+  check('Level 0 走廊网格模式生效', !!(l0.terrain && l0.terrain.hallwayGrid), JSON.stringify(l0.terrain || {}).slice(0, 80));
+  const walkableCount = l0.tiles.flat().filter((t) => WALK.has(t)).length;
+  // 环绕 BFS：与游戏内 looping 移动一致（跨边界相邻）
+  const wrapBfs = (level) => {
+    const w = level.width;
+    const h = level.height;
+    const seen = new Set([level.spawn.x + ',' + level.spawn.y]);
+    const q = [[level.spawn.x, level.spawn.y]];
+    while (q.length) {
+      const [x, y] = q.pop();
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = (x + dx + w) % w;
+        const ny = (y + dy + h) % h;
+        const k = nx + ',' + ny;
+        if (seen.has(k)) continue;
+        if (!WALK.has(level.tiles[ny][nx])) continue;
+        seen.add(k);
+        q.push([nx, ny]);
+      }
+    }
+    return seen;
+  };
+  check('Level 0 游戏内(环绕)100% 可达', wrapBfs(l0).size === walkableCount, `${wrapBfs(l0).size}/${walkableCount}`);
+  const noWrap = bfsReach(l0).size;
+  check('非环绕视角 ≥98% 可达（大部分联通）', noWrap / walkableCount >= 0.98, `${noWrap}/${walkableCount}=${((noWrap / walkableCount) * 100).toFixed(1)}%`);
+  const doors = (l0.props || []).filter((p) => p.kind === 'door').length;
+  check('门数量充足（≥20）', doors >= 20, `${doors} 扇门`);
+  const dTiles = l0.tiles.flat().filter((t) => t === 'D').length;
+  check('D 门瓦片与门道具数量一致', dTiles === doors, `tiles=${dTiles} props=${doors}`);
+  let allFull = true;
+  let worstRatio = 1;
+  for (let s = 1; s <= 5; s++) {
+    const lv = generateLevel(levels['level-0'], s);
+    const wc = lv.tiles.flat().filter((t) => WALK.has(t)).length;
+    if (wrapBfs(lv).size !== wc) allFull = false;
+    worstRatio = Math.min(worstRatio, bfsReach(lv).size / wc);
+  }
+  check('5 个种子游戏内全部 100% 联通', allFull);
+  check('5 个种子非环绕联通率均 ≥98%', worstRatio >= 0.98, `最差=${(worstRatio * 100).toFixed(1)}%`);
+  const lv2 = generateLevel(levels['level-0'], 7);
+  const rowY = 4; // 走廊行（y%8===4 全行可走）
+  let okWalk = true;
+  for (let i = 0; i < 200; i++) {
+    const xx = ((Math.floor(lv2.width / 2) + i) % lv2.width + lv2.width) % lv2.width;
+    if (!WALK.has(lv2.tiles[rowY][xx])) {
+      okWalk = false;
+      break;
+    }
+  }
+  check('沿走廊行直线走 200 步全程可行（无尽走廊）', okWalk);
+}
+
 // ---------- 汇总 ----------
 console.log(`\n====================`);
 console.log(`冒烟测试完成：通过 ${pass} 项，失败 ${fail} 项`);
