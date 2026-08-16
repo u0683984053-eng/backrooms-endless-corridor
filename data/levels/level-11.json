@@ -15,7 +15,7 @@
     "roomCount": 24, "roomSizeMin": 6, "roomSizeMax": 14,
     "corridorWidth": 3,
     "wallStyle": "glass", "floorStyle": "concrete",
-    "extraFeatures": ["windows", "counters", "shelves", "furniture", "fountain"]
+    "extraFeatures": ["windows", "counters", "shelves", "furniture", "fountain, plants, posters"]
   },
   "spaceRules": ["euclidean"],
   "entities": [

@@ -711,6 +711,83 @@ function makePropTexture(kind, pal) {
       g.stroke();
       break;
     }
+    case 'crates': {
+      // 板条箱：木框 + 斜撑
+      g.fillStyle = shade(prim, -20);
+      g.fillRect(6, 10, 36, 32);
+      g.strokeStyle = shade(prim, -45);
+      g.lineWidth = 2;
+      g.strokeRect(6, 10, 36, 32);
+      g.beginPath();
+      g.moveTo(6, 10);
+      g.lineTo(42, 42);
+      g.moveTo(42, 10);
+      g.lineTo(6, 42);
+      g.stroke();
+      g.strokeRect(12, 22, 24, 8);
+      break;
+    }
+    case 'papers': {
+      // 文件堆：层叠纸张
+      for (let i = 0; i < 4; i++) {
+        g.fillStyle = i % 2 ? '#d8d0b8' : '#c8c0a8';
+        g.save();
+        g.translate(24, 30 - i * 3);
+        g.rotate((i - 1.5) * 0.12);
+        g.fillRect(-14, -10, 28, 20);
+        g.restore();
+      }
+      g.strokeStyle = 'rgba(0,0,0,0.25)';
+      g.lineWidth = 1;
+      g.beginPath();
+      for (let i = 0; i < 3; i++) {
+        const y = 26 - i * 3;
+        g.moveTo(14, y);
+        g.lineTo(34, y);
+      }
+      g.stroke();
+      break;
+    }
+    case 'plants': {
+      // 盆栽：陶盆 + 绿叶
+      g.fillStyle = '#8a5a3a';
+      g.beginPath();
+      g.moveTo(10, 38);
+      g.lineTo(14, 22);
+      g.lineTo(34, 22);
+      g.lineTo(38, 38);
+      g.closePath();
+      g.fill();
+      g.fillStyle = '#3a7a3a';
+      g.beginPath();
+      g.ellipse(24, 16, 10, 7, 0, 0, Math.PI * 2);
+      g.fill();
+      g.fillStyle = '#4a9a4a';
+      g.beginPath();
+      g.ellipse(20, 12, 5, 8, -0.4, 0, Math.PI * 2);
+      g.fill();
+      g.beginPath();
+      g.ellipse(29, 14, 4, 7, 0.4, 0, Math.PI * 2);
+      g.fill();
+      break;
+    }
+    case 'posters': {
+      // 海报：贴墙的纸（半透明、微皱）
+      g.save();
+      g.globalAlpha = 0.85;
+      g.fillStyle = '#e8e0c0';
+      g.fillRect(8, 6, 32, 36);
+      g.strokeStyle = 'rgba(0,0,0,0.4)';
+      g.lineWidth = 1;
+      g.strokeRect(8, 6, 32, 36);
+      // 海报上的模糊图形（看不太清的"内容"）
+      g.fillStyle = 'rgba(120,40,40,0.5)';
+      g.fillRect(14, 12, 20, 12);
+      g.fillStyle = 'rgba(40,60,120,0.45)';
+      g.fillRect(14, 28, 20, 8);
+      g.restore();
+      break;
+    }
     case 'fountain': {
       g.fillStyle = '#7a9ab8';
       g.beginPath();

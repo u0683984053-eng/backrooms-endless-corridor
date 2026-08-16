@@ -15,7 +15,7 @@
     "roomCount": 24, "roomSizeMin": 4, "roomSizeMax": 12,
     "corridorWidth": 3,
     "wallStyle": "wallpaper", "floorStyle": "carpet",
-    "extraFeatures": ["doors", "columns", "furniture", "puddles", "wires"]
+    "extraFeatures": ["doors", "columns", "furniture, posters", "puddles", "wires"]
   },
   "spaceRules": ["looping"],
   "entities": [

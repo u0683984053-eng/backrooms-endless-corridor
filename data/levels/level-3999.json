@@ -15,7 +15,7 @@
     "roomCount": 22, "roomSizeMin": 5, "roomSizeMax": 12,
     "corridorWidth": 3,
     "wallStyle": "drywall", "floorStyle": "tile",
-    "extraFeatures": ["counters", "shelves", "fountain", "windows", "doors", "elevator"]
+    "extraFeatures": ["counters", "shelves", "fountain, plants, posters, crates", "windows", "doors", "elevator"]
   },
   "spaceRules": ["euclidean"],
   "entities": [

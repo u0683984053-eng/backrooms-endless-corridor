@@ -353,6 +353,60 @@ function buildLevel(dna, rng) {
       }
     }
   }
+  // 精细道具：板条箱/文件堆/盆栽（房间内地面，不挡路）+ 海报（挂墙）
+  if (extra.includes('crates') || extra.includes('papers') || extra.includes('plants') || extra.includes('posters')) {
+    for (const room of rooms) {
+      if (room.w < 4 || room.h < 4) continue;
+      // 板条箱：1-3 个（仓库/商业层）
+      if (extra.includes('crates') && chance(rng, 0.8)) {
+        const n = randInt(rng, 1, 3);
+        for (let i = 0; i < n; i++) {
+          const cx = room.x + randInt(rng, 1, room.w - 2);
+          const cy = room.y + randInt(rng, 1, room.h - 2);
+          if (tiles[cy][cx] === '.') {
+            tiles[cy][cx] = '#';
+            props.push({ x: cx, y: cy, kind: 'crates' });
+          }
+        }
+      }
+      // 文件堆：1-2 个（办公层）
+      if (extra.includes('papers') && chance(rng, 0.7)) {
+        const n = randInt(rng, 1, 2);
+        for (let i = 0; i < n; i++) {
+          const cx = room.x + randInt(rng, 1, room.w - 2);
+          const cy = room.y + randInt(rng, 1, room.h - 2);
+          if (tiles[cy][cx] === '.') {
+            tiles[cy][cx] = '#';
+            props.push({ x: cx, y: cy, kind: 'papers' });
+          }
+        }
+      }
+      // 盆栽：0-1 个（宜居/公共层）
+      if (extra.includes('plants') && chance(rng, 0.4)) {
+        const cx = room.x + randInt(rng, 1, room.w - 2);
+        const cy = room.y + randInt(rng, 1, room.h - 2);
+        if (tiles[cy][cx] === '.') {
+          tiles[cy][cx] = '#';
+          props.push({ x: cx, y: cy, kind: 'plants' });
+        }
+      }
+      // 海报：沿墙挂（墙瓦片，不挡路）
+      if (extra.includes('posters')) {
+        const n = randInt(rng, 1, 2);
+        for (let i = 0; i < n; i++) {
+          const edge = pick(rng, ['top', 'bottom', 'left', 'right']);
+          let px, py;
+          if (edge === 'top') { px = room.x + randInt(rng, 0, room.w - 1); py = room.y - 1; }
+          else if (edge === 'bottom') { px = room.x + randInt(rng, 0, room.w - 1); py = room.y + room.h; }
+          else if (edge === 'left') { px = room.x - 1; py = room.y + randInt(rng, 0, room.h - 1); }
+          else { px = room.x + room.w; py = room.y + randInt(rng, 0, room.h - 1); }
+          if (px >= 1 && py >= 1 && px < W - 1 && py < H - 1 && tiles[py][px] === '#') {
+            props.push({ x: px, y: py, kind: 'posters' });
+          }
+        }
+      }
+    }
+  }
   if (extra.includes('pipes')) {
     // 管道：沿墙绘制（记录靠走廊的墙瓦片）
     const n = randInt(rng, 4, 9);

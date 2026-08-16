@@ -15,7 +15,7 @@
     "roomCount": 20, "roomSizeMin": 4, "roomSizeMax": 10,
     "corridorWidth": 2,
     "wallStyle": "drywall", "floorStyle": "carpet",
-    "extraFeatures": ["counters", "shelves", "furniture", "doors", "windows"]
+    "extraFeatures": ["counters", "shelves", "furniture, papers, posters", "doors", "windows"]
   },
   "spaceRules": ["euclidean"],
   "entities": [

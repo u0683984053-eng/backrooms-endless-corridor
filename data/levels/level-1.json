@@ -15,7 +15,7 @@
     "roomCount": 18, "roomSizeMin": 5, "roomSizeMax": 12,
     "corridorWidth": 3,
     "wallStyle": "concrete", "floorStyle": "concrete",
-    "extraFeatures": ["shelves", "counters", "columns", "doors", "furniture"]
+    "extraFeatures": ["shelves", "counters", "columns", "doors", "furniture, crates"]
   },
   "spaceRules": ["euclidean"],
   "entities": [

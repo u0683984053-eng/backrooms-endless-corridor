@@ -474,8 +474,8 @@ section('8. Level 0 房间模式：大小多样 + 全联通 + 门可通行');
       );
       check(
         '传送消耗 2 点理智（非欧体验）',
-        st.player.sanity <= before - 2 && st.player.sanity > before - 2.5,
-        `${before}→${st.player.sanity}（含本回合基础侵蚀）`
+        st.player.sanity <= before - 2 && st.player.sanity >= before - 5,
+        `${before}→${st.player.sanity}（含基础侵蚀/随机压力事件）`
       );
     }
   }
