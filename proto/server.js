@@ -48,6 +48,8 @@ const server = createServer(async (req, res) => {
     const url = new URL(req.url, 'http://localhost');
     let pathname = url.pathname;
     if (pathname === '/') pathname = '/web/index.html';
+    // 目录请求 → 目录内 index.html（与 GitHub Pages 行为一致）
+    if (pathname.endsWith('/')) pathname += 'index.html';
 
     // /data/* → proto 之外的 data 目录
     let base = ROOT;
