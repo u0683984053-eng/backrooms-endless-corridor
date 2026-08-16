@@ -1731,10 +1731,10 @@ export function createInfiniteLevel(dna, runSeed) {
     const p = nearestWalkableInfinite(level, 0, 0);
     level.spawn = { x: p.x, y: p.y };
   }
-  // 出口：2-4 个，距出生点 8-24 格，确定性方向
+  // 出口：2-4 个（循环取用 DNA 出口目标），距出生点 8-24 格，确定性方向
   const er = mulberry32(hashString(`${runSeed}|${dna.id}|exits`));
   const exitSpecs = dna.exits && dna.exits.length ? dna.exits : [{ kind: 'noclip', target: 'hub' }];
-  const n = Math.min(exitSpecs.length, randInt(er, 2, 4));
+  const n = randInt(er, 2, 4);
   const placed = [];
   for (let i = 0; i < n; i++) {
     const spec = exitSpecs[i % exitSpecs.length];
@@ -1782,9 +1782,15 @@ export function updateActiveChunks(level, px, py) {
   if (cx === level.playerChunkX && cy === level.playerChunkY) return false;
   level.playerChunkX = cx;
   level.playerChunkY = cy;
+  // 激活集 = 玩家周围 3×3 + 警觉/附近（≤20 格）存活实体的所在 chunk（追击不因换 chunk 中断）
   const active = new Set();
   for (let dy = -1; dy <= 1; dy++) {
     for (let dx = -1; dx <= 1; dx++) active.add(cx + dx + ',' + (cy + dy));
+  }
+  for (const e of level.entities) {
+    if (e.hp > 0 && e.chunkKey && Math.abs(e.x - px) + Math.abs(e.y - py) <= 20) {
+      active.add(e.chunkKey);
+    }
   }
   level.entities = level.entities.filter((e) => active.has(e.chunkKey));
   level.items = level.items.filter((it) => active.has(it.chunkKey));
@@ -1803,4 +1809,62 @@ export function updateActiveChunks(level, px, py) {
     }
   }
   return true;
+}
+
+/** 无限层出口指引：最近的出口（含隐藏）的方向与距离；hidden 由调用方决定模糊显示 */
+export function nearestExitInfo(level, px, py) {
+  if (!level.infinite || !level.exits || level.exits.length === 0) return null;
+  let best = null;
+  for (let i = 0; i < level.exits.length; i++) {
+    const ex = level.exits[i];
+    const d = Math.sqrt((ex.x - px) ** 2 + (ex.y - py) ** 2);
+    if (!best || d < best.d) {
+      best = {
+        x: ex.x,
+        y: ex.y,
+        d,
+        dx: ex.x - px,
+        dy: ex.y - py,
+        angle: Math.atan2(ex.y - py, ex.x - px),
+        kind: ex.kind,
+        hidden: !!ex.hidden,
+      };
+    }
+  }
+  return best;
+}
+
+/** 8 向箭头字符（按角度，0°=右，顺时针） */
+export const COMPASS_ARROWS = ['→', '↘', '↓', '↙', '←', '↖', '↑', '↗'];
+
+/** 角度 → 8 向箭头索引（0=右，顺时针） */
+export function angleToArrow(angle) {
+  const idx = Math.round((angle * 4) / Math.PI);
+  return ((idx % 8) + 8) % 8;
+}
+
+/** 无限层 chunk 缓存上限：超出后丢弃离玩家最远的 chunk（内容确定性，可随时重建） */
+export function trimChunkCache(level, maxChunks = 128) {
+  if (!level.infinite || !level.chunks || level.chunks.size <= maxChunks) return 0;
+  const cx = level.playerChunkX;
+  const cy = level.playerChunkY;
+  const keys = [...level.chunks.keys()].sort((a, b) => {
+    const pa = a.split(',').map(Number);
+    const pb = b.split(',').map(Number);
+    const da = Math.max(Math.abs(pa[0] - cx), Math.abs(pa[1] - cy));
+    const db = Math.max(Math.abs(pb[0] - cx), Math.abs(pb[1] - cy));
+    return db - da;
+  });
+  let dropped = 0;
+  while (level.chunks.size > maxChunks && dropped < keys.length) {
+    const k = keys[dropped++];
+    // 激活中的实体/物品所在 chunk 不丢弃
+    const c = level.chunks.get(k);
+    if (c && level.entities.some((e) => e.hp > 0 && e.chunkKey === k)) continue;
+    level.chunks.delete(k);
+  }
+  if (dropped > 0) {
+    level.chunkKeys = [...level.chunks.keys()];
+  }
+  return dropped;
 }

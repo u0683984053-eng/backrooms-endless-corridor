@@ -1,0 +1,89 @@
+{
+  "id": "level-19",
+  "name": "Level 19 — 仓储区",
+  "number": 19,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "industrial",
+  "aesthetic": "liminal",
+  "light": "flickering",
+  "sanDrain": 0.06,
+  "description": "无尽延伸的仓库：低矮的天花板压得人喘不过气，货架如森林般密布，荧光灯在头顶嗡嗡作响。这里的空气很安静，安静得能听见自己的脚步声在货架间回荡很久。",
+  "palette": {
+    "primary": "#8a8f8a",
+    "secondary": "#5c615c",
+    "accent": "#3a3f3a",
+    "light": "#d8d8c8"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 12,
+    "roomSizeMin": 4,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "metal",
+    "floorStyle": "concrete",
+    "extraFeatures": [
+      "shelves",
+      "crates",
+      "columns",
+      "wires",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "duller",
+      "density": 0.006,
+      "aggression": "passive"
+    },
+    {
+      "type": "clump",
+      "density": 0.003,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [],
+  "soundscape": {
+    "ambient": [
+      "荧光灯嗡鸣",
+      "远处货架吱呀声"
+    ],
+    "startles": [
+      "金属碰撞声",
+      "什么东西从货架上掉下来"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-1",
+      "hidden": true,
+      "danger": false,
+      "description": "货架缝隙间透出的白光——另一侧是更大的仓库。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-hub",
+      "hidden": true,
+      "danger": false,
+      "description": "一堵墙的接缝处，透过它能看见亮着灯的房间。"
+    }
+  ]
+}

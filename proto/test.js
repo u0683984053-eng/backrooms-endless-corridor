@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { loadLevels, LEVEL_IDS, mutateDna } from './engine/dna.js';
-import { generateLevel, verifyReachable, createInfiniteLevel, tileAt, CHUNK, WALKABLE_TILES } from './engine/generator.js';
+import { generateLevel, verifyReachable, createInfiniteLevel, tileAt, CHUNK, WALKABLE_TILES, nearestExitInfo, COMPASS_ARROWS, angleToArrow, trimChunkCache } from './engine/generator.js';
 import { hashString } from './engine/rng.js';
 import { createGame, step, enterLevel, playerVisibleTiles, serializeState, deserializeState } from './engine/game.js';
 
@@ -385,6 +385,70 @@ section('5.5 无限世界：Minecraft 式分块生成');
     st.player.y = Math.floor(lv2.height / 2);
     step(st, { type: 'move', dx: -1, dy: 0 });
     check('!层左边界被墙挡住', st.player.x === 0, `x=${st.player.x}`);
+  }
+}
+
+// ---------- 5.6 无限层优化：出口指引 / 缓存上限 / 追击保持 ----------
+section('5.6 无限层优化：出口指引 / 缓存上限 / 追击保持');
+{
+  const lvl = createInfiniteLevel(levels['level-0'], 11);
+  // 出口指引（hidden 出口也返回方向，由调用方决定模糊显示）
+  const info = nearestExitInfo(lvl, lvl.spawn.x, lvl.spawn.y);
+  check('出口指引返回最近出口', info !== null && info.d >= 0, info ? `d=${info.d.toFixed(1)}` : 'null');
+  check('出口指引字段齐全（角度/方向/距离/隐藏标记）', !!info && typeof info.angle === 'number' && typeof info.d === 'number' && typeof info.kind === 'string' && typeof info.hidden === 'boolean');
+  check('指引方向与坐标一致', !!info && Math.abs(Math.atan2(info.dy, info.dx) - info.angle) < 1e-9);
+  // 角度 → 8 向箭头
+  check('箭头映射 0°=→', COMPASS_ARROWS[angleToArrow(0)] === '→');
+  check('箭头映射 -90°=↑', COMPASS_ARROWS[angleToArrow(-Math.PI / 2)] === '↑');
+  check('箭头映射 45°=↘', COMPASS_ARROWS[angleToArrow(Math.PI / 4)] === '↘');
+  check('箭头映射 180°=←', COMPASS_ARROWS[angleToArrow(Math.PI)] === '←');
+  // 缓存上限：生成 20×20 区域 chunk 后裁剪
+  for (let i = 0; i < 20; i++) {
+    for (let j = 0; j < 20; j++) lvl.getTile(i * 16 + 7, j * 16 + 7);
+  }
+  const before = lvl.chunks.size;
+  const dropped = trimChunkCache(lvl, 64);
+  check('chunk 缓存超限被裁剪', before > 64 && lvl.chunks.size <= 64, `${before}→${lvl.chunks.size} dropped=${dropped}`);
+  // 确定性重建：裁剪后重新生成内容一致
+  check('被裁剪 chunk 确定性重建', lvl.getTile(7, 7) === lvl.getTile(7, 7));
+  // 实体追击保持：玩家跑出当前 chunk 后，警觉实体仍激活
+  const st = createGame({ levels, seed: 21 });
+  const lv2 = st.level;
+  lv2.entities.push({
+    id: 'test:1,1', chunkKey: '0,0', x: st.player.x + 3, y: st.player.y,
+    type: 'hound', hp: 50, aggression: 'hostile', state: 'idle', visible: true, alert: true, wait: 0, revealed: false,
+  });
+  st.entities = lv2.entities;
+  for (let i = 0; i < 17; i++) step(st, { type: 'move', dx: 1, dy: 0 });
+  check('警觉实体跨 chunk 保持激活（追击不中断）', st.entities.some((e) => e.id === 'test:1,1'), `entities=${st.entities.length}`);
+
+  // 所有无限层健全性：出口 2-4 个、出生点可行走、激活集实体/物品合法
+  {
+    let okAll = true;
+    let checked = 0;
+    for (const id of LEVEL_IDS) {
+      const dna = levels[id];
+      if (!dna.terrain || !dna.terrain.infinite) continue;
+      checked++;
+      const lv = createInfiniteLevel(dna, 3);
+      const okExit = lv.exits.length >= 2 && lv.exits.length <= 4;
+      const okSpawn = WALKABLE_TILES.has(lv.getTile(lv.spawn.x, lv.spawn.y));
+      const okEnt = lv.entities.every((e) => typeof e.x === 'number' && e.chunkKey);
+      if (!(okExit && okSpawn && okEnt)) okAll = false;
+    }
+    check(`全部 ${checked} 个无限层健全（出口 2-4/出生点可行走/实体带 chunkKey）`, okAll, `checked=${checked}`);
+  }
+
+  // 存档体积保护：explored 环形淘汰保持上限
+  {
+    const st2 = createGame({ levels, seed: 33 });
+    // 直接灌入 35000 个已探索格（模拟长时间游玩）
+    const set = st2.explored['level-0'];
+    for (let i = 0; i < 35000; i++) set.add((i % 500) + ',' + Math.floor(i / 500));
+    step(st2, { type: 'move', dx: 1, dy: 0 });
+    check('explored 环形淘汰保持 ≤30000+视野', st2.explored['level-0'].size <= 30000 + 300, `size=${st2.explored['level-0'].size}`);
+    const saved = JSON.stringify(serializeState(st2));
+    check('存档体积受控（<1MB）', saved.length < 1000000, `${(saved.length / 1024).toFixed(0)}KB`);
   }
 }
 

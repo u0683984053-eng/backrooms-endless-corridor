@@ -40,6 +40,9 @@ export const LEVEL_IDS = [
   'level-922',
   'level-hub',
   'level-!',
+  // 全面优化新增（Fandom 经典层）
+  'level-19',
+  'level-205',
 ];
 
 /** 默认值（合并时逐字段覆盖，保证任何残缺 DNA 都能得到完整结构） */

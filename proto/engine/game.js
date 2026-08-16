@@ -3,7 +3,7 @@
 // 回合经济学：玩家动作 → 出口切换 → 实体行动 → 状态结算 → 事件日志。
 
 import { mulberry32, hashString, chance, pick, DIRS } from './rng.js';
-import { generateLevel, createInfiniteLevel, updateActiveChunks, tileAt } from './generator.js';
+import { generateLevel, createInfiniteLevel, updateActiveChunks, trimChunkCache, tileAt } from './generator.js';
 import { updateEntity, ENTITY_DEFS } from './entities.js';
 import { createPlayer, applyPlayerAction, viewRadiusOf, isLitTile, pushLog } from './player.js';
 
@@ -87,8 +87,11 @@ export function step(state, action) {
   // ---- 玩家阶段 ----
   const playerEvents = applyPlayerAction(state, action, world);
   for (const x of playerEvents) events.push(x);
-  // 无限层：玩家移动后刷新激活 chunk 集（实体/物品进出视野半径）
-  if (state.level.infinite) updateActiveChunks(state.level, state.player.x, state.player.y);
+  // 无限层：玩家移动后刷新激活 chunk 集（实体/物品进出视野半径）+ 缓存上限（确定性重建）
+  if (state.level.infinite) {
+    updateActiveChunks(state.level, state.player.x, state.player.y);
+    trimChunkCache(state.level, 128);
+  }
 
   // ---- 出口切换（切换后重建 world） ----
   if (state.pendingExit) {
@@ -199,10 +202,24 @@ function checkAchievements(state, events) {
   }
 }
 
+/** 每层已探索集合上限：超出后 FIFO 淘汰最旧一格（存档体积保护，地图持续滚动更新） */
+const EXPLORED_CAP = 30000;
+
 /** 把当前视野并入该层级的"已探索"集合（雾战争实现） */
 function updateExplored(state) {
   const set = state.explored[state.levelId];
-  for (const t of playerVisibleTiles(state)) set.add(t.x + ',' + t.y);
+  const tiles = playerVisibleTiles(state);
+  // 需要淘汰的数量：超出上限的部分（每新增一格淘汰一格，保持 ≤ CAP）
+  let toEvict = set.size + tiles.length - EXPLORED_CAP;
+  if (toEvict > 0) {
+    const it = set.values();
+    while (toEvict-- > 0) {
+      const v = it.next().value;
+      if (v === undefined) break;
+      set.delete(v);
+    }
+  }
+  for (const t of tiles) set.add(t.x + ',' + t.y);
 }
 
 /** 切换层级（重新确定性生成目标层级；keepPlayer 保留玩家属性） */

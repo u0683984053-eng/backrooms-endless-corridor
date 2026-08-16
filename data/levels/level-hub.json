@@ -130,6 +130,20 @@
       "hidden": false,
       "danger": false,
       "description": "标着『11』的门：门后是城市的路灯光。"
+    },
+    {
+      "target": "level-19",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "标着『19』的门：门缝里透出货架与荧光灯。"
+    },
+    {
+      "target": "level-205",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "标着『205』的门：门后是红砖与安静。"
     }
   ]
 }

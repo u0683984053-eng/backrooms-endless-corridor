@@ -1,0 +1,78 @@
+{
+  "id": "level-205",
+  "name": "Level 205 — 虚空之室",
+  "number": 205,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "void",
+  "aesthetic": "dreamcore",
+  "light": "dim",
+  "sanDrain": 0.02,
+  "description": "几间红石砖砌成的房间，门和窗户通往纯粹的虚空。没有实体——只有安静，安静得让你听见自己的心跳。在这里待久了，你会开始怀疑墙的另一侧是否真的存在。",
+  "palette": {
+    "primary": "#8a4e3a",
+    "secondary": "#5c3428",
+    "accent": "#2e1c14",
+    "light": "#e8b8a0"
+  },
+  "terrain": {
+    "width": 26,
+    "height": 26,
+    "roomCount": 8,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "brick",
+    "floorStyle": "tile",
+    "extraFeatures": [
+      "doors",
+      "puddles"
+    ],
+    "infinite": false
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "note"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "有人用指甲在墙上刻了一行字：『别从窗户往外看太久。』",
+      "sanityEffect": -2,
+      "note": "墙上刻着：别从窗户往外看太久。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "虚空的风声（其实没有风）",
+      "自己的心跳"
+    ],
+    "startles": [
+      "远处传来一声闷响，像什么东西掉进了虚空"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-404",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇通向虚空的门——你推开门，走进的却是另一个房间。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-hub",
+      "hidden": false,
+      "danger": false,
+      "description": "一扇亮着暖光的门，正常得可疑。"
+    }
+  ]
+}

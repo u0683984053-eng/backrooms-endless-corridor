@@ -13,7 +13,7 @@ import {
 } from '../engine/game.js';
 import { ITEM_META, viewRadiusOf } from '../engine/player.js';
 import { ENTITY_DEFS } from '../engine/entities.js';
-import { tileAt } from '../engine/generator.js';
+import { tileAt, nearestExitInfo, COMPASS_ARROWS, angleToArrow } from '../engine/generator.js';
 import { hashString } from '../engine/rng.js';
 // 程序化音频（AUDIO-SPEC v1.0）：零依赖 Web Audio，所有调用都 try/catch 包裹
 import {
@@ -1363,19 +1363,16 @@ function drawGame() {
           break;
         }
       } else if (explored.has(key)) {
-        // ---- 已探索但不在视野：降饱和 40% + 暗化 60% ----
+        // ---- 已探索但不在视野：降饱和+暗化（一次合并覆盖，减少 fillRect） ----
         let tex = null;
         if (t === '#') tex = vc.wall;
         else if (t === '~') tex = vc.waterTex || vc.floor;
         else tex = vc.floor;
         if (tex) ctx.drawImage(tex, tx, ty, tile, tile);
-        ctx.fillStyle = 'rgba(128,128,128,0.28)'; // 降饱和
-        ctx.fillRect(tx, ty, tile, tile);
-        ctx.fillStyle = 'rgba(0,0,0,0.62)'; // 暗化
+        ctx.fillStyle = 'rgba(36,33,26,0.85)';
         ctx.fillRect(tx, ty, tile, tile);
       } else {
-        ctx.fillStyle = '#000';
-        ctx.fillRect(tx, ty, tile, tile);
+        // ---- 未探索：黑色底已整屏铺过，跳过（省去逐格 fillRect） ----
       }
     }
   }
@@ -1610,6 +1607,22 @@ function renderHud() {
     hint.classList.toggle('hidden', !nearExit);
     if (nearExit) hint.textContent = '✨ 附近有卡出点 —— 按 X 卡出';
   }
+
+  // 无限层出口罗盘：指向最近的出口（隐藏出口未发现时显示模糊方向，解决无限世界迷路）
+  const compass = $('exit-compass');
+  if (compass) {
+    const info = nearestExitInfo(level, p.x, p.y);
+    if (info) {
+      const arrow = COMPASS_ARROWS[angleToArrow(info.angle)];
+      const known =
+        !info.hidden ||
+        (disc && disc.has(level.exits.findIndex((e) => e.x === info.x && e.y === info.y)));
+      compass.textContent = known ? `${arrow} 出口 ${Math.round(info.d)}m` : `${arrow} 出口 ?`;
+      compass.classList.remove('hidden');
+    } else {
+      compass.classList.add('hidden');
+    }
+  }
 }
 
 function setBar(id, v) {
@@ -1807,15 +1820,33 @@ function drawMapModal() {
         mapCtx.fillRect((dx + R) * tw, (dy + R) * th, tw + 1, th + 1);
       }
     }
-    // 出口（仅玩家附近已发现的）
+    // 出口（仅玩家附近已发现的；范围外的画边缘箭头指方向）
     for (let i = 0; i < level.exits.length; i++) {
       const ex = level.exits[i];
       if (ex.hidden && !g.discoveredExits[g.levelId].has(i)) continue;
       const dx = ex.x - g.player.x;
       const dy = ex.y - g.player.y;
-      if (Math.abs(dx) > R || Math.abs(dy) > R) continue;
-      mapCtx.fillStyle = ex.hidden ? '#e8e08a' : '#8ad8a0';
-      mapCtx.fillRect((dx + R) * tw + tw * 0.25, (dy + R) * th + th * 0.25, tw * 0.5 + 1, th * 0.5 + 1);
+      if (Math.abs(dx) <= R && Math.abs(dy) <= R) {
+        mapCtx.fillStyle = ex.hidden ? '#e8e08a' : '#8ad8a0';
+        mapCtx.fillRect((dx + R) * tw + tw * 0.25, (dy + R) * th + th * 0.25, tw * 0.5 + 1, th * 0.5 + 1);
+      } else {
+        // 边缘箭头：指向出口方向（归一化到局部地图边缘）
+        const norm = Math.max(Math.abs(dx), Math.abs(dy));
+        const ax = (dx / norm) * R + R;
+        const ay = (dy / norm) * R + R;
+        const ang = Math.atan2(dy, dx);
+        mapCtx.save();
+        mapCtx.translate(ax * tw + tw / 2, ay * th + th / 2);
+        mapCtx.rotate(ang);
+        mapCtx.fillStyle = ex.hidden ? 'rgba(232,224,138,0.9)' : 'rgba(138,216,160,0.9)';
+        mapCtx.beginPath();
+        mapCtx.moveTo(8, 0);
+        mapCtx.lineTo(-4, -5);
+        mapCtx.lineTo(-4, 5);
+        mapCtx.closePath();
+        mapCtx.fill();
+        mapCtx.restore();
+      }
     }
     // 玩家（中心）
     mapCtx.fillStyle = '#f2f2f2';

@@ -19,6 +19,7 @@ import {
 } from './engine/game.js';
 import { viewRadiusOf, ITEM_META } from './engine/player.js';
 import { ENTITY_DEFS } from './engine/entities.js';
+import { nearestExitInfo, COMPASS_ARROWS, angleToArrow } from './engine/generator.js';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const SAVE_FILE = path.join(ROOT, 'saves', 'cli-save.json');
@@ -104,11 +105,19 @@ function renderView(state, radiusOverride) {
 function renderStatus() {
   const { player, level } = state;
   const pct = (v) => (v >= 100 ? 'MAX' : String(Math.round(v)).padStart(3));
+  let compass = '';
+  if (level.infinite) {
+    const info = nearestExitInfo(level, player.x, player.y);
+    if (info) {
+      compass = ` 出口${COMPASS_ARROWS[angleToArrow(info.angle)]}${Math.round(info.d)}m`;
+    }
+  }
   return (
     `HP ${pct(player.hp)}  SAN ${pct(player.sanity)}  STA ${pct(player.stamina)}  ` +
     `| ${level.name}（难度 ${level.difficultyClass}）| 第 ${state.turn} 回合 | ` +
     `手电:${player.flashlight ? '开' : '关'}(${Math.floor(player.battery)}%) ` +
-    `潜行:${player.sneak ? '开' : '关'} 武器:${player.weapon ? '撬棍' : '徒手'}`
+    `潜行:${player.sneak ? '开' : '关'} 武器:${player.weapon ? '撬棍' : '徒手'}` +
+    compass
   );
 }
 
