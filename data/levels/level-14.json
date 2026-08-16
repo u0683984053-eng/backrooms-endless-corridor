@@ -9,31 +9,98 @@
   "light": "bright",
   "sanDrain": 0,
   "description": "绿色的草地、明亮的阳光、清澈的河流。这里是后室少数没有危险的地方——但正是这种完美让人不安。野餐毯摆好了，秋千在晃，却没有人。你第一次希望这里不是真的。",
-  "palette": { "primary": "#3a7a4a", "secondary": "#2a5a38", "accent": "#8ac89a", "light": "#e8f0d0" },
-  "terrain": {
-    "width": 32, "height": 32,
-    "roomCount": 10, "roomSizeMin": 6, "roomSizeMax": 14,
-    "corridorWidth": 3,
-    "wallStyle": "drywall", "floorStyle": "grass",
-    "extraFeatures": ["fountain", "furniture", "columns"]
+  "palette": {
+    "primary": "#3a7a4a",
+    "secondary": "#2a5a38",
+    "accent": "#8ac89a",
+    "light": "#e8f0d0"
   },
-  "spaceRules": ["euclidean"],
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 10,
+    "roomSizeMin": 6,
+    "roomSizeMax": 14,
+    "corridorWidth": 3,
+    "wallStyle": "drywall",
+    "floorStyle": "grass",
+    "extraFeatures": [
+      "fountain",
+      "furniture",
+      "columns"
+    ],
+    "topology": "fields"
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
   "entities": [],
-  "items": ["almond-water", "royal-ration", "medkit", "battery", "flashlight", "note"],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "medkit",
+    "battery",
+    "flashlight",
+    "note"
+  ],
   "itemDensity": 0.3,
   "setPieces": [
-    { "type": "object", "position": "random", "text": "河边的草地上铺着一张红白格野餐毯，毯上摆着三明治和果汁，杯壁还挂着水珠。没有人。毯子边缘整整齐齐，连一个脚印都没有。", "sanityEffect": -5, "note": "野餐毯摆得整整齐齐，像在等永远不会来的人。" },
-    { "type": "object", "position": "center", "text": "一棵大树的枝桠上挂着一架秋千，绳结打得漂亮。你坐上去，它荡得很高，风很暖——你几乎忘了自己在哪里。直到你发现树影的方向和太阳相反。", "sanityEffect": -3, "note": "秋千荡得很高。树影的方向不对。" },
-    { "type": "object", "position": "far-corner", "text": "远处小丘上站着一个黑色的轮廓，一动不动。你转身走开，再回头，它还在那里——和你离开时一样的距离、一样的姿势。你每一次转身，它都在。", "sanityEffect": -8, "note": "远处的人影。每次转身，它都在。" }
+    {
+      "type": "object",
+      "position": "random",
+      "text": "河边的草地上铺着一张红白格野餐毯，毯上摆着三明治和果汁，杯壁还挂着水珠。没有人。毯子边缘整整齐齐，连一个脚印都没有。",
+      "sanityEffect": -5,
+      "note": "野餐毯摆得整整齐齐，像在等永远不会来的人。"
+    },
+    {
+      "type": "object",
+      "position": "center",
+      "text": "一棵大树的枝桠上挂着一架秋千，绳结打得漂亮。你坐上去，它荡得很高，风很暖——你几乎忘了自己在哪里。直到你发现树影的方向和太阳相反。",
+      "sanityEffect": -3,
+      "note": "秋千荡得很高。树影的方向不对。"
+    },
+    {
+      "type": "object",
+      "position": "far-corner",
+      "text": "远处小丘上站着一个黑色的轮廓，一动不动。你转身走开，再回头，它还在那里——和你离开时一样的距离、一样的姿势。你每一次转身，它都在。",
+      "sanityEffect": -8,
+      "note": "远处的人影。每次转身，它都在。"
+    }
   ],
   "soundscape": {
-    "ambient": ["鸟鸣", "溪水潺潺", "风吹树叶的沙沙声"],
-    "startles": ["树枝在身后折断", "远处传来一声模糊的呼唤——像是你的名字", "鸟鸣突然全部停止"],
+    "ambient": [
+      "鸟鸣",
+      "溪水潺潺",
+      "风吹树叶的沙沙声"
+    ],
+    "startles": [
+      "树枝在身后折断",
+      "远处传来一声模糊的呼唤——像是你的名字",
+      "鸟鸣突然全部停止"
+    ],
     "silenceEvents": true
   },
   "exits": [
-    { "target": "level-0", "kind": "noclip", "hidden": true, "danger": false, "description": "河对岸的草地有一片颜色不对的阴影，像一块贴上去的补丁。你踩进去，脚下变成了发黄的墙纸和潮湿的地毯——你回到了这一切开始的地方。" },
-    { "target": "level-10", "kind": "door", "hidden": false, "danger": true, "description": "一扇立在草地上的木门，门框上缠着野花。推开门，是金黄的麦田。你回头，身后只剩草地。" },
-    { "target": "level-922", "kind": "door", "hidden": true, "danger": false, "description": "树林尽头一座玻璃温室，阳光透过穹顶——绿色的香气从门缝里溢出来。" }
+    {
+      "target": "level-0",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": false,
+      "description": "河对岸的草地有一片颜色不对的阴影，像一块贴上去的补丁。你踩进去，脚下变成了发黄的墙纸和潮湿的地毯——你回到了这一切开始的地方。"
+    },
+    {
+      "target": "level-10",
+      "kind": "door",
+      "hidden": false,
+      "danger": true,
+      "description": "一扇立在草地上的木门，门框上缠着野花。推开门，是金黄的麦田。你回头，身后只剩草地。"
+    },
+    {
+      "target": "level-922",
+      "kind": "door",
+      "hidden": true,
+      "danger": false,
+      "description": "树林尽头一座玻璃温室，阳光透过穹顶——绿色的香气从门缝里溢出来。"
+    }
   ]
 }

@@ -9,37 +9,126 @@
   "light": "dark",
   "sanDrain": 0.3,
   "description": "一家无尽延伸的破旧旅馆：红色地毯、昏暗走廊、无数房门。门后有时是客房，有时是别的什么。住在这里的东西会模仿敲门声。",
-  "palette": { "primary": "#7a2a2a", "secondary": "#5c2020", "accent": "#c8a060", "light": "#d8b878" },
-  "terrain": {
-    "width": 26, "height": 26,
-    "roomCount": 16, "roomSizeMin": 3, "roomSizeMax": 6,
-    "corridorWidth": 2,
-    "wallStyle": "wallpaper", "floorStyle": "carpet",
-    "extraFeatures": ["doors", "furniture", "windows", "elevator"]
+  "palette": {
+    "primary": "#7a2a2a",
+    "secondary": "#5c2020",
+    "accent": "#c8a060",
+    "light": "#d8b878"
   },
-  "spaceRules": ["non-euclidean"],
-  "entities": [
-    { "type": "smiler", "density": 0.014, "aggression": "hostile" },
-    { "type": "partygoer", "density": 0.008, "aggression": "hostile" },
-    { "type": "skin-stealer", "density": 0.005, "aggression": "curious" },
-    { "type": "deathmoth", "density": 0.006, "aggression": "curious" }
+  "terrain": {
+    "width": 30,
+    "height": 30,
+    "roomCount": 16,
+    "roomSizeMin": 3,
+    "roomSizeMax": 6,
+    "corridorWidth": 2,
+    "wallStyle": "wallpaper",
+    "floorStyle": "carpet",
+    "extraFeatures": [
+      "doors",
+      "furniture",
+      "windows",
+      "elevator"
+    ],
+    "topology": "hotel"
+  },
+  "spaceRules": [
+    "non-euclidean"
   ],
-  "items": ["key", "almond-water", "flashlight", "battery", "note"],
+  "entities": [
+    {
+      "type": "smiler",
+      "density": 0.014,
+      "aggression": "hostile"
+    },
+    {
+      "type": "partygoer",
+      "density": 0.008,
+      "aggression": "hostile"
+    },
+    {
+      "type": "skin-stealer",
+      "density": 0.005,
+      "aggression": "curious"
+    },
+    {
+      "type": "deathmoth",
+      "density": 0.006,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "key",
+    "almond-water",
+    "flashlight",
+    "battery",
+    "note"
+  ],
   "itemDensity": 0.08,
   "setPieces": [
-    { "type": "weird-room", "position": "random", "text": "客房 404 的门没有锁。里面是一间普通客房，但墙上挂满了钟，全部停在 3:33。", "sanityEffect": -7, "note": "客房 404：满墙的钟，都停在 3:33。" },
-    { "type": "writing", "position": "random", "text": "走廊镜子上用口红写着：『敲门的是我。』", "sanityEffect": -5, "note": "镜子上的口红字：『敲门的是我。』" },
-    { "type": "corpse", "position": "far-corner", "text": "浴缸里放着一件叠好的制服，叠得整整齐齐，像在等人穿。", "sanityEffect": -6, "note": "浴缸里叠着一件制服。" }
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "客房 404 的门没有锁。里面是一间普通客房，但墙上挂满了钟，全部停在 3:33。",
+      "sanityEffect": -7,
+      "note": "客房 404：满墙的钟，都停在 3:33。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "走廊镜子上用口红写着：『敲门的是我。』",
+      "sanityEffect": -5,
+      "note": "镜子上的口红字：『敲门的是我。』"
+    },
+    {
+      "type": "corpse",
+      "position": "far-corner",
+      "text": "浴缸里放着一件叠好的制服，叠得整整齐齐，像在等人穿。",
+      "sanityEffect": -6,
+      "note": "浴缸里叠着一件制服。"
+    }
   ],
   "soundscape": {
-    "ambient": ["走廊尽头的电梯运转声", "水管里的咕噜声", "地毯上拖行的声音"],
-    "startles": ["敲门声：两下，停顿，一下", "房间里的电视自己打开", "走廊灯一盏盏熄灭向你逼近"],
+    "ambient": [
+      "走廊尽头的电梯运转声",
+      "水管里的咕噜声",
+      "地毯上拖行的声音"
+    ],
+    "startles": [
+      "敲门声：两下，停顿，一下",
+      "房间里的电视自己打开",
+      "走廊灯一盏盏熄灭向你逼近"
+    ],
     "silenceEvents": true
   },
   "exits": [
-    { "target": "level-11", "kind": "noclip", "hidden": true, "danger": false, "description": "电梯门打开，里面不是电梯井，而是夜晚的城市街道。" },
-    { "target": "level-3", "kind": "elevator", "hidden": false, "danger": true, "description": "一部向下走的电梯，按键只有一个'3'，但楼层牌写着'B1'。" },
-    { "target": "level-6", "kind": "noclip", "hidden": true, "danger": false, "description": "走廊尽头一扇没上锁的门，门后是彻底的黑暗——你听到自己的呼吸被吞没。" },
-    { "target": "level-66", "kind": "door", "hidden": true, "danger": false, "description": "消防通道的尽头有一道泳池入口，门缝里透出柔和的水光。" }
+    {
+      "target": "level-11",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": false,
+      "description": "电梯门打开，里面不是电梯井，而是夜晚的城市街道。"
+    },
+    {
+      "target": "level-3",
+      "kind": "elevator",
+      "hidden": false,
+      "danger": true,
+      "description": "一部向下走的电梯，按键只有一个'3'，但楼层牌写着'B1'。"
+    },
+    {
+      "target": "level-6",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": false,
+      "description": "走廊尽头一扇没上锁的门，门后是彻底的黑暗——你听到自己的呼吸被吞没。"
+    },
+    {
+      "target": "level-66",
+      "kind": "door",
+      "hidden": true,
+      "danger": false,
+      "description": "消防通道的尽头有一道泳池入口，门缝里透出柔和的水光。"
+    }
   ]
 }

@@ -218,6 +218,106 @@ function buildCaves(tiles, W, H, rng, props, rooms) {
   }
 }
 
+/** 仓库大厅拓扑（Level 1 宜居地带）：开阔大厅 + 柱列 + 边缘房间，F 版"巨大仓库式空间" */
+function buildWarehouse(tiles, W, H, rng, props, rooms) {
+  // 中央大厅全打通
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) tiles[y][x] = '.';
+  }
+  // 混凝土柱列：每 5 格一柱
+  for (let y = 4; y < H - 1; y += 5) {
+    for (let x = 4; x < W - 1; x += 5) tiles[y][x] = '#';
+  }
+  // 边缘小房间带（办公室/隔间），面向大厅开门
+  for (let y = 1; y < H - 3; y += 4) {
+    for (const sx of [0, W - 5]) {
+      for (let yy = y; yy < y + 3; yy++) {
+        for (let xx = sx; xx < sx + 3; xx++) {
+          if (xx >= 1 && yy >= 1 && xx < W - 1 && yy < H - 1) tiles[yy][xx] = '.';
+        }
+      }
+      rooms.push({ x: sx + 1, y: y + 1, w: 3, h: 3 });
+      // 门朝大厅
+      const doorX = sx === 0 ? 4 : W - 5;
+      if (tiles[y + 1][doorX] === '#') {
+        tiles[y + 1][doorX] = 'D';
+        props.push({ x: doorX, y: y + 1, kind: 'door' });
+      }
+    }
+  }
+  rooms.push({ x: 5, y: 5, w: W - 10, h: H - 10 });
+}
+
+/** 旅馆拓扑（Level 5 恐怖旅馆）：窄走廊网格 + 走廊两侧的 3×3 房间，门口遍布（F 版红地毯走廊+无数房门） */
+function buildHotel(tiles, W, H, rng, props, rooms) {
+  const stride = 6;
+  const isCorridor = (x, y) => x % stride === 2 || y % stride === 2;
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      tiles[y][x] = isCorridor(x, y) ? '.' : '#';
+    }
+  }
+  // 房间：x%6∈{3,4,5} 且 y%6∈{3,4,5} 的 3×3 块，紧邻走廊开口
+  for (let by = 0; by < Math.floor(H / stride); by++) {
+    for (let bx = 0; bx < Math.floor(W / stride); bx++) {
+      const x0 = bx * stride + 3;
+      const y0 = by * stride + 3;
+      for (let yy = y0; yy < y0 + 3; yy++) {
+        for (let xx = x0; xx < x0 + 3; xx++) tiles[yy][xx] = '.';
+      }
+      rooms.push({ x: x0, y: y0, w: 3, h: 3 });
+      // 门口（房间与走廊交界）：每面 1 扇 D（可走通道标记）
+      const doors = [
+        [x0, y0, 'top'],
+        [x0, y0 + 2, 'bottom'],
+        [x0, y0, 'left'],
+        [x0 + 2, y0, 'right'],
+      ];
+      for (const [dx, dy] of [[x0, y0], [x0, y0 + 2], [x0, y0], [x0 + 2, y0]]) {
+        if (chance(rng, 0.7)) {
+          if (tiles[dy][dx] === '.') {
+            tiles[dy][dx] = 'D';
+            props.push({ x: dx, y: dy, kind: 'door' });
+          }
+        }
+      }
+    }
+  }
+}
+
+/** 田野/开阔地拓扑（Level 10 田野、Level 14 天堂）：开阔地面 + 随机障碍簇 + 稀疏建筑 */
+function buildFields(tiles, W, H, rng, props, rooms) {
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) tiles[y][x] = '.';
+  }
+  // 障碍簇（树丛/石堆/草垛）：随机圆块
+  const n = randInt(rng, 8, 16);
+  for (let i = 0; i < n; i++) {
+    const cx = randInt(rng, 3, W - 4);
+    const cy = randInt(rng, 3, H - 4);
+    const r = randInt(rng, 2, 4);
+    for (let yy = cy - r; yy <= cy + r; yy++) {
+      for (let xx = cx - r; xx <= cx + r; xx++) {
+        if (xx >= 1 && yy >= 1 && xx < W - 1 && yy < H - 1 && (xx - cx) ** 2 + (yy - cy) ** 2 <= r * r) {
+          tiles[yy][xx] = '#';
+        }
+      }
+    }
+  }
+  // 稀疏建筑（农舍/小屋）
+  const houses = randInt(rng, 3, 5);
+  for (let i = 0; i < houses; i++) {
+    const hx = randInt(rng, 2, W - 6);
+    const hy = randInt(rng, 2, H - 6);
+    for (let yy = hy; yy < hy + 4; yy++) {
+      for (let xx = hx; xx < hx + 4; xx++) {
+        if (xx >= 1 && yy >= 1 && xx < W - 1 && yy < H - 1) tiles[yy][xx] = '.';
+      }
+    }
+    rooms.push({ x: hx + 1, y: hy + 1, w: 2, h: 2 });
+  }
+}
+
 /** 生成单次布局（内部函数，调用方负责可达性验证） */
 function buildLevel(dna, rng) {
   const T = dna.terrain;
@@ -248,6 +348,12 @@ function buildLevel(dna, rng) {
     buildCityGrid(tiles, W, H, rng, props, rooms);
   } else if (topology === 'racetrack') {
     buildRacetrack(tiles, W, H, rng, props, rooms);
+  } else if (topology === 'warehouse') {
+    buildWarehouse(tiles, W, H, rng, props, rooms);
+  } else if (topology === 'hotel') {
+    buildHotel(tiles, W, H, rng, props, rooms);
+  } else if (topology === 'fields') {
+    buildFields(tiles, W, H, rng, props, rooms);
   } else if (topology === 'caves') {
     buildCaves(tiles, W, H, rng, props, rooms);
   } else {

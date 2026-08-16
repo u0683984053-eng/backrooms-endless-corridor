@@ -749,6 +749,79 @@ section('13. 拓扑：城市街区/跑道/洞穴，各层级几何结构不同')
     levelHash(l11) !== levelHash(lBang) && levelHash(lBang) !== levelHash(l8) && levelHash(l11) !== levelHash(l8)
   );
 }
+
+// ---------- 14. 拓扑对照 F 版（仓库/旅馆/郊区/田野/天堂） ----------
+section('14. 拓扑：各层级几何符合 F 版描述');
+{
+  const WALK = new Set(['.', '~', 'D', 'S', 'E', 'I', 'T']);
+  const wrapBfs = (level) => {
+    const w = level.width;
+    const h = level.height;
+    const seen = new Set([level.spawn.x + ',' + level.spawn.y]);
+    const q = [[level.spawn.x, level.spawn.y]];
+    while (q.length) {
+      const [x, y] = q.pop();
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = (x + dx + w) % w;
+        const ny = (y + dy + h) % h;
+        const k = nx + ',' + ny;
+        if (seen.has(k)) continue;
+        if (!WALK.has(level.tiles[ny][nx])) continue;
+        seen.add(k);
+        q.push([nx, ny]);
+      }
+    }
+    return seen;
+  };
+  const ratio = (lv) => {
+    const wc = lv.tiles.flat().filter((t) => WALK.has(t)).length;
+    return wc > 0 ? wrapBfs(lv).size / wc : 0;
+  };
+  const openRatio = (lv) => lv.tiles.flat().filter((t) => t === '.').length / (lv.width * lv.height);
+
+  // Level 1 宜居地带：开阔仓库大厅（开阔率 ≥70%）+ 柱列
+  const l1 = generateLevel(levels['level-1'], 7);
+  check('Level 1 使用 warehouse 拓扑', (l1.terrain || {}).topology === 'warehouse');
+  check('Level 1 开阔大厅（地板占比 ≥70%）', openRatio(l1) >= 0.7, `${(openRatio(l1) * 100).toFixed(0)}%`);
+  const pillarCount = l1.tiles.flat().filter((t) => t === '#').length;
+  check('Level 1 柱列存在（墙占比 2-25%）', pillarCount / (l1.width * l1.height) >= 0.02 && pillarCount / (l1.width * l1.height) <= 0.25, `${((pillarCount / (l1.width * l1.height)) * 100).toFixed(1)}%`);
+  check('Level 1 环绕 100% 联通', ratio(l1) >= 0.999);
+
+  // Level 5 恐怖旅馆：走廊两侧房间（走廊网格 + 房间 ≥12）
+  const l5 = generateLevel(levels['level-5'], 7);
+  check('Level 5 使用 hotel 拓扑', (l5.terrain || {}).topology === 'hotel', JSON.stringify((l5.terrain || {}).topology));
+  check('Level 5 尺寸 30×30', l5.width === 30 && l5.height === 30, `${l5.width}×${l5.height}`);
+  check('Level 5 房间数 ≥12（走廊两侧客房）', (l5.rooms || []).length >= 12, `${(l5.rooms || []).length} 间`);
+  const l5Doors = (l5.props || []).filter((p) => p.kind === 'door').length;
+  check('Level 5 门口遍布（门 ≥8）', l5Doors >= 8, `${l5Doors} 扇`);
+  check('Level 5 环绕 100% 联通', ratio(l5) >= 0.999);
+
+  // Level 9 郊区：城市街区（街道 + 沿街房屋）
+  const l9 = generateLevel(levels['level-9'], 7);
+  check('Level 9 使用 city-grid 拓扑', (l9.terrain || {}).topology === 'city-grid');
+  check('Level 9 街道贯通（行 y=1 横向可走 ≥90%）', (() => {
+    let n = 0;
+    for (let x = 0; x < l9.width; x++) if (WALK.has(l9.tiles[1][x])) n++;
+    return n / l9.width >= 0.9;
+  })());
+  check('Level 9 环绕 100% 联通', ratio(l9) >= 0.999);
+
+  // Level 10 田野：开阔（地板占比 ≥85%）+ 障碍簇
+  const l10 = generateLevel(levels['level-10'], 7);
+  check('Level 10 使用 fields 拓扑', (l10.terrain || {}).topology === 'fields');
+  check('Level 10 开阔农田（地板占比 ≥80%）', openRatio(l10) >= 0.8, `${(openRatio(l10) * 100).toFixed(0)}%`);
+  check('Level 10 环绕 100% 联通', ratio(l10) >= 0.999);
+
+  // Level 14 天堂：开阔草地
+  const l14 = generateLevel(levels['level-14'], 7);
+  check('Level 14 使用 fields 拓扑', (l14.terrain || {}).topology === 'fields');
+  check('Level 14 开阔草地（地板占比 ≥65%）', openRatio(l14) >= 0.65, `${(openRatio(l14) * 100).toFixed(0)}%`);
+  check('Level 14 环绕 100% 联通', ratio(l14) >= 0.999);
+
+  // 各层级拓扑互异（几何形态确实不同）
+  const hashes = [l1, l5, l9, l10, l14].map(levelHash);
+  check('仓库/旅馆/郊区/田野/天堂 拓扑布局互异', new Set(hashes).size === 5);
+}
 console.log(`\n====================`);
 console.log(`冒烟测试完成：通过 ${pass} 项，失败 ${fail} 项`);
 process.exitCode = fail > 0 ? 1 : 0;

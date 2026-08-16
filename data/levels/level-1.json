@@ -31,7 +31,8 @@
       "doors",
       "furniture",
       "crates"
-    ]
+    ],
+    "topology": "warehouse"
   },
   "spaceRules": [
     "euclidean"

@@ -9,34 +9,111 @@
   "light": "dim",
   "sanDrain": 0.15,
   "description": "永恒的黄昏笼罩着空旷的郊区。浓雾贴着地面流淌，每一栋房子都亮着灯，却没有一扇窗后有人影。你路过很多个家，没有一个是你的。",
-  "palette": { "primary": "#5c6472", "secondary": "#3e4654", "accent": "#8f9aac", "light": "#c8b89a" },
-  "terrain": {
-    "width": 40, "height": 40,
-    "roomCount": 20, "roomSizeMin": 5, "roomSizeMax": 10,
-    "corridorWidth": 3,
-    "wallStyle": "drywall", "floorStyle": "concrete",
-    "extraFeatures": ["windows", "doors", "furniture", "columns"]
+  "palette": {
+    "primary": "#5c6472",
+    "secondary": "#3e4654",
+    "accent": "#8f9aac",
+    "light": "#c8b89a"
   },
-  "spaceRules": ["euclidean"],
-  "entities": [
-    { "type": "faceling", "density": 0.02, "aggression": "passive" },
-    { "type": "watcher", "density": 0.01, "aggression": "curious" }
+  "terrain": {
+    "width": 48,
+    "height": 48,
+    "roomCount": 20,
+    "roomSizeMin": 5,
+    "roomSizeMax": 10,
+    "corridorWidth": 3,
+    "wallStyle": "drywall",
+    "floorStyle": "concrete",
+    "extraFeatures": [
+      "windows",
+      "doors",
+      "furniture",
+      "columns"
+    ],
+    "topology": "city-grid"
+  },
+  "spaceRules": [
+    "euclidean"
   ],
-  "items": ["almond-water", "royal-ration", "battery", "flashlight", "medkit", "note"],
+  "entities": [
+    {
+      "type": "faceling",
+      "density": 0.02,
+      "aggression": "passive"
+    },
+    {
+      "type": "watcher",
+      "density": 0.01,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
   "itemDensity": 0.15,
   "setPieces": [
-    { "type": "object", "position": "random", "text": "门廊的秋千在无风的傍晚轻轻摇晃，好像有人刚刚起身离开。坐垫上还残留着体温的错觉。", "sanityEffect": -4, "note": "无风的傍晚，门廊秋千在摇晃。" },
-    { "type": "weird-room", "position": "far-corner", "text": "推开一扇虚掩的门，餐厅里摆着三副餐具，食物还在冒热气，餐巾叠得整整齐齐。墙上挂着全家福——照片里的每一张脸都是模糊的。", "sanityEffect": -6, "note": "晚餐还在冒热气。全家福里没有一张清晰的脸。" },
-    { "type": "object", "position": "random", "text": "客厅的电视机亮着，屏幕上是满屏的雪花，沙沙声在空房间里格外清晰。电源线没有插进插座。", "sanityEffect": -7, "note": "没插电的电视，亮着雪花。" }
+    {
+      "type": "object",
+      "position": "random",
+      "text": "门廊的秋千在无风的傍晚轻轻摇晃，好像有人刚刚起身离开。坐垫上还残留着体温的错觉。",
+      "sanityEffect": -4,
+      "note": "无风的傍晚，门廊秋千在摇晃。"
+    },
+    {
+      "type": "weird-room",
+      "position": "far-corner",
+      "text": "推开一扇虚掩的门，餐厅里摆着三副餐具，食物还在冒热气，餐巾叠得整整齐齐。墙上挂着全家福——照片里的每一张脸都是模糊的。",
+      "sanityEffect": -6,
+      "note": "晚餐还在冒热气。全家福里没有一张清晰的脸。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "客厅的电视机亮着，屏幕上是满屏的雪花，沙沙声在空房间里格外清晰。电源线没有插进插座。",
+      "sanityEffect": -7,
+      "note": "没插电的电视，亮着雪花。"
+    }
   ],
   "soundscape": {
-    "ambient": ["傍晚的风穿过街道", "远处传来一声犬吠", "窗帘被风吹动拍打窗框", "电线在风中低鸣"],
-    "startles": ["某扇门在身后轻轻关上", "犬吠突然变得很近", "脚步声——但街上空无一人"],
+    "ambient": [
+      "傍晚的风穿过街道",
+      "远处传来一声犬吠",
+      "窗帘被风吹动拍打窗框",
+      "电线在风中低鸣"
+    ],
+    "startles": [
+      "某扇门在身后轻轻关上",
+      "犬吠突然变得很近",
+      "脚步声——但街上空无一人"
+    ],
     "silenceEvents": true
   },
   "exits": [
-    { "target": "level-10", "kind": "door", "hidden": false, "danger": false, "description": "一栋房子后院的木门虚掩着，门缝里漏出金色的光。推开门，是延伸到天边的麦田。" },
-    { "target": "level-14", "kind": "door", "hidden": false, "danger": false, "description": "某栋房子的前门挂着欢迎花环。推开门，阳光、草地和鸟鸣扑面而来——完美得让人起鸡皮疙瘩。" },
-    { "target": "level-11", "kind": "noclip", "hidden": true, "danger": false, "description": "雾最浓的路口，柏油路面在雾气里微微发亮，像刚下过雨。你踩上去，雾气散开——变成了无尽城市的街道。" }
+    {
+      "target": "level-10",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "一栋房子后院的木门虚掩着，门缝里漏出金色的光。推开门，是延伸到天边的麦田。"
+    },
+    {
+      "target": "level-14",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "某栋房子的前门挂着欢迎花环。推开门，阳光、草地和鸟鸣扑面而来——完美得让人起鸡皮疙瘩。"
+    },
+    {
+      "target": "level-11",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": false,
+      "description": "雾最浓的路口，柏油路面在雾气里微微发亮，像刚下过雨。你踩上去，雾气散开——变成了无尽城市的街道。"
+    }
   ]
 }

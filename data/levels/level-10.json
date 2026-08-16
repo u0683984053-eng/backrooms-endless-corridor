@@ -9,33 +9,102 @@
   "light": "bright",
   "sanDrain": 0.05,
   "description": "金色的麦田一直铺到地平线。白昼温暖而安静，风把麦浪推到天边。这里几乎让人忘记后室——几乎。田野深处总有什么东西在看着你。",
-  "palette": { "primary": "#c8a84a", "secondary": "#8a7030", "accent": "#5a4a20", "light": "#f0d878" },
-  "terrain": {
-    "width": 40, "height": 40,
-    "roomCount": 12, "roomSizeMin": 6, "roomSizeMax": 16,
-    "corridorWidth": 3,
-    "wallStyle": "brick", "floorStyle": "grass",
-    "extraFeatures": ["puddles", "doors", "furniture"]
+  "palette": {
+    "primary": "#c8a84a",
+    "secondary": "#8a7030",
+    "accent": "#5a4a20",
+    "light": "#f0d878"
   },
-  "spaceRules": ["euclidean"],
-  "entities": [
-    { "type": "moth", "density": 0.015, "aggression": "passive" },
-    { "type": "clump", "density": 0.004, "aggression": "passive" }
+  "terrain": {
+    "width": 40,
+    "height": 40,
+    "roomCount": 12,
+    "roomSizeMin": 6,
+    "roomSizeMax": 16,
+    "corridorWidth": 3,
+    "wallStyle": "brick",
+    "floorStyle": "grass",
+    "extraFeatures": [
+      "puddles",
+      "doors",
+      "furniture"
+    ],
+    "topology": "fields"
+  },
+  "spaceRules": [
+    "euclidean"
   ],
-  "items": ["almond-water", "royal-ration", "medkit", "battery", "flashlight", "note"],
+  "entities": [
+    {
+      "type": "moth",
+      "density": 0.015,
+      "aggression": "passive"
+    },
+    {
+      "type": "clump",
+      "density": 0.004,
+      "aggression": "passive"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "medkit",
+    "battery",
+    "flashlight",
+    "note"
+  ],
   "itemDensity": 0.3,
   "setPieces": [
-    { "type": "object", "position": "center", "text": "田野正中立着一个稻草人，帽子压得很低，双臂展开。你走过时觉得它在看你——回头看，它的头微微转了一个角度。", "sanityEffect": -3, "note": "稻草人。走过之后，它的头似乎转了角度。" },
-    { "type": "object", "position": "far-corner", "text": "一台锈蚀的拖拉机停在麦田边，驾驶座上放着一顶草帽，钥匙还插在锁孔里。油箱是满的——但麦田里没有路。", "sanityEffect": -2, "note": "满油的拖拉机，停在没有路的田野边。" },
-    { "type": "object", "position": "random", "text": "麦田里有一行脚印，从地平线那头一直延伸到你脚下，然后在你站的地方戛然而止——像是有人走到这里，然后消失了。", "sanityEffect": -4, "note": "一行脚印消失在脚下。这里不该有人。" }
+    {
+      "type": "object",
+      "position": "center",
+      "text": "田野正中立着一个稻草人，帽子压得很低，双臂展开。你走过时觉得它在看你——回头看，它的头微微转了一个角度。",
+      "sanityEffect": -3,
+      "note": "稻草人。走过之后，它的头似乎转了角度。"
+    },
+    {
+      "type": "object",
+      "position": "far-corner",
+      "text": "一台锈蚀的拖拉机停在麦田边，驾驶座上放着一顶草帽，钥匙还插在锁孔里。油箱是满的——但麦田里没有路。",
+      "sanityEffect": -2,
+      "note": "满油的拖拉机，停在没有路的田野边。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "麦田里有一行脚印，从地平线那头一直延伸到你脚下，然后在你站的地方戛然而止——像是有人走到这里，然后消失了。",
+      "sanityEffect": -4,
+      "note": "一行脚印消失在脚下。这里不该有人。"
+    }
   ],
   "soundscape": {
-    "ambient": ["风吹麦浪的沙沙声", "远处的虫鸣", "偶尔的鸟叫"],
-    "startles": ["麦田深处传来窸窣声", "稻草人的衣袖被风扯动", "远处一声闷雷——天空却万里无云"],
+    "ambient": [
+      "风吹麦浪的沙沙声",
+      "远处的虫鸣",
+      "偶尔的鸟叫"
+    ],
+    "startles": [
+      "麦田深处传来窸窣声",
+      "稻草人的衣袖被风扯动",
+      "远处一声闷雷——天空却万里无云"
+    ],
     "silenceEvents": false
   },
   "exits": [
-    { "target": "level-11", "kind": "door", "hidden": false, "danger": false, "description": "麦田边缘立着一扇孤零零的地铁闸门，周围什么都没有。推开它，是城市路灯的暖光。" },
-    { "target": "level-9", "kind": "door", "hidden": false, "danger": true, "description": "一栋被麦田半埋的旧房子，门开着。门里是永恒的黄昏——和一条空无一人的街道。" }
+    {
+      "target": "level-11",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "麦田边缘立着一扇孤零零的地铁闸门，周围什么都没有。推开它，是城市路灯的暖光。"
+    },
+    {
+      "target": "level-9",
+      "kind": "door",
+      "hidden": false,
+      "danger": true,
+      "description": "一栋被麦田半埋的旧房子，门开着。门里是永恒的黄昏——和一条空无一人的街道。"
+    }
   ]
 }
