@@ -296,6 +296,24 @@ section('5.5 无限世界：Minecraft 式分块生成');
   check('负坐标可生成', WALKABLE_TILES.has(lvl.getTile(-3, -7)) || lvl.getTile(-3, -7) === '#');
   check('远方坐标可生成（chunk 惰性）', ['#', '.', 'D', '~', 'E', 'I', 'S', 'T'].includes(lvl.getTile(500, 500)));
   check('chunk 缓存生效', lvl.chunks.size > 0, `chunks=${lvl.chunks.size}`);
+  // 房间迷宫质量：Level 0 是"房间与柱子"——房间密集（≥5 间/chunk）、可走面积占比高（非长过道迷宫）
+  {
+    let rooms = 0;
+    let walk = 0;
+    for (let cy = -1; cy <= 1; cy++) {
+      for (let cx = -1; cx <= 1; cx++) {
+        const c = lvl.getChunk(cx, cy);
+        rooms += c.roomCount || 0;
+        for (let y = 0; y < 16; y++) {
+          for (let x = 0; x < 16; x++) {
+            if (WALKABLE_TILES.has(c.tiles[y][x])) walk++;
+          }
+        }
+      }
+    }
+    check('Level 0 房间密集（3×3 chunk ≥15 间）', rooms >= 15, `${rooms} 间`);
+    check('Level 0 可走面积占比高（≥60%，房间为主）', walk / (9 * 256) >= 0.6, `${((walk / (9 * 256)) * 100).toFixed(0)}%`);
+  }
   // 确定性：同种子两次生成，相同 chunk 内容一致
   const lvl2 = createInfiniteLevel(dna, 9);
   const same = (a, b) => {
@@ -320,16 +338,34 @@ section('5.5 无限世界：Minecraft 式分块生成');
     seams.every(([x, y]) => edgeWalkable(x, y)),
     seams.map(([x, y]) => `(${x},${y})=${lvl.getTile(x, y)}`).join(' ')
   );
-  // 无边界漫游：向一个方向走 60 步永不报错、坐标持续增长
+  // 无边界漫游：从出生点可向上穿过 3 个 chunk（端口连通，寻路可达而非直线）
   {
     const state = createGame({ levels, seed: 5 });
-    const p0 = { x: state.player.x, y: state.player.y };
-    let ok = true;
-    for (let i = 0; i < 60; i++) {
-      const res = step(state, { type: 'move', dx: 0, dy: -1 });
-      if (res.over) { ok = false; break; }
+    const lv = state.level;
+    const sx = state.player.x;
+    const sy = state.player.y;
+    const target = sy - 48;
+    const seen = new Set([sx + ',' + sy]);
+    const q = [[sx, sy, 0]];
+    let reached = false;
+    while (q.length && !reached) {
+      const [x, y, d] = q.shift();
+      if (y <= target) {
+        reached = true;
+        break;
+      }
+      if (d >= 300) continue;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx;
+        const ny = y + dy;
+        const k = nx + ',' + ny;
+        if (seen.has(k)) continue;
+        if (lv.getTile(nx, ny) === '#') continue;
+        seen.add(k);
+        q.push([nx, ny, d + 1]);
+      }
     }
-    check('无限层向上 60 步不越界', ok && state.player.y < p0.y, `y=${p0.y}→${state.player.y}`);
+    check('无限层可向上穿越 3 个 chunk（端口连通）', reached, `from (${sx},${sy}) to y=${target}`);
     check('无限层探索视野不抛错', (() => { try { playerVisibleTiles(state); return true; } catch { return false; } })());
   }
   // 有限层墙边界：hub 与 ! 走不出去

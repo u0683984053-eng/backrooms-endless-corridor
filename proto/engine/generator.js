@@ -1235,25 +1235,48 @@ function portInner(p) {
   };
 }
 
-/** 两点间 L 形走廊（先横后纵） */
-function carveL(tiles, a, b) {
-  if (a.x <= b.x) for (let x = a.x; x <= b.x; x++) tiles[a.y][x] = '.';
-  else for (let x = b.x; x <= a.x; x++) tiles[a.y][x] = '.';
-  if (a.y <= b.y) for (let y = a.y; y <= b.y; y++) tiles[y][b.x] = '.';
-  else for (let y = b.y; y <= a.y; y++) tiles[y][b.x] = '.';
+/** 两点间 L 形走廊（先横后纵），宽度 cw（默认 2，奇数居中） */
+function carveL(tiles, a, b, cw = 2) {
+  const h = Math.floor((cw - 1) / 2);
+  const y0 = Math.max(1, a.y - h);
+  const y1 = Math.min(CHUNK - 2, a.y + h);
+  const xLo = Math.min(a.x, b.x);
+  const xHi = Math.max(a.x, b.x);
+  for (let yy = y0; yy <= y1; yy++) {
+    for (let xx = xLo; xx <= xHi; xx++) tiles[yy][xx] = '.';
+  }
+  const x0 = Math.max(1, b.x - h);
+  const x1 = Math.min(CHUNK - 2, b.x + h);
+  const yLo = Math.min(a.y, b.y);
+  const yHi = Math.max(a.y, b.y);
+  for (let yy = yLo; yy <= yHi; yy++) {
+    for (let xx = x0; xx <= x1; xx++) tiles[yy][xx] = '.';
+  }
 }
 
-/** 房间迷宫 chunk：8 端口 + 1-3 个随机房间 + 顺序 L 走廊（全连通） */
-function buildRoomsChunk(tiles, rng) {
+/**
+ * 房间迷宫 chunk：房间铺满 + 短通道连接 + 房间内饰（柱子/家具/水洼）。
+ * 房间数量按 DNA roomCount 折算（Level 0 密集房间迷宫、薄墙），
+ * 节点（房间+端口）用 MST 最短连接 → 只有短通道，没有贯穿长过道。
+ */
+function buildRoomsChunk(tiles, rng, dna) {
   carvePorts(tiles);
+  const T = dna.terrain || {};
+  const baseArea = Math.max(1, (T.width || 48) * (T.height || 48));
+  const dense = Math.max(
+    3,
+    Math.min(10, Math.round(((T.roomCount || 8) / baseArea) * CHUNK * CHUNK * 2.2))
+  );
+  const roomCount = randInt(rng, Math.max(3, dense - 1), dense + 1);
+  const sizeMin = Math.min(4, Math.max(3, T.roomSizeMin || 4));
+  const sizeMax = Math.max(sizeMin, Math.min(7, T.roomSizeMax || 7));
   const rooms = [];
-  const roomCount = randInt(rng, 1, 3);
   for (let i = 0; i < roomCount; i++) {
-    const rw = randInt(rng, 4, 7);
-    const rh = randInt(rng, 4, 7);
-    for (let t = 0; t < 20; t++) {
-      const x = randInt(rng, 2, CHUNK - rw - 2);
-      const y = randInt(rng, 2, CHUNK - rh - 2);
+    const rw = randInt(rng, sizeMin, sizeMax);
+    const rh = randInt(rng, sizeMin, sizeMax);
+    for (let t = 0; t < 60; t++) {
+      const x = randInt(rng, 1, Math.max(1, CHUNK - rw - 1));
+      const y = randInt(rng, 1, Math.max(1, CHUNK - rh - 1));
       if (!overlaps(rooms, x, y, rw, rh)) {
         rooms.push({ x, y, w: rw, h: rh });
         carveRoom(tiles, x, y, rw, rh);
@@ -1262,13 +1285,69 @@ function buildRoomsChunk(tiles, rng) {
     }
   }
   if (rooms.length === 0) {
-    rooms.push({ x: 5, y: 5, w: 5, h: 5 });
-    carveRoom(tiles, 5, 5, 5, 5);
+    rooms.push({ x: 5, y: 5, w: 6, h: 6 });
+    carveRoom(tiles, 5, 5, 6, 6);
   }
-  // 节点 = 8 端口内端 + 房间中心，顺序连接 → 全部连通
-  const nodes = EDGE_PORTS.map(portInner);
-  for (const r of rooms) nodes.push({ x: r.x + Math.floor(r.w / 2), y: r.y + Math.floor(r.h / 2) });
-  for (let i = 1; i < nodes.length; i++) carveL(tiles, nodes[i - 1], nodes[i]);
+  // 节点 = 房间中心 + 8 端口内端；MST 最短生成树连接（短通道，不横穿）
+  const cw = Math.min(3, Math.max(1, T.corridorWidth || 2));
+  const nodes = [];
+  for (const r of rooms) {
+    nodes.push({ x: r.x + Math.floor(r.w / 2), y: r.y + Math.floor(r.h / 2) });
+  }
+  for (const p of EDGE_PORTS) nodes.push(portInner(p));
+  const connected = new Set([0]);
+  while (connected.size < nodes.length) {
+    let best = -1;
+    let bestFrom = -1;
+    let bestD = Infinity;
+    for (const i of connected) {
+      for (let j = 0; j < nodes.length; j++) {
+        if (connected.has(j)) continue;
+        const d = Math.abs(nodes[i].x - nodes[j].x) + Math.abs(nodes[i].y - nodes[j].y);
+        if (d < bestD) {
+          bestD = d;
+          best = j;
+          bestFrom = i;
+        }
+      }
+    }
+    if (best < 0) break;
+    carveL(tiles, nodes[bestFrom], nodes[best], cw);
+    connected.add(best);
+  }
+  // 房间内饰（DNA extraFeatures）：柱子/家具/水洼——Level 0 的"房间与柱子"
+  const extra = T.extraFeatures || [];
+  if (extra.includes('columns')) {
+    for (const r of rooms) {
+      if (r.w < 5 || r.h < 5) continue;
+      const n = r.w >= 7 && r.h >= 7 ? 2 : 1;
+      for (let i = 0; i < n; i++) {
+        const cx = r.x + randInt(rng, 1, r.w - 2);
+        const cy = r.y + randInt(rng, 1, r.h - 2);
+        if (tiles[cy][cx] === '.') tiles[cy][cx] = '#';
+      }
+    }
+  }
+  if (extra.includes('furniture') || extra.includes('crates') || extra.includes('counters') || extra.includes('shelves')) {
+    for (const r of rooms) {
+      if (r.w < 5 || r.h < 5 || !chance(rng, 0.5)) continue;
+      const n = randInt(rng, 1, 2);
+      for (let i = 0; i < n; i++) {
+        const cx = r.x + randInt(rng, 1, r.w - 2);
+        const cy = r.y + randInt(rng, 1, r.h - 2);
+        if (tiles[cy][cx] === '.') tiles[cy][cx] = '#';
+      }
+    }
+  }
+  if (extra.includes('puddles')) {
+    for (const r of rooms) {
+      if (r.w < 4 || r.h < 4 || !chance(rng, 0.5)) continue;
+      const cx = r.x + randInt(rng, 1, r.w - 2);
+      const cy = r.y + randInt(rng, 1, r.h - 2);
+      if (tiles[cy][cx] === '.') tiles[cy][cx] = '~';
+    }
+  }
+  return rooms.length;
 }
 
 /** 洞穴 chunk：8 端口 + 从端口出发的随机游走 + 随机洞穴室 */
@@ -1498,13 +1577,14 @@ function buildChunk(dna, runSeed, cx, cy) {
   const gx0 = cx * CHUNK;
   const gy0 = cy * CHUNK;
   const topology = dna.terrain.topology || (dna.environment === 'caves' ? 'caves' : 'rooms');
+  let roomCount = 0;
   if (topology === 'hallway-grid') buildHallwayChunk(tiles, rng, gx0, gy0);
   else if (topology === 'city-grid') buildCityChunk(tiles, gx0, gy0, dna, runSeed);
   else if (topology === 'warehouse') buildWarehouseChunk(tiles, rng, gx0, gy0);
   else if (topology === 'hotel') buildHotelChunk(tiles, gx0, gy0, dna, runSeed);
   else if (topology === 'fields') buildFieldsChunk(tiles, rng);
   else if (topology === 'caves') buildCavesChunk(tiles, rng);
-  else buildRoomsChunk(tiles, rng);
+  else roomCount = buildRoomsChunk(tiles, rng, dna);
 
   // 实体：密度 × 256 格期望值，泊松化
   const ents = [];
@@ -1578,7 +1658,7 @@ function buildChunk(dna, runSeed, cx, cy) {
       });
     }
   }
-  return { tiles, entities: ents, items: its };
+  return { tiles, entities: ents, items: its, roomCount };
 }
 
 /** 无限层级上的最近可行走格（螺旋搜索，越远越生成） */
