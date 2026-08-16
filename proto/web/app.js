@@ -184,11 +184,15 @@ function newGame() {
   rebuildVisuals();
   renderAll();
   saveGame();
+  // 与野性入口一致的可见反馈：跌入层级过渡遮罩（含层级名与描述）
+  const dna = game.levels[game.levelId];
+  showTransition(`你跌入了 ${dna.name}（难度 Class ${dna.difficultyClass}）\n${dna.description}`, 3400);
 }
 
 function continueGame() {
   const data = loadJSON(SAVE_KEY, null);
   if (!data) {
+    // 无存档：直接开新局（按钮始终可点，不再静默禁用）
     newGame();
     return;
   }
@@ -1647,12 +1651,31 @@ function fakeFlashLoop() {
 }
 
 // ---------- 开始界面 & 按钮 ----------
+/** 点击诊断条：任何开始按钮被点击都会在这里留痕（排查"按钮无效"用） */
+function logClick(id, extra) {
+  const dbg = $('click-debug');
+  if (!dbg) return;
+  dbg.classList.remove('hidden');
+  const t = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+  dbg.textContent = `[${t}] 点击: ${id}${extra ? ' → ' + extra : ''}`;
+}
+
 function wireButtons() {
-  $('btn-new').addEventListener('click', () => safeRun(newGame));
-  $('btn-continue').addEventListener('click', () => safeRun(continueGame));
-  $('btn-wild').addEventListener('click', () => safeRun(enterWild));
+  $('btn-new').addEventListener('click', () => {
+    logClick('btn-new', '开始新游戏');
+    safeRun(newGame);
+  });
+  $('btn-continue').addEventListener('click', () => {
+    logClick('btn-continue', '继续/新开局');
+    safeRun(continueGame);
+  });
+  $('btn-wild').addEventListener('click', () => {
+    logClick('btn-wild', '野性层级');
+    safeRun(enterWild);
+  });
   $('btn-death-new').addEventListener('click', () => {
     hideOverlay('death-modal');
+    logClick('btn-death-new', '再次跌落');
     safeRun(newGame);
   });
   document.querySelectorAll('.modal-close').forEach((btn) => {
@@ -1709,8 +1732,6 @@ function wireButtons() {
   $('start-codex').textContent = discovered
     ? `Codex：已发现 ${discovered} 个层级 · 死亡 ${deaths} 次 · 笔记 ${(codex.notes || []).length} 条`
     : '';
-  $('btn-continue').disabled = !loadJSON(SAVE_KEY, null);
-  if (!$('btn-continue').disabled) $('btn-continue').textContent = '继续上次冒险';
 }
 
 // ---------- 启动 ----------

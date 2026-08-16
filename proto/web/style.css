@@ -852,3 +852,28 @@ body.in-game #touch-pad {
 .exit-hint.hidden {
   display: none;
 }
+
+/* 点击诊断条（排查用） */
+.click-debug {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 9998;
+  background: rgba(0, 0, 0, 0.75);
+  color: #7fff7f;
+  font: 11px/1.6 monospace;
+  padding: 4px 8px;
+  border-radius: 4px;
+  max-width: 70vw;
+  white-space: pre-wrap;
+  pointer-events: none;
+}
+.click-debug.hidden {
+  display: none;
+}
+
+/* 按钮按压反馈 */
+.start-btn:active {
+  transform: translateY(1px);
+  filter: brightness(1.25);
+}
