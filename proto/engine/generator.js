@@ -264,7 +264,8 @@ function buildLevel(dna, rng) {
       }
     }
   }
-  if (extra.includes('doors') || isOutdoors) {
+  // 门：仅室内层级（DNA 声明 doors）才有；户外层没有门（Level 11 城市等）
+  if (extra.includes('doors')) {
     // 门 = 墙上的真实开口：一侧邻房间地板、另一侧邻可走区域（走廊/其他房间）的墙瓦片，
     // 打通为 'D'（可通行）。杜绝"门通向死缝"的假门。
     const roomSet = new Set();
@@ -699,6 +700,23 @@ function buildLevel(dna, rng) {
     });
   }
 
+  // ---------- 10. 门配对（同层非欧传送） ----------
+  // 门的定位：室内层级内通往"另一间房"的通道——配对后穿过门 = 传送到配对的另一扇门。
+  // 排序后"前半 × 后半"配对 → 保证配对门相距很远（后室非欧特性）。
+  const doorLinks = [];
+  {
+    const doorProps = props.filter((p) => p.kind === 'door');
+    if (doorProps.length >= 2) {
+      const sorted = doorProps.slice().sort((a, b) => a.y * W + a.x - (b.y * W + b.x));
+      const half = Math.floor(sorted.length / 2);
+      for (let i = 0; i < half; i++) {
+        const a = sorted[i];
+        const b = sorted[i + half];
+        doorLinks.push({ x1: a.x, y1: a.y, x2: b.x, y2: b.y });
+      }
+    }
+  }
+
   return {
     id: dna.id,
     name: dna.name,
@@ -720,6 +738,7 @@ function buildLevel(dna, rng) {
     props,
     portals,
     rooms,
+    doorLinks,
     palette: dna.palette,
     light: dna.light,
     spaceRules: dna.spaceRules,

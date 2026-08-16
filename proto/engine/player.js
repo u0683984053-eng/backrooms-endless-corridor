@@ -308,6 +308,29 @@ function tryMove(state, world, dx, dy, events, opts) {
     player.y = ny;
     moved++;
 
+    // 门（配对传送）：同层内通往"另一间房"——穿过门即传送到配对的另一扇门（非欧特性）
+    if (!teleported && tile === 'D') {
+      const link = (level.doorLinks || []).find(
+        (l) =>
+          (l.x1 === player.x && l.y1 === player.y) || (l.x2 === player.x && l.y2 === player.y)
+      );
+      if (link) {
+        const destIsFirst = link.x1 === player.x && link.y1 === player.y;
+        const tx = destIsFirst ? link.x2 : link.x1;
+        const ty = destIsFirst ? link.y2 : link.y1;
+        const blocked = state.entities.some((e) => e.x === tx && e.y === ty && e.hp > 0);
+        if (!blocked && level.tiles[ty] && level.tiles[ty][tx] !== '#') {
+          player.x = tx;
+          player.y = ty;
+          teleported = true;
+          player.sanity = Math.max(0, player.sanity - 2);
+          events.push({ text: '你推开一扇门……门后竟是另一个房间。', kind: 'level' });
+        } else {
+          events.push({ text: '门吱呀作响，但另一侧被堵住了。', kind: 'system' });
+        }
+      }
+    }
+
     // 记录噪音（供猎犬/抓挠者听声）
     state.lastNoise = { level: opts.noise, x: player.x, y: player.y };
 

@@ -439,6 +439,48 @@ section('8. Level 0 房间模式：大小多样 + 全联通 + 门可通行');
   check('门数量充足（≥10）', doors >= 10, `${doors} 扇门`);
   const dTiles = l0.tiles.flat().filter((t) => t === 'D').length;
   check('D 瓦片与门道具一致', dTiles === doors, `${dTiles}/${doors}`);
+  // 门配对传送：doorLinks 覆盖门道具、端点均为 D 瓦片、配对相距远（非欧特性）
+  const links = l0.doorLinks || [];
+  check('门配对存在（≥3 对）', links.length >= 3, `${links.length} 对`);
+  const linksOk = links.every(
+    (l) =>
+      l0.tiles[l.y1][l.x1] === 'D' &&
+      l0.tiles[l.y2][l.x2] === 'D' &&
+      !(l.x1 === l.x2 && l.y1 === l.y2)
+  );
+  check('配对端点均为门且非自环', linksOk);
+  const avgDist =
+    links.length > 0
+      ? links.reduce((s, l) => s + (Math.abs(l.x1 - l.x2) + Math.abs(l.y1 - l.y2)), 0) / links.length
+      : 0;
+  check('配对平均距离 ≥8（传送至远处房间）', avgDist >= 8, `平均 ${avgDist.toFixed(1)} 格`);
+  // 功能测试：踏上任意一扇门 → 传送到配对门
+  if (links.length > 0) {
+    const st = createGame({ levels, seed: 42 });
+    const l = links[0];
+    const nx = l.x1 > 0 ? l.x1 - 1 : l.x1 + 1;
+    const ny = l.y1;
+    if (st.level.tiles[ny][nx] !== '#') {
+      st.player.x = nx;
+      st.player.y = ny;
+      const before = st.player.sanity;
+      step(st, { type: 'move', dx: l.x1 - nx, dy: 0 });
+      check(
+        '踏上门的玩家传送到配对门',
+        st.player.x === l.x2 && st.player.y === l.y2,
+        `(${st.player.x},${st.player.y}) → 期望(${l.x2},${l.y2})`
+      );
+      check(
+        '传送消耗 2 点理智（非欧体验）',
+        st.player.sanity <= before - 2 && st.player.sanity > before - 2.5,
+        `${before}→${st.player.sanity}（含本回合基础侵蚀）`
+      );
+    }
+  }
+  // 户外层（Level 11 无尽城市）不应有门
+  const l11 = generateLevel(levels['level-11'], 5);
+  const doorProps11 = (l11.props || []).filter((p) => p.kind === 'door').length;
+  check('户外层（Level 11）无门', doorProps11 === 0, `${doorProps11} 扇`);
   // 门必须是"墙上的真开口"：每扇门至少 2 个可走邻居（房间侧 + 外侧），且本身在墙位
   const doorOnWall = (l0.props || [])
     .filter((p) => p.kind === 'door')
