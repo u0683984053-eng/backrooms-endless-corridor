@@ -12,6 +12,7 @@
   "palette": { "primary": "#4a3a2a", "secondary": "#33281c", "accent": "#7a5a3a", "light": "#b08a5a" },
   "terrain": {
     "width": 36, "height": 36,
+    "topology": "caves",
     "roomCount": 14, "roomSizeMin": 5, "roomSizeMax": 12,
     "corridorWidth": 2,
     "wallStyle": "brick", "floorStyle": "gravel",

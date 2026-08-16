@@ -11,7 +11,8 @@
   "description": "红色墙壁、绿色『EXIT』标志、蜂鸣警报。这条走廊没有尽头，身后的笑声越来越近。别停下来。别回头看。跑。",
   "palette": { "primary": "#8a2020", "secondary": "#6a1818", "accent": "#40ff40", "light": "#ff4040" },
   "terrain": {
-    "width": 40, "height": 12,
+    "width": 56, "height": 12,
+    "topology": "racetrack",
     "roomCount": 3, "roomSizeMin": 3, "roomSizeMax": 5,
     "corridorWidth": 3,
     "wallStyle": "wallpaper", "floorStyle": "linoleum",

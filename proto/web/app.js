@@ -1571,18 +1571,8 @@ function renderHud() {
   $('turn-info').textContent = `第 ${g.turn} 回合`;
   $('light-info').textContent = `手电:${p.flashlight ? '开' : '关'} 电量 ${Math.floor(p.battery)}% · 潜行:${p.sneak ? '开' : '关'} · 武器:${p.weapon ? '撬棍' : '徒手'}`;
 
-  // 物品栏
-  const inv = $('inv');
-  inv.innerHTML = '';
-  p.inventory.forEach((item, idx) => {
-    const meta = ITEM_META[item] || { name: item, emoji: '❓' };
-    const el = document.createElement('span');
-    el.className = 'inv-item' + (item === 'crowbar' && p.weapon === 'crowbar' ? ' weapon' : '');
-    el.title = `${meta.name}：${meta.desc}（按 ${idx + 1} 使用）`;
-    el.textContent = `${meta.emoji} ${meta.name}`;
-    el.addEventListener('click', () => doAction({ type: 'use', item }));
-    inv.appendChild(el);
-  });
+  // 背包：仅更新按钮角标与弹窗内容（不常驻 HUD，避免挤压画面）
+  updateInvUI();
 
   // 美学核类滤镜类（#view）与理智滤镜类（#stage）
   const view = $('view');
@@ -1608,6 +1598,55 @@ function renderHud() {
 
 function setBar(id, v) {
   $(id + '-fill').style.width = `${Math.max(0, Math.min(100, v))}%`;
+}
+
+/** 背包：角标数量 + 弹窗物品网格（B 键/🎒按钮打开） */
+function updateInvUI() {
+  if (!game) return;
+  const p = game.player;
+  const count = $('inv-count');
+  if (count) count.textContent = p.inventory.length > 0 ? String(p.inventory.length) : '';
+  if (!$('inv-modal').classList.contains('hidden')) fillInvModal();
+}
+
+function fillInvModal() {
+  if (!game) return;
+  const p = game.player;
+  const grid = $('inv-grid');
+  grid.innerHTML = '';
+  if (p.inventory.length === 0) {
+    grid.innerHTML = '<div class="inv-empty">背包是空的……去层级里找找杏仁水吧。</div>';
+    return;
+  }
+  p.inventory.forEach((item, idx) => {
+    const meta = ITEM_META[item] || { name: item, emoji: '❓' };
+    const el = document.createElement('button');
+    el.className = 'inv-cell' + (item === 'crowbar' && p.weapon === 'crowbar' ? ' weapon' : '');
+    el.title = `${meta.name}：${meta.desc}（点击使用 / 按 ${idx + 1}）`;
+    el.innerHTML = `<span class="inv-cell-emoji">${meta.emoji}</span><span class="inv-cell-name">${meta.name}</span><span class="inv-cell-key">${idx + 1}</span>`;
+    el.addEventListener('click', () => {
+      doAction({ type: 'use', item });
+      fillInvModal();
+      renderHud();
+    });
+    grid.appendChild(el);
+  });
+}
+
+/** 关闭所有打开的弹窗（触屏按键操作前调用，解决"弹窗遮罩挡住按钮"） */
+function closeOpenModals() {
+  for (const id of ['log-modal', 'map-modal', 'help-modal', 'inv-modal']) {
+    hideOverlay(id);
+  }
+}
+
+function toggleInvModal() {
+  if ($('inv-modal').classList.contains('hidden')) {
+    fillInvModal();
+    showOverlay('inv-modal');
+  } else {
+    hideOverlay('inv-modal');
+  }
 }
 
 function renderEvents(events) {
@@ -1791,6 +1830,9 @@ function handleKey(e) {
   }
 
   switch (key) {
+    case 'b':
+      toggleInvModal();
+      break;
     case 'e':
       doAction({ type: 'interact' });
       break;
@@ -2130,6 +2172,7 @@ function logClick(id, extra) {
 function wireButtons() {
   // 静音开关（🔊/🔇，点击切换）
   $('btn-mute').addEventListener('click', toggleMute);
+  $('btn-inv').addEventListener('click', toggleInvModal);
   wireVolumeSlider();
   $('btn-new').addEventListener('click', () => {
     logClick('btn-new', '开始新游戏');
@@ -2178,6 +2221,7 @@ function wireButtons() {
           : ['mouseup', 'mouseleave'];
       btn.addEventListener(downEv, (e) => {
         if (e.preventDefault) e.preventDefault();
+        closeOpenModals(); // 弹窗打开时先关掉，避免遮罩挡住按键
         move();
         holdTimer = setInterval(move, 170);
       });
@@ -2190,6 +2234,7 @@ function wireButtons() {
           fillLogModal();
           showOverlay('log-modal');
         } else {
+          closeOpenModals(); // 弹窗打开时先关掉，避免遮罩挡住按键
           safeRun(() => doAction(a));
         }
       });

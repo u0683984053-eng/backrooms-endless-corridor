@@ -9,35 +9,116 @@
   "light": "dim",
   "sanDrain": 0.15,
   "description": "一片广袤的办公区：隔间、旋转椅、蒙尘的电脑。文件散落一地，打印机偶尔自己吐出一张纸，纸上只有一行乱码。",
-  "palette": { "primary": "#a8a090", "secondary": "#7a7468", "accent": "#6a8a9a", "light": "#b8b8a8" },
-  "terrain": {
-    "width": 30, "height": 30,
-    "roomCount": 20, "roomSizeMin": 4, "roomSizeMax": 10,
-    "corridorWidth": 2,
-    "wallStyle": "drywall", "floorStyle": "carpet",
-    "extraFeatures": ["counters", "shelves", "furniture, papers, posters", "doors", "windows"]
+  "palette": {
+    "primary": "#a8a090",
+    "secondary": "#7a7468",
+    "accent": "#6a8a9a",
+    "light": "#b8b8a8"
   },
-  "spaceRules": ["euclidean"],
-  "entities": [
-    { "type": "duller", "density": 0.01, "aggression": "hostile" },
-    { "type": "faceling", "density": 0.008, "aggression": "curious" },
-    { "type": "clump", "density": 0.005, "aggression": "passive" }
+  "terrain": {
+    "width": 30,
+    "height": 30,
+    "roomCount": 20,
+    "roomSizeMin": 4,
+    "roomSizeMax": 10,
+    "corridorWidth": 2,
+    "wallStyle": "drywall",
+    "floorStyle": "carpet",
+    "extraFeatures": [
+      "counters",
+      "shelves",
+      "furniture",
+      "papers",
+      "posters",
+      "doors",
+      "windows"
+    ]
+  },
+  "spaceRules": [
+    "euclidean"
   ],
-  "items": ["note", "battery", "almond-water", "royal-ration", "key"],
+  "entities": [
+    {
+      "type": "duller",
+      "density": 0.01,
+      "aggression": "hostile"
+    },
+    {
+      "type": "faceling",
+      "density": 0.008,
+      "aggression": "curious"
+    },
+    {
+      "type": "clump",
+      "density": 0.005,
+      "aggression": "passive"
+    }
+  ],
+  "items": [
+    "note",
+    "battery",
+    "almond-water",
+    "royal-ration",
+    "key"
+  ],
   "itemDensity": 0.18,
   "setPieces": [
-    { "type": "writing", "position": "random", "text": "一张贴在显示器上的便签：『绩效面谈改到今天。会议室在走廊尽头。它们也在等。』", "sanityEffect": -4, "note": "显示器上的便签提到会议室——走廊尽头确实有一间会议室。" },
-    { "type": "corpse", "position": "far-corner", "text": "一张办公椅上坐着一具完整的骨架，还戴着工牌，姓名被涂掉了，职位写着：层级管理员。", "sanityEffect": -8, "note": "一具戴工牌的骨架，职位：层级管理员。" },
-    { "type": "object", "position": "random", "text": "打印机吐出的纸上印着：『你们的工作成果很好。请继续。』", "sanityEffect": -3, "note": "打印机自己吐出一张纸：『请继续。』" }
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "一张贴在显示器上的便签：『绩效面谈改到今天。会议室在走廊尽头。它们也在等。』",
+      "sanityEffect": -4,
+      "note": "显示器上的便签提到会议室——走廊尽头确实有一间会议室。"
+    },
+    {
+      "type": "corpse",
+      "position": "far-corner",
+      "text": "一张办公椅上坐着一具完整的骨架，还戴着工牌，姓名被涂掉了，职位写着：层级管理员。",
+      "sanityEffect": -8,
+      "note": "一具戴工牌的骨架，职位：层级管理员。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "打印机吐出的纸上印着：『你们的工作成果很好。请继续。』",
+      "sanityEffect": -3,
+      "note": "打印机自己吐出一张纸：『请继续。』"
+    }
   ],
   "soundscape": {
-    "ambient": ["空调风管低鸣", "打印机间歇工作声", "远处键盘敲击声"],
-    "startles": ["打印机突然吐出纸", "某部电话响起又挂断", "隔间后面传来椅子转动的声音"],
+    "ambient": [
+      "空调风管低鸣",
+      "打印机间歇工作声",
+      "远处键盘敲击声"
+    ],
+    "startles": [
+      "打印机突然吐出纸",
+      "某部电话响起又挂断",
+      "隔间后面传来椅子转动的声音"
+    ],
     "silenceEvents": false
   },
   "exits": [
-    { "target": "level-5", "kind": "door", "hidden": false, "danger": false, "description": "一扇贴着'员工通道'的防火门，门后飘来廉价香水的气味。" },
-    { "target": "level-11", "kind": "window", "hidden": true, "danger": false, "description": "一扇窗户外面不是街道，而是一片灯火通明的城市夜景——玻璃可以穿过。" },
-    { "target": "level-34", "kind": "door", "hidden": false, "danger": false, "description": "员工食堂的大门，门缝里飘出食物的香气——但里面从没有人用餐。" }
+    {
+      "target": "level-5",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "一扇贴着'员工通道'的防火门，门后飘来廉价香水的气味。"
+    },
+    {
+      "target": "level-11",
+      "kind": "window",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇窗户外面不是街道，而是一片灯火通明的城市夜景——玻璃可以穿过。"
+    },
+    {
+      "target": "level-34",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "员工食堂的大门，门缝里飘出食物的香气——但里面从没有人用餐。"
+    }
   ]
 }

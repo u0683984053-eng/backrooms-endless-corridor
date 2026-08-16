@@ -34,7 +34,7 @@
       <div class="hud-right">
         <div id="turn-info" class="hud-chip"></div>
         <div id="light-info" class="hud-chip"></div>
-        <div id="inv" class="inv"></div>
+        <button id="btn-inv" class="mute-btn" title="背包 (B)">🎒<span id="inv-count" class="inv-count"></span></button>
         <input id="vol-slider" type="range" min="0" max="100" value="80" class="vol-slider" title="音量" />
         <button id="btn-mute" class="mute-btn" title="静音">🔊</button>
       </div>
@@ -99,6 +99,16 @@
         <h2>探索日志</h2>
         <div id="log-body" class="modal-body"></div>
         <button class="modal-close" data-close="log-modal">关闭 (J)</button>
+      </div>
+    </div>
+
+    <!-- 背包弹窗（B 打开；不常驻 HUD，避免挤压画面） -->
+    <div id="inv-modal" class="modal hidden">
+      <div class="modal-box">
+        <h2>背包</h2>
+        <div id="inv-grid" class="inv-grid"></div>
+        <p class="hint" id="inv-hint">点击物品使用；数字键 1-9 快捷使用</p>
+        <button class="modal-close" data-close="inv-modal">关闭 (B)</button>
       </div>
     </div>
 

@@ -35,6 +35,7 @@
         "roomSizeMin": { "type": "integer", "minimum": 3, "maximum": 12 },
         "roomSizeMax": { "type": "integer", "minimum": 3, "maximum": 24 },
         "hallwayGrid": { "type": "boolean", "description": "走廊网格布局（经典 Level 0 无尽联通、无死角）；宽高需为 8 的倍数" },
+        "topology": { "type": "string", "enum": ["rooms", "hallway-grid", "city-grid", "racetrack", "caves"], "description": "几何拓扑：rooms=房间迷宫（默认）；hallway-grid=走廊网格；city-grid=城市街区（Level 11）；racetrack=长条跑道（Level !）；caves=洞穴隧道（Level 8）。各层级的几何结构不同，严格按 F 版形态" },
         "corridorWidth": { "type": "integer", "minimum": 1, "maximum": 3 },
         "wallStyle": { "enum": ["wallpaper", "tile", "concrete", "metal", "brick", "glass", "drywall"] },
         "floorStyle": { "enum": ["carpet", "tile", "linoleum", "concrete", "grass", "water", "gravel", "wood"] },

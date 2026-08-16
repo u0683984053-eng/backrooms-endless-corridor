@@ -122,6 +122,102 @@ function buildHallwayGrid(tiles, W, H, rng, props) {
   }
 }
 
+/** 城市街区拓扑（Level 11 无尽城市）：宽街道网格 + 街区建筑，完全不同于房间迷宫 */
+function buildCityGrid(tiles, W, H, rng, props, rooms) {
+  const stride = 12; // 街道间距（W/H 需为 12 的倍数）
+  const streetW = 3;
+  const isStreet = (x, y) => x % stride < streetW || y % stride < streetW;
+  // 1) 街道网格全打通
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (isStreet(x, y)) tiles[y][x] = '.';
+    }
+  }
+  // 2) 街区 = 建筑（外墙 1 格 + 内部），每面街道开 1-2 个店门
+  for (let by = 0; by < Math.floor(H / stride); by++) {
+    for (let bx = 0; bx < Math.floor(W / stride); bx++) {
+      const x0 = bx * stride + streetW;
+      const y0 = by * stride + streetW;
+      const x1 = Math.min(bx * stride + stride - 1, W - 1);
+      const y1 = Math.min(by * stride + stride - 1, H - 1);
+      for (let y = y0; y <= y1; y++) {
+        for (let x = x0; x <= x1; x++) {
+          const edge = x === x0 || x === x1 || y === y0 || y === y1;
+          tiles[y][x] = edge ? '#' : '.';
+        }
+      }
+      rooms.push({ x: x0 + 1, y: y0 + 1, w: x1 - x0 - 1, h: y1 - y0 - 1 });
+      const doorCount = randInt(rng, 1, 2);
+      for (let i = 0; i < doorCount; i++) {
+        const side = pick(rng, ['top', 'bottom', 'left', 'right']);
+        let dx, dy;
+        if (side === 'top') { dx = randInt(rng, x0 + 1, x1 - 1); dy = y0; }
+        else if (side === 'bottom') { dx = randInt(rng, x0 + 1, x1 - 1); dy = y1; }
+        else if (side === 'left') { dx = x0; dy = randInt(rng, y0 + 1, y1 - 1); }
+        else { dx = x1; dy = randInt(rng, y0 + 1, y1 - 1); }
+        if (tiles[dy][dx] === '#') {
+          tiles[dy][dx] = 'D';
+          props.push({ x: dx, y: dy, kind: 'door' });
+        }
+      }
+    }
+  }
+}
+
+/** 跑道拓扑（Level !）：一条笔直的长走廊，两侧是带门的房间（F 版"两侧有门的跑道"） */
+function buildRacetrack(tiles, W, H, rng, props, rooms) {
+  const mid = Math.floor(H / 2);
+  // 1) 中央跑道（宽 3），从西到东全打通
+  for (let y = mid - 1; y <= mid + 1; y++) {
+    for (let x = 0; x < W; x++) tiles[y][x] = '.';
+  }
+  // 2) 两侧房间带：每 6 格一个 3×3 房间，开一扇门朝向跑道
+  for (let x = 0; x + 2 < W; x += 6) {
+    for (const [ry0, dir] of [[0, 1], [H - 3, -1]]) {
+      for (let yy = ry0; yy < ry0 + 3; yy++) {
+        for (let xx = x; xx < x + 3; xx++) tiles[yy][xx] = '.';
+      }
+      rooms.push({ x, y: ry0, w: 3, h: 3 });
+      const doorY = dir === 1 ? ry0 + 3 : ry0 - 1;
+      const dx = x + randInt(rng, 0, 2);
+      if (doorY >= 0 && doorY < H && tiles[doorY][dx] === '#') {
+        tiles[doorY][dx] = 'D';
+        props.push({ x: dx, y: doorY, kind: 'door' });
+        // 门廊：打通门与中央跑道之间的间隔行（门必须真正通向走廊）
+        const aisleY = dir === 1 ? doorY + 1 : doorY - 1;
+        if (aisleY >= 0 && aisleY < H && tiles[aisleY][dx] === '#') tiles[aisleY][dx] = '.';
+      }
+    }
+  }
+}
+
+/** 洞穴拓扑（Level 8）：随机游走隧道 + 洞穴室，完全非规则的天然拓扑 */
+function buildCaves(tiles, W, H, rng, props, rooms) {
+  const carve = (px, py, r) => {
+    for (let yy = py - r; yy <= py + r; yy++) {
+      for (let xx = px - r; xx <= px + r; xx++) {
+        if (xx < 1 || yy < 1 || xx >= W - 1 || yy >= H - 1) continue;
+        if ((xx - px) ** 2 + (yy - py) ** 2 <= r * r) tiles[yy][xx] = '.';
+      }
+    }
+  };
+  let x = Math.floor(W / 2);
+  let y = Math.floor(H / 2);
+  carve(x, y, randInt(rng, 2, 4));
+  rooms.push({ x: x - 3, y: y - 3, w: 6, h: 6 });
+  const steps = Math.floor((W * H) / 40);
+  for (let i = 0; i < steps; i++) {
+    const dir = DIRS4[randInt(rng, 0, 3)];
+    const len = randInt(rng, 1, 3);
+    for (let s = 0; s < len; s++) {
+      x = Math.max(1, Math.min(W - 2, x + dir.dx));
+      y = Math.max(1, Math.min(H - 2, y + dir.dy));
+      tiles[y][x] = '.';
+      if (rng() < 0.12) carve(x, y, randInt(rng, 1, 3));
+    }
+  }
+}
+
 /** 生成单次布局（内部函数，调用方负责可达性验证） */
 function buildLevel(dna, rng) {
   const T = dna.terrain;
@@ -143,14 +239,17 @@ function buildLevel(dna, rng) {
   const occupied = new Set(); // "x,y" —— 出生点/出口/传送门/实体/物品占用的瓦片
   const props = []; // {x, y, kind} —— 道具记录（供 web 端矢量绘制与门通道）
 
-  // ---------- 1. 布局模式 ----------
-  // hallwayGrid（经典 Level 0）：纵横贯通的走廊网格 + 房间 + 门，全连通无死角
-  // 规则（stride=8，需 W/H 为 8 的倍数，配合 looping 环绕实现无尽联通）：
-  //   走廊线：x%8===4 或 y%8===4
-  //   墙   ：x%8∈{3,5} 或 y%8∈{3,5}（非走廊处）
-  //   房间 ：其余（5×5 的区块）
-  if (T.hallwayGrid) {
+  // ---------- 1. 布局模式（拓扑由 DNA terrain.topology 指定，F 版层级各具形态） ----------
+  // 拓扑：rooms（房间迷宫，默认）/ hallway-grid / city-grid（城市街区）/ racetrack（跑道）/ caves（洞穴隧道）
+  const topology = T.topology || (env === 'caves' ? 'caves' : T.hallwayGrid ? 'hallway-grid' : 'rooms');
+  if (topology === 'hallway-grid') {
     buildHallwayGrid(tiles, W, H, rng, props);
+  } else if (topology === 'city-grid') {
+    buildCityGrid(tiles, W, H, rng, props, rooms);
+  } else if (topology === 'racetrack') {
+    buildRacetrack(tiles, W, H, rng, props, rooms);
+  } else if (topology === 'caves') {
+    buildCaves(tiles, W, H, rng, props, rooms);
   } else {
     // 常规模式：房间矩形（不重叠）+ L 形走廊连接全部房间（保证全连通）
     const roomCount = T.roomCount;
@@ -755,12 +854,13 @@ function buildLevel(dna, rng) {
   }
 
   // ---------- 10. 门配对（同层非欧传送） ----------
-  // 门的定位：室内层级内通往"另一间房"的通道——配对后穿过门 = 传送到配对的另一扇门。
-  // 排序后"前半 × 后半"配对 → 保证配对门相距很远（后室非欧特性）。
-  // 约 15% 的配对是锁着的（需要钥匙，钥匙可在层级中拾取）。
+  // 门的定位：室内迷宫类层级（rooms / hallway-grid）内通往"另一间房"的通道——
+  // 配对后穿过门 = 传送到配对的另一扇门（非欧特性，排序配对保证相距很远）。
+  // 城市（city-grid）/跑道（racetrack）/洞穴（caves）的门是普通通道（走进去即可，不传送）。
   const doorLinks = [];
   {
-    const doorProps = props.filter((p) => p.kind === 'door');
+    const teleportTopology = topology === 'rooms' || topology === 'hallway-grid';
+    const doorProps = teleportTopology ? props.filter((p) => p.kind === 'door') : [];
     if (doorProps.length >= 2) {
       const sorted = doorProps.slice().sort((a, b) => a.y * W + a.x - (b.y * W + b.x));
       const half = Math.floor(sorted.length / 2);

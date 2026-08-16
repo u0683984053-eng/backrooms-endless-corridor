@@ -479,10 +479,11 @@ section('8. Level 0 房间模式：大小多样 + 全联通 + 门可通行');
       );
     }
   }
-  // 户外层（Level 11 无尽城市）不应有门
+  // 户外城市（Level 11）店门：存在（建筑入口）但不参与传送配对（doorLinks 为空）
   const l11 = generateLevel(levels['level-11'], 5);
   const doorProps11 = (l11.props || []).filter((p) => p.kind === 'door').length;
-  check('户外层（Level 11）无门', doorProps11 === 0, `${doorProps11} 扇`);
+  check('户外城市（Level 11）有店门（≥5）', doorProps11 >= 5, `${doorProps11} 扇`);
+  check('城市店门不参与传送配对', (l11.doorLinks || []).length === 0, `${(l11.doorLinks || []).length} 对`);
   // 锁门机制：锁着的门无钥匙挡路、有钥匙通过并消耗
   {
     let tested = false;
@@ -686,6 +687,67 @@ section('12. 新实体/实体图鉴/时间与重力异常');
     if (r.events.some((e) => e.text.includes('重力'))) gravityEvent = true;
   }
   check('重力异常：30 回合触发翻转事件', gravityEvent);
+}
+
+// ---------- 13. 层级拓扑差异化（F 版几何形态） ----------
+section('13. 拓扑：城市街区/跑道/洞穴，各层级几何结构不同');
+{
+  const WALK = new Set(['.', '~', 'D', 'S', 'E', 'I', 'T']);
+  const wrapBfs = (level) => {
+    const w = level.width;
+    const h = level.height;
+    const seen = new Set([level.spawn.x + ',' + level.spawn.y]);
+    const q = [[level.spawn.x, level.spawn.y]];
+    while (q.length) {
+      const [x, y] = q.pop();
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = (x + dx + w) % w;
+        const ny = (y + dy + h) % h;
+        const k = nx + ',' + ny;
+        if (seen.has(k)) continue;
+        if (!WALK.has(level.tiles[ny][nx])) continue;
+        seen.add(k);
+        q.push([nx, ny]);
+      }
+    }
+    return seen;
+  };
+  const ratio = (lv) => {
+    const wc = lv.tiles.flat().filter((t) => WALK.has(t)).length;
+    return wc > 0 ? wrapBfs(lv).size / wc : 0;
+  };
+
+  // Level 11：城市街区网格（宽街道 + 街区建筑）
+  const l11 = generateLevel(levels['level-11'], 7);
+  check('Level 11 使用 city-grid 拓扑', (l11.terrain || {}).topology === 'city-grid', JSON.stringify(l11.terrain || {}).slice(0, 60));
+  check('Level 11 街道贯通（行 y=1 横向可走 ≥90%）', (() => {
+    let n = 0;
+    for (let x = 0; x < l11.width; x++) if (WALK.has(l11.tiles[1][x])) n++;
+    return n / l11.width >= 0.9;
+  })(), `row1 walkable=${l11.tiles[1].filter((t) => WALK.has(t)).length}/${l11.width}`);
+  check('Level 11 街区建筑存在（房间数 ≥10）', (l11.rooms || []).length >= 10, `${(l11.rooms || []).length} 栋`);
+  check('Level 11 环绕 100% 联通', ratio(l11) >= 0.999);
+
+  // Level !：长条跑道（中央走廊贯通 + 两侧房间带）
+  const lBang = generateLevel(levels['level-!'], 7);
+  check('Level ! 使用 racetrack 拓扑', (lBang.terrain || {}).topology === 'racetrack');
+  check('Level ! 长条形（宽 > 4 倍高）', lBang.width > lBang.height * 4, `${lBang.width}×${lBang.height}`);
+  const midY = Math.floor(lBang.height / 2);
+  const corridorFull = lBang.tiles[midY].every((t) => WALK.has(t));
+  check('Level ! 中央跑道全程贯通', corridorFull, `row ${midY} full`);
+  const sideRooms = (lBang.rooms || []).length;
+  check('Level ! 两侧房间带（≥8 间）', sideRooms >= 8, `${sideRooms} 间`);
+  check('Level ! 环绕 100% 联通', ratio(lBang) >= 0.999);
+
+  // Level 8：洞穴（随机游走隧道，天然不规则）
+  const l8 = generateLevel(levels['level-8'], 7);
+  check('Level 8 使用 caves 拓扑', (l8.terrain || {}).topology === 'caves' || l8.environment === 'caves');
+  check('Level 8 环绕 100% 联通', ratio(l8) >= 0.999);
+  // 三种拓扑布局互不相同（哈希不同）
+  check(
+    '城市/跑道/洞穴三种拓扑布局互异',
+    levelHash(l11) !== levelHash(lBang) && levelHash(lBang) !== levelHash(l8) && levelHash(l11) !== levelHash(l8)
+  );
 }
 console.log(`\n====================`);
 console.log(`冒烟测试完成：通过 ${pass} 项，失败 ${fail} 项`);
