@@ -12,11 +12,10 @@
   "palette": { "primary": "#c8b46a", "secondary": "#8a7a4e", "accent": "#5c5236", "light": "#e8e08a" },
   "terrain": {
     "width": 48, "height": 48,
-    "hallwayGrid": true,
-    "roomCount": 14, "roomSizeMin": 4, "roomSizeMax": 9,
-    "corridorWidth": 2,
+    "roomCount": 24, "roomSizeMin": 4, "roomSizeMax": 12,
+    "corridorWidth": 3,
     "wallStyle": "wallpaper", "floorStyle": "carpet",
-    "extraFeatures": ["doors", "furniture", "puddles", "wires"]
+    "extraFeatures": ["doors", "columns", "furniture", "puddles", "wires"]
   },
   "spaceRules": ["looping"],
   "entities": [

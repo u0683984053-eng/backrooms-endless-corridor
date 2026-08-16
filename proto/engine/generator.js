@@ -265,10 +265,12 @@ function buildLevel(dna, rng) {
     }
   }
   if (extra.includes('doors') || isOutdoors) {
+    // 每间房开 1-3 扇门（各 85% 概率尝试；原版设定"房间靠门洞互相连通"）
     for (const room of rooms) {
-      if (!chance(rng, 0.7)) continue;
-      // 找一个房间边界上的地板格，改为门（户外层记录为窗户）
-      for (let t = 0; t < 30; t++) {
+      const doorTarget = randInt(rng, 1, 3);
+      let opened = 0;
+      for (let attempt = 0; attempt < doorTarget * 2 && opened < doorTarget; attempt++) {
+        // 找一个房间边界上的地板格，改为门（户外层记录为窗户）
         const edge = pick(rng, ['top', 'bottom', 'left', 'right']);
         let px, py;
         if (edge === 'top') {
@@ -300,7 +302,7 @@ function buildLevel(dna, rng) {
           if (ox >= 1 && oy >= 1 && ox < W - 1 && oy < H - 1 && tiles[oy][ox] === '#') {
             tiles[oy][ox] = '.';
           }
-          break;
+          opened++;
         }
       }
     }
@@ -452,6 +454,110 @@ function buildLevel(dna, rng) {
     }
   }
 
+  // ---------- 5.5 连通性清理（可复用算法的第 5 步） ----------
+  // 从出生点 BFS（looping 层级按环绕移动），把任何不可达的孤立可行走格还原为墙，
+  // 保证"玩家永远不会被困在无法返回的死格"；确定性、适用于所有生成模式。
+  {
+    const wrap = dna.spaceRules.includes('looping');
+    const seen = new Set([key(spawn.x, spawn.y)]);
+    const q = [[spawn.x, spawn.y]];
+    while (q.length) {
+      const [cx, cy] = q.pop();
+      for (const d of DIRS4) {
+        const nx = wrap ? mod(cx + d.dx, W) : cx + d.dx;
+        const ny = wrap ? mod(cy + d.dy, H) : cy + d.dy;
+        if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+        const k = key(nx, ny);
+        if (seen.has(k)) continue;
+        if (!WALKABLE_TILES.has(tiles[ny][nx])) continue;
+        seen.add(k);
+        q.push([nx, ny]);
+      }
+    }
+    const removed = new Set();
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        if (WALKABLE_TILES.has(tiles[y][x]) && !seen.has(key(x, y))) {
+          tiles[y][x] = '#';
+          removed.add(key(x, y));
+        }
+      }
+    }
+    if (removed.size > 0) {
+      // 同步清理落在孤立格上的道具与失效的传送门对
+      for (let i = props.length - 1; i >= 0; i--) {
+        if (removed.has(key(props[i].x, props[i].y))) props.splice(i, 1);
+      }
+      for (let i = portals.length - 1; i >= 0; i--) {
+        const [a, b] = portals[i];
+        if (removed.has(key(a.x, a.y)) || removed.has(key(b.x, b.y))) portals.splice(i, 1);
+      }
+    }
+    // looping 层保证至少一条"接缝通道"：某列上下边界同时开口、某行左右边界同时开口
+    // （无尽环绕感：走任意方向跨过边界后仍能继续前进；确定性，不消耗 rng）
+    if (wrap) {
+      let seamX = -1;
+      for (let x = 0; x < W; x++) {
+        if (tiles[0][x] !== '#' && tiles[H - 1][x] !== '#') { seamX = x; break; }
+      }
+      if (seamX < 0) {
+        for (let x = 0; x < W; x++) {
+          if (tiles[0][x] !== '#' && tiles[H - 2][x] !== '#') { seamX = x; tiles[H - 1][x] = '.'; break; }
+        }
+      }
+      if (seamX < 0) {
+        for (let x = 0; x < W; x++) {
+          if (tiles[H - 1][x] !== '#' && tiles[1][x] !== '#') { seamX = x; tiles[0][x] = '.'; break; }
+        }
+      }
+      if (seamX < 0) {
+        // 终极兜底：上下边缘若全封闭，在"内侧可走"的列直接开辟接缝通道
+        for (let x = 0; x < W; x++) {
+          if (tiles[1][x] !== '#') {
+            seamX = x;
+            tiles[0][x] = '.';
+            if (tiles[H - 1][x] === '#') tiles[H - 1][x] = '.';
+            break;
+          }
+        }
+      }
+      let seamY = -1;
+      for (let y = 0; y < H; y++) {
+        if (tiles[y][0] !== '#' && tiles[y][W - 1] !== '#') { seamY = y; break; }
+      }
+      if (seamY < 0) {
+        for (let y = 0; y < H; y++) {
+          if (tiles[y][0] !== '#' && tiles[y][W - 2] !== '#') { seamY = y; tiles[y][W - 1] = '.'; break; }
+        }
+      }
+      if (seamY < 0) {
+        for (let y = 0; y < H; y++) {
+          if (tiles[y][W - 1] !== '#' && tiles[y][1] !== '#') { seamY = y; tiles[y][0] = '.'; break; }
+        }
+      }
+      if (seamY < 0) {
+        // 终极兜底：左右边缘若全封闭，在"内侧可走"的行直接开辟接缝通道
+        for (let y = 0; y < H; y++) {
+          if (tiles[y][1] !== '#') {
+            seamY = y;
+            tiles[y][0] = '.';
+            if (tiles[y][W - 1] === '#') tiles[y][W - 1] = '.';
+            break;
+          }
+        }
+      }
+      // 接缝格标记为占用：实体/出口不再落座，保证接缝永远可通行
+      if (seamX >= 0) {
+        occupied.add(key(seamX, 0));
+        occupied.add(key(seamX, H - 1));
+      }
+      if (seamY >= 0) {
+        occupied.add(key(0, seamY));
+        occupied.add(key(W - 1, seamY));
+      }
+    }
+  }
+
   // ---------- 6. 出口：每个 DNA exit → 一个 E 瓦片 ----------
   const walkablesNow = collectWalkable(tiles).filter((p) => !occupied.has(key(p.x, p.y)));
   for (const ex of dna.exits) {
@@ -479,6 +585,10 @@ function buildLevel(dna, rng) {
     if (!pos) pos = findFreeNear(tiles, occupied, spawn.x, spawn.y);
     if (tiles[pos.y][pos.x] === '#') tiles[pos.y][pos.x] = '.';
     tiles[pos.y][pos.x] = 'E';
+    // 出口覆盖了原瓦片（如门/水洼）→ 移除同格道具，保持瓦片与道具数据一致
+    for (let i = props.length - 1; i >= 0; i--) {
+      if (props[i].x === pos.x && props[i].y === pos.y) props.splice(i, 1);
+    }
     occupied.add(key(pos.x, pos.y));
     exits.push({
       x: pos.x,
@@ -579,6 +689,7 @@ function buildLevel(dna, rng) {
     setPieces,
     props,
     portals,
+    rooms,
     palette: dna.palette,
     light: dna.light,
     spaceRules: dna.spaceRules,
