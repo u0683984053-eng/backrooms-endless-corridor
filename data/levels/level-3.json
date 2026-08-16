@@ -9,35 +9,115 @@
   "light": "flickering",
   "sanDrain": 0.2,
   "description": "巨大的电气设施：发电机、配电柜、裸露的电线与忽明忽暗的灯。空气中臭氧味浓重。灯光熄灭的瞬间，有什么东西会靠近。",
-  "palette": { "primary": "#8a847a", "secondary": "#6a665e", "accent": "#d8b83a", "light": "#c8c060" },
-  "terrain": {
-    "width": 26, "height": 26,
-    "roomCount": 12, "roomSizeMin": 4, "roomSizeMax": 8,
-    "corridorWidth": 2,
-    "wallStyle": "concrete", "floorStyle": "linoleum",
-    "extraFeatures": ["wires", "doors", "columns", "pipes", "furniture"]
+  "palette": {
+    "primary": "#8a847a",
+    "secondary": "#6a665e",
+    "accent": "#d8b83a",
+    "light": "#c8c060"
   },
-  "spaceRules": ["euclidean"],
-  "entities": [
-    { "type": "watcher", "density": 0.01, "aggression": "curious" },
-    { "type": "duller", "density": 0.008, "aggression": "hostile" },
-    { "type": "smiler", "density": 0.006, "aggression": "hostile" }
+  "terrain": {
+    "width": 26,
+    "height": 26,
+    "roomCount": 12,
+    "roomSizeMin": 4,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "concrete",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "wires",
+      "doors",
+      "columns",
+      "pipes",
+      "furniture"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
   ],
-  "items": ["battery", "flashlight", "almond-water", "note", "crowbar"],
+  "entities": [
+    {
+      "type": "watcher",
+      "density": 0.01,
+      "aggression": "curious"
+    },
+    {
+      "type": "duller",
+      "density": 0.008,
+      "aggression": "hostile"
+    },
+    {
+      "type": "smiler",
+      "density": 0.006,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "battery",
+    "flashlight",
+    "almond-water",
+    "note",
+    "crowbar"
+  ],
   "itemDensity": 0.1,
   "setPieces": [
-    { "type": "weird-room", "position": "center", "text": "配电室正中央悬着一盏没有电线的灯泡，它自己亮着，照着一把空椅子。椅子上放着一副眼镜。", "sanityEffect": -6, "note": "一盏悬空的灯泡照着一副眼镜。没有电线。" },
-    { "type": "writing", "position": "random", "text": "配电柜上用粉笔写着：『断电 47 秒。不要呼吸。不要眨眼。』", "sanityEffect": -5, "note": "配电柜上的粉笔字：『断电 47 秒。』" },
-    { "type": "monolith", "position": "far-corner", "text": "一块锈蚀的铁碑，上面刻着几百个名字，最新的名字下面没有日期。", "sanityEffect": -7, "note": "发现一块刻满名字的铁碑。" }
+    {
+      "type": "weird-room",
+      "position": "center",
+      "text": "配电室正中央悬着一盏没有电线的灯泡，它自己亮着，照着一把空椅子。椅子上放着一副眼镜。",
+      "sanityEffect": -6,
+      "note": "一盏悬空的灯泡照着一副眼镜。没有电线。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "配电柜上用粉笔写着：『断电 47 秒。不要呼吸。不要眨眼。』",
+      "sanityEffect": -5,
+      "note": "配电柜上的粉笔字：『断电 47 秒。』"
+    },
+    {
+      "type": "monolith",
+      "position": "far-corner",
+      "text": "一块锈蚀的铁碑，上面刻着几百个名字，最新的名字下面没有日期。",
+      "sanityEffect": -7,
+      "note": "发现一块刻满名字的铁碑。"
+    }
   ],
   "soundscape": {
-    "ambient": ["变压器低沉嗡鸣", "电弧噼啪声", "通风扇转动"],
-    "startles": ["整层灯光熄灭两秒", "配电柜突然爆出火花", "黑暗中传来窃笑"],
+    "ambient": [
+      "变压器低沉嗡鸣",
+      "电弧噼啪声",
+      "通风扇转动"
+    ],
+    "startles": [
+      "整层灯光熄灭两秒",
+      "配电柜突然爆出火花",
+      "黑暗中传来窃笑"
+    ],
     "silenceEvents": true
   },
   "exits": [
-    { "target": "level-4", "kind": "noclip", "hidden": false, "danger": false, "description": "一面墙上的瓷砖像棋盘一样错位，摸上去是凉的。" },
-    { "target": "level-5", "kind": "elevator", "hidden": false, "danger": false, "description": "一部亮着'5'的电梯，里面铺着红色地毯，有一股香水味。" },
-    { "target": "level-404", "kind": "door", "hidden": false, "danger": false, "description": "一扇标着『系统机房』的金属门，门缝里透出绿色的终端光。" }
+    {
+      "target": "level-4",
+      "kind": "noclip",
+      "hidden": false,
+      "danger": false,
+      "description": "一面墙上的瓷砖像棋盘一样错位，摸上去是凉的。"
+    },
+    {
+      "target": "level-5",
+      "kind": "elevator",
+      "hidden": false,
+      "danger": false,
+      "description": "一部亮着'5'的电梯，里面铺着红色地毯，有一股香水味。"
+    },
+    {
+      "target": "level-404",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "一扇标着『系统机房』的金属门，门缝里透出绿色的终端光。"
+    }
   ]
 }

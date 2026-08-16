@@ -9,34 +9,110 @@
   "light": "dark",
   "sanDrain": 0.3,
   "description": "无尽延伸的地下室：低矮的天花板、潮湿的水泥地、霉味和滴水声。灯很少，而且大多坏了。这里总让人觉得天花板在往下压。",
-  "palette": { "primary": "#4a463e", "secondary": "#36332c", "accent": "#8a6a4a", "light": "#8a8878" },
-  "terrain": {
-    "width": 30, "height": 30,
-    "roomCount": 14, "roomSizeMin": 4, "roomSizeMax": 9,
-    "corridorWidth": 2,
-    "wallStyle": "concrete", "floorStyle": "concrete",
-    "extraFeatures": ["pipes", "wires", "doors", "puddles", "crates", "shelves"]
+  "palette": {
+    "primary": "#4a463e",
+    "secondary": "#36332c",
+    "accent": "#8a6a4a",
+    "light": "#8a8878"
   },
-  "spaceRules": ["euclidean"],
-  "entities": [
-    { "type": "clump", "density": 0.018, "aggression": "hostile" },
-    { "type": "skin-stealer", "density": 0.008, "aggression": "curious" },
-    { "type": "hound", "density": 0.008, "aggression": "hostile" }
+  "terrain": {
+    "width": 30,
+    "height": 30,
+    "roomCount": 14,
+    "roomSizeMin": 4,
+    "roomSizeMax": 9,
+    "corridorWidth": 2,
+    "wallStyle": "concrete",
+    "floorStyle": "concrete",
+    "extraFeatures": [
+      "pipes",
+      "wires",
+      "doors",
+      "puddles",
+      "crates",
+      "shelves"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
   ],
-  "items": ["battery", "flashlight", "almond-water", "key", "note", "crowbar"],
+  "entities": [
+    {
+      "type": "clump",
+      "density": 0.018,
+      "aggression": "hostile"
+    },
+    {
+      "type": "skin-stealer",
+      "density": 0.008,
+      "aggression": "curious"
+    },
+    {
+      "type": "hound",
+      "density": 0.008,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "battery",
+    "flashlight",
+    "almond-water",
+    "key",
+    "note",
+    "crowbar"
+  ],
   "itemDensity": 0.1,
   "setPieces": [
-    { "type": "writing", "position": "random", "text": "墙上用粉笔写着：『地下室有 13 级台阶。我数过 14 次，都是 13。』", "sanityEffect": -5, "note": "粉笔字：13 级台阶，数了 14 次。" },
-    { "type": "object", "position": "center", "text": "一个老旧的锅炉还在运转，炉门缝里透出红光。锅炉旁边放着一把椅子，椅子上有坐过的温度。", "sanityEffect": -6, "note": "还在运转的锅炉，椅子还有余温。" },
-    { "type": "corpse", "position": "far-corner", "text": "角落的阴影里有一双鞋，整齐地并排放着，鞋尖朝墙。鞋的主人不在。", "sanityEffect": -7, "note": "一双朝墙的鞋。" }
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "墙上用粉笔写着：『地下室有 13 级台阶。我数过 14 次，都是 13。』",
+      "sanityEffect": -5,
+      "note": "粉笔字：13 级台阶，数了 14 次。"
+    },
+    {
+      "type": "object",
+      "position": "center",
+      "text": "一个老旧的锅炉还在运转，炉门缝里透出红光。锅炉旁边放着一把椅子，椅子上有坐过的温度。",
+      "sanityEffect": -6,
+      "note": "还在运转的锅炉，椅子还有余温。"
+    },
+    {
+      "type": "corpse",
+      "position": "far-corner",
+      "text": "角落的阴影里有一双鞋，整齐地并排放着，鞋尖朝墙。鞋的主人不在。",
+      "sanityEffect": -7,
+      "note": "一双朝墙的鞋。"
+    }
   ],
   "soundscape": {
-    "ambient": ["滴水声（规律得不像真的）", "锅炉的低鸣", "老鼠在墙里跑过"],
-    "startles": ["滴水声突然停了", "锅炉发出一声巨响", "墙里传来抓挠声"],
+    "ambient": [
+      "滴水声（规律得不像真的）",
+      "锅炉的低鸣",
+      "老鼠在墙里跑过"
+    ],
+    "startles": [
+      "滴水声突然停了",
+      "锅炉发出一声巨响",
+      "墙里传来抓挠声"
+    ],
     "silenceEvents": true
   },
   "exits": [
-    { "target": "level-1", "kind": "stairwell", "hidden": false, "danger": false, "description": "一段向上的楼梯，尽头是仓库的灯光和板条箱的气味。" },
-    { "target": "level-34", "kind": "stairwell", "hidden": true, "danger": false, "description": "一扇写着『员工通道』的铁门，门后是食堂后厨的走廊。" }
+    {
+      "target": "level-1",
+      "kind": "stairwell",
+      "hidden": false,
+      "danger": false,
+      "description": "一段向上的楼梯，尽头是仓库的灯光和板条箱的气味。"
+    },
+    {
+      "target": "level-34",
+      "kind": "stairwell",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇写着『员工通道』的铁门，门后是食堂后厨的走廊。"
+    }
   ]
 }

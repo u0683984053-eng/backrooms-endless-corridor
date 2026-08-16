@@ -30,8 +30,9 @@ function mod(n, m) {
   return ((n % m) + m) % m;
 }
 
-/** 主入口：确定性生成一个层级 */
+/** 主入口：确定性生成一个层级（terrain.infinite → 无限分块世界） */
 export function generateLevel(dna, runSeed) {
+  if (dna.terrain && dna.terrain.infinite) return createInfiniteLevel(dna, runSeed);
   const base = String(runSeed);
   let last = null;
   for (let attempt = 0; attempt < 8; attempt++) {
@@ -1134,8 +1135,31 @@ function findFreeNear(tiles, occupied, x, y) {
   return { x: 1, y: 1 };
 }
 
-/** 可达性验证：出生点 BFS 可达所有出口（looping 层按环面处理） */
+/** 可达性验证：出生点 BFS 可达所有出口（looping 层按环面处理；无限层限深验证） */
 export function verifyReachable(level) {
+  if (level.infinite) {
+    // 无限层：出口都在出生点附近（8-24 格），80 步 BFS 足够验证
+    if (!WALKABLE_TILES.has(tileAt(level, level.spawn.x, level.spawn.y))) return false;
+    const exitKeys = new Set((level.exits || []).map((e) => key(e.x, e.y)));
+    if (exitKeys.size === 0) return true;
+    const seen = new Set([key(level.spawn.x, level.spawn.y)]);
+    const queue = [[level.spawn.x, level.spawn.y, 0]];
+    let head = 0;
+    while (head < queue.length) {
+      const [x, y, d] = queue[head++];
+      if (d >= 80) continue;
+      for (const dd of DIRS4) {
+        const nx = x + dd.dx;
+        const ny = y + dd.dy;
+        const k = key(nx, ny);
+        if (seen.has(k)) continue;
+        if (tileAt(level, nx, ny) === '#') continue;
+        seen.add(k);
+        queue.push([nx, ny, d + 1]);
+      }
+    }
+    return [...exitKeys].every((k) => seen.has(k));
+  }
   const { tiles, width: W, height: H, spawn, exits } = level;
   if (!WALKABLE_TILES.has(tiles[spawn.y][spawn.x])) return false;
   const looping = level.spaceRules.includes('looping');
@@ -1163,4 +1187,540 @@ export function verifyReachable(level) {
   }
   if (exits.length === 0) return seen.size > 1;
   return exits.every((e) => seen.has(key(e.x, e.y)));
+}
+
+// ================= 无限世界（Minecraft 式分块生成） =================
+// 原理：整个世界按 16×16 的 chunk 分块，chunk 内容由 (cx,cy) 的确定性种子生成，
+// 玩家走到哪里就生成到哪里（getTile 惰性生成并缓存）——"无边界"层级没有地图
+// 边缘，任何方向都能永远走下去。网格类拓扑（走廊网格/城市/旅馆/仓库）用全局
+// 坐标公式，chunk 边界自然对齐无缝；迷宫/洞穴类用固定边缘端口保证相邻 chunk
+// 互相连通。有限层级越界一律视为墙（tileAt），绝不出现"走到地图外的虚空"。
+
+export const CHUNK = 16;
+
+const posmod = (n, m) => ((n % m) + m) % m;
+
+/** 统一取瓦片：无限层惰性生成；有限层越界视为墙（墙而非虚空边界） */
+export function tileAt(level, x, y) {
+  if (level.infinite) return level.getTile(x, y);
+  if (x < 0 || y < 0 || x >= level.width || y >= level.height) return '#';
+  return level.tiles[y][x];
+}
+
+function chunkRng(dna, runSeed, cx, cy) {
+  return mulberry32(hashString(`${runSeed}|${dna.id}|chunk:${cx},${cy}`));
+}
+
+/** 8 个边缘端口（chunk 局部坐标）：每边 2 个，宽 2 格深 2 格，跨 chunk 对齐 */
+const EDGE_PORTS = [
+  { x: 4, y: 0 }, { x: 11, y: 0 },
+  { x: 4, y: 15 }, { x: 11, y: 15 },
+  { x: 0, y: 4 }, { x: 0, y: 11 },
+  { x: 15, y: 4 }, { x: 15, y: 11 },
+];
+
+function carvePorts(tiles) {
+  for (const p of EDGE_PORTS) {
+    const dx = p.x === 0 ? 1 : p.x === 15 ? -1 : 0;
+    const dy = p.y === 0 ? 1 : p.y === 15 ? -1 : 0;
+    tiles[p.y][p.x] = '.';
+    tiles[p.y + dy][p.x + dx] = '.';
+  }
+}
+
+function portInner(p) {
+  return {
+    x: p.x + (p.x === 0 ? 1 : p.x === 15 ? -1 : 0),
+    y: p.y + (p.y === 0 ? 1 : p.y === 15 ? -1 : 0),
+  };
+}
+
+/** 两点间 L 形走廊（先横后纵） */
+function carveL(tiles, a, b) {
+  if (a.x <= b.x) for (let x = a.x; x <= b.x; x++) tiles[a.y][x] = '.';
+  else for (let x = b.x; x <= a.x; x++) tiles[a.y][x] = '.';
+  if (a.y <= b.y) for (let y = a.y; y <= b.y; y++) tiles[y][b.x] = '.';
+  else for (let y = b.y; y <= a.y; y++) tiles[y][b.x] = '.';
+}
+
+/** 房间迷宫 chunk：8 端口 + 1-3 个随机房间 + 顺序 L 走廊（全连通） */
+function buildRoomsChunk(tiles, rng) {
+  carvePorts(tiles);
+  const rooms = [];
+  const roomCount = randInt(rng, 1, 3);
+  for (let i = 0; i < roomCount; i++) {
+    const rw = randInt(rng, 4, 7);
+    const rh = randInt(rng, 4, 7);
+    for (let t = 0; t < 20; t++) {
+      const x = randInt(rng, 2, CHUNK - rw - 2);
+      const y = randInt(rng, 2, CHUNK - rh - 2);
+      if (!overlaps(rooms, x, y, rw, rh)) {
+        rooms.push({ x, y, w: rw, h: rh });
+        carveRoom(tiles, x, y, rw, rh);
+        break;
+      }
+    }
+  }
+  if (rooms.length === 0) {
+    rooms.push({ x: 5, y: 5, w: 5, h: 5 });
+    carveRoom(tiles, 5, 5, 5, 5);
+  }
+  // 节点 = 8 端口内端 + 房间中心，顺序连接 → 全部连通
+  const nodes = EDGE_PORTS.map(portInner);
+  for (const r of rooms) nodes.push({ x: r.x + Math.floor(r.w / 2), y: r.y + Math.floor(r.h / 2) });
+  for (let i = 1; i < nodes.length; i++) carveL(tiles, nodes[i - 1], nodes[i]);
+}
+
+/** 洞穴 chunk：8 端口 + 从端口出发的随机游走 + 随机洞穴室 */
+function buildCavesChunk(tiles, rng) {
+  carvePorts(tiles);
+  const starts = EDGE_PORTS.map(portInner);
+  let x = starts[0].x;
+  let y = starts[0].y;
+  tiles[y][x] = '.';
+  for (let s = 1; s < starts.length; s++) {
+    for (let i = 0; i < 60; i++) {
+      const dir = DIRS4[randInt(rng, 0, 3)];
+      x = Math.max(1, Math.min(CHUNK - 2, x + dir.dx));
+      y = Math.max(1, Math.min(CHUNK - 2, y + dir.dy));
+      tiles[y][x] = '.';
+      if (Math.abs(x - starts[s].x) + Math.abs(y - starts[s].y) <= 2) break;
+    }
+  }
+  const caves = randInt(rng, 1, 3);
+  for (let i = 0; i < caves; i++) {
+    const cx = randInt(rng, 3, CHUNK - 4);
+    const cy = randInt(rng, 3, CHUNK - 4);
+    const r = randInt(rng, 2, 4);
+    for (let yy = cy - r; yy <= cy + r; yy++) {
+      for (let xx = cx - r; xx <= cx + r; xx++) {
+        if (xx >= 1 && yy >= 1 && xx < CHUNK - 1 && yy < CHUNK - 1 && (xx - cx) ** 2 + (yy - cy) ** 2 <= r * r) {
+          tiles[yy][xx] = '.';
+        }
+      }
+    }
+  }
+}
+
+/** 走廊网格 chunk：全局公式（stride 8 整除 CHUNK，边界天然对齐无缝） */
+function buildHallwayChunk(tiles, rng, gx0, gy0) {
+  const stride = 8;
+  const isCorridor = (gx, gy) => posmod(gx, stride) === 4 || posmod(gy, stride) === 4;
+  const isWall = (gx, gy) => {
+    const xm = posmod(gx, stride);
+    const ym = posmod(gy, stride);
+    return (xm === 3 || xm === 5 || ym === 3 || ym === 5) && !isCorridor(gx, gy);
+  };
+  for (let ly = 0; ly < CHUNK; ly++) {
+    for (let lx = 0; lx < CHUNK; lx++) {
+      const gx = gx0 + lx;
+      const gy = gy0 + ly;
+      tiles[ly][lx] = isCorridor(gx, gy) ? '.' : isWall(gx, gy) ? '#' : '.';
+    }
+  }
+  // 门（概率 0.24）：一侧邻走廊、另一侧邻房间的墙（走廊不跨 chunk 边界，判定安全）
+  const isRoomTile = (t) => t === '.' || t === '~';
+  for (let ly = 1; ly < CHUNK - 1; ly++) {
+    for (let lx = 1; lx < CHUNK - 1; lx++) {
+      if (tiles[ly][lx] !== '#') continue;
+      const gx = gx0 + lx;
+      const gy = gy0 + ly;
+      let hasCorridor = false;
+      let hasRoom = false;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nlx = lx + dx;
+        const nly = ly + dy;
+        if (nlx < 0 || nly < 0 || nlx >= CHUNK || nly >= CHUNK) continue;
+        if (isCorridor(gx + dx, gy + dy) && tiles[nly][nlx] !== '#') hasCorridor = true;
+        else if (isRoomTile(tiles[nly][nlx])) hasRoom = true;
+      }
+      if (hasCorridor && hasRoom && chance(rng, 0.24)) tiles[ly][lx] = 'D';
+    }
+  }
+}
+
+/** 城市街区 chunk：全局街道公式 + 块哈希门位（跨 chunk 一致） */
+function buildCityChunk(tiles, gx0, gy0, dna, runSeed) {
+  const stride = 12;
+  const streetW = 3;
+  for (let ly = 0; ly < CHUNK; ly++) {
+    for (let lx = 0; lx < CHUNK; lx++) {
+      const gx = gx0 + lx;
+      const gy = gy0 + ly;
+      if (posmod(gx, stride) < streetW || posmod(gy, stride) < streetW) {
+        tiles[ly][lx] = '.';
+        continue;
+      }
+      const xm = posmod(gx, stride);
+      const ym = posmod(gy, stride);
+      const edge = xm === 3 || xm === 11 || ym === 3 || ym === 11;
+      tiles[ly][lx] = edge ? '#' : '.';
+    }
+  }
+  // 门：由"街区种子"决定（与 chunk 无关），每个街区 1-2 扇店门，位置确定
+  const bx0 = Math.floor(gx0 / stride);
+  const bx1 = Math.floor((gx0 + CHUNK - 1) / stride);
+  const by0 = Math.floor(gy0 / stride);
+  const by1 = Math.floor((gy0 + CHUNK - 1) / stride);
+  for (let by = by0; by <= by1; by++) {
+    for (let bx = bx0; bx <= bx1; bx++) {
+      const br = mulberry32(hashString(`${runSeed}|${dna.id}|blk:${bx},${by}`));
+      const x0 = bx * stride + streetW;
+      const y0 = by * stride + streetW;
+      const x1 = bx * stride + stride - 1;
+      const y1 = by * stride + stride - 1;
+      const doorCount = randInt(br, 1, 2);
+      for (let i = 0; i < doorCount; i++) {
+        const side = pick(br, ['top', 'bottom', 'left', 'right']);
+        let dx, dy;
+        if (side === 'top') { dx = randInt(br, x0 + 1, x1 - 1); dy = y0; }
+        else if (side === 'bottom') { dx = randInt(br, x0 + 1, x1 - 1); dy = y1; }
+        else if (side === 'left') { dx = x0; dy = randInt(br, y0 + 1, y1 - 1); }
+        else { dx = x1; dy = randInt(br, y0 + 1, y1 - 1); }
+        const lx = dx - gx0;
+        const ly = dy - gy0;
+        if (lx >= 0 && lx < CHUNK && ly >= 0 && ly < CHUNK && tiles[ly][lx] === '#') {
+          tiles[ly][lx] = 'D';
+        }
+      }
+    }
+  }
+}
+
+/** 仓库 chunk：开阔大厅 + 全局柱列 + 稀疏隔间（避开边缘保证通路） */
+function buildWarehouseChunk(tiles, rng, gx0, gy0) {
+  for (let ly = 0; ly < CHUNK; ly++) {
+    for (let lx = 0; lx < CHUNK; lx++) tiles[ly][lx] = '.';
+  }
+  for (let ly = 0; ly < CHUNK; ly++) {
+    for (let lx = 0; lx < CHUNK; lx++) {
+      if (posmod(gx0 + lx, 5) === 4 && posmod(gy0 + ly, 5) === 4) tiles[ly][lx] = '#';
+    }
+  }
+  const n = randInt(rng, 0, 2);
+  for (let i = 0; i < n; i++) {
+    const hx = randInt(rng, 3, CHUNK - 6);
+    const hy = randInt(rng, 3, CHUNK - 6);
+    for (let yy = hy - 1; yy <= hy + 3; yy++) {
+      for (let xx = hx - 1; xx <= hx + 3; xx++) {
+        const edge = xx === hx - 1 || xx === hx + 3 || yy === hy - 1 || yy === hy + 3;
+        tiles[yy][xx] = edge ? '#' : '.';
+      }
+    }
+    const side = randInt(rng, 0, 3);
+    let dx, dy;
+    if (side === 0) { dx = hx + randInt(rng, 0, 2); dy = hy - 1; }
+    else if (side === 1) { dx = hx + randInt(rng, 0, 2); dy = hy + 3; }
+    else if (side === 2) { dx = hx - 1; dy = hy + randInt(rng, 0, 2); }
+    else { dx = hx + 3; dy = hy + randInt(rng, 0, 2); }
+    if (dx >= 1 && dy >= 1 && dx < CHUNK - 1 && dy < CHUNK - 1 && tiles[dy][dx] === '#') {
+      tiles[dy][dx] = 'D';
+    }
+  }
+}
+
+/** 旅馆 chunk：全局走廊公式（stride 6）+ 块哈希门口（房间角，跨 chunk 一致） */
+function buildHotelChunk(tiles, gx0, gy0, dna, runSeed) {
+  const stride = 6;
+  for (let ly = 0; ly < CHUNK; ly++) {
+    for (let lx = 0; lx < CHUNK; lx++) {
+      const gx = gx0 + lx;
+      const gy = gy0 + ly;
+      if (posmod(gx, stride) === 2 || posmod(gy, stride) === 2) tiles[ly][lx] = '.';
+      else tiles[ly][lx] = '#';
+    }
+  }
+  for (let ly = 0; ly < CHUNK; ly++) {
+    for (let lx = 0; lx < CHUNK; lx++) {
+      const xm = posmod(gx0 + lx, stride);
+      const ym = posmod(gy0 + ly, stride);
+      if (xm >= 3 && ym >= 3) tiles[ly][lx] = '.';
+    }
+  }
+  const bx0 = Math.floor(gx0 / stride);
+  const bx1 = Math.floor((gx0 + CHUNK - 1) / stride);
+  const by0 = Math.floor(gy0 / stride);
+  const by1 = Math.floor((gy0 + CHUNK - 1) / stride);
+  for (let by = by0; by <= by1; by++) {
+    for (let bx = bx0; bx <= bx1; bx++) {
+      const br = mulberry32(hashString(`${runSeed}|${dna.id}|hblk:${bx},${by}`));
+      const x0 = bx * stride + 3;
+      const y0 = by * stride + 3;
+      for (const [dx, dy] of [[x0, y0], [x0, y0 + 2], [x0, y0], [x0 + 2, y0]]) {
+        if (!chance(br, 0.7)) continue;
+        const lx = dx - gx0;
+        const ly = dy - gy0;
+        if (lx >= 0 && lx < CHUNK && ly >= 0 && ly < CHUNK && tiles[ly][lx] === '.') {
+          tiles[ly][lx] = 'D';
+        }
+      }
+    }
+  }
+}
+
+/** 田野 chunk：开阔地面 + 障碍簇 + 稀疏农舍（避开边缘保证跨 chunk 通路） */
+function buildFieldsChunk(tiles, rng) {
+  for (let ly = 0; ly < CHUNK; ly++) {
+    for (let lx = 0; lx < CHUNK; lx++) tiles[ly][lx] = '.';
+  }
+  const n = randInt(rng, 2, 5);
+  for (let i = 0; i < n; i++) {
+    const cx = randInt(rng, 3, CHUNK - 4);
+    const cy = randInt(rng, 3, CHUNK - 4);
+    const r = randInt(rng, 1, 3);
+    for (let yy = cy - r; yy <= cy + r; yy++) {
+      for (let xx = cx - r; xx <= cx + r; xx++) {
+        if (xx >= 2 && yy >= 2 && xx < CHUNK - 2 && yy < CHUNK - 2 && (xx - cx) ** 2 + (yy - cy) ** 2 <= r * r) {
+          tiles[yy][xx] = '#';
+        }
+      }
+    }
+  }
+  if (chance(rng, 0.6)) {
+    const hx = randInt(rng, 3, CHUNK - 7);
+    const hy = randInt(rng, 3, CHUNK - 7);
+    for (let yy = hy; yy < hy + 4; yy++) {
+      for (let xx = hx; xx < hx + 4; xx++) {
+        const edge = xx === hx || xx === hx + 3 || yy === hy || yy === hy + 3;
+        tiles[yy][xx] = edge ? '#' : '.';
+      }
+    }
+    const dx = hx + randInt(rng, 0, 3);
+    const dy = hy - 1;
+    if (dy >= 2 && tiles[dy][dx] === '#') tiles[dy][dx] = 'D';
+  }
+}
+
+/** 构建单个 chunk：瓦片 + 实体 + 物品（确定性，可独立重放） */
+function buildChunk(dna, runSeed, cx, cy) {
+  const rng = chunkRng(dna, runSeed, cx, cy);
+  const tiles = Array.from({ length: CHUNK }, () => Array(CHUNK).fill('#'));
+  const gx0 = cx * CHUNK;
+  const gy0 = cy * CHUNK;
+  const topology = dna.terrain.topology || (dna.environment === 'caves' ? 'caves' : 'rooms');
+  if (topology === 'hallway-grid') buildHallwayChunk(tiles, rng, gx0, gy0);
+  else if (topology === 'city-grid') buildCityChunk(tiles, gx0, gy0, dna, runSeed);
+  else if (topology === 'warehouse') buildWarehouseChunk(tiles, rng, gx0, gy0);
+  else if (topology === 'hotel') buildHotelChunk(tiles, gx0, gy0, dna, runSeed);
+  else if (topology === 'fields') buildFieldsChunk(tiles, rng);
+  else if (topology === 'caves') buildCavesChunk(tiles, rng);
+  else buildRoomsChunk(tiles, rng);
+
+  // 实体：密度 × 256 格期望值，泊松化
+  const ents = [];
+  const used = new Set();
+  if (dna.entities) {
+    for (const spec of dna.entities) {
+      if (!spec || !spec.density || spec.density <= 0) continue;
+      const def = ENTITY_DEFS[spec.type];
+      if (!def) continue;
+      const expected = spec.density * CHUNK * CHUNK;
+      const count = Math.floor(expected) + (rng() < expected - Math.floor(expected) ? 1 : 0);
+      for (let i = 0; i < count; i++) {
+        let px = -1;
+        let py = -1;
+        for (let t = 0; t < 40; t++) {
+          const tx = randInt(rng, 1, CHUNK - 2);
+          const ty = randInt(rng, 1, CHUNK - 2);
+          const k = tx + ',' + ty;
+          if (WALKABLE_TILES.has(tiles[ty][tx]) && tiles[ty][tx] !== 'D' && !used.has(k)) {
+            px = tx;
+            py = ty;
+            used.add(k);
+            break;
+          }
+        }
+        if (px < 0) continue;
+        const stealthy = spec.type === 'skin-stealer' || spec.type === 'scratcher';
+        ents.push({
+          id: (gx0 + px) + ',' + (gy0 + py),
+          chunkKey: cx + ',' + cy,
+          x: gx0 + px,
+          y: gy0 + py,
+          type: spec.type,
+          aggression: spec.aggression || 'curious',
+          hp: def.hp,
+          state: 'idle',
+          visible: !stealthy,
+          alert: false,
+          wait: randInt(rng, 0, 3),
+          revealed: false,
+        });
+      }
+    }
+  }
+  // 物品：itemDensity × 256 期望值
+  const its = [];
+  if (dna.itemDensity > 0 && dna.items.length > 0) {
+    const expected = dna.itemDensity * CHUNK * CHUNK;
+    const count = Math.max(1, Math.floor(expected) + (rng() < expected - Math.floor(expected) ? 1 : 0));
+    for (let i = 0; i < count; i++) {
+      let px = -1;
+      let py = -1;
+      for (let t = 0; t < 40; t++) {
+        const tx = randInt(rng, 1, CHUNK - 2);
+        const ty = randInt(rng, 1, CHUNK - 2);
+        const k = tx + ',' + ty;
+        if (WALKABLE_TILES.has(tiles[ty][tx]) && tiles[ty][tx] !== 'D' && !used.has(k)) {
+          px = tx;
+          py = ty;
+          used.add(k);
+          break;
+        }
+      }
+      if (px < 0) continue;
+      its.push({
+        id: 'i:' + (gx0 + px) + ',' + (gy0 + py),
+        chunkKey: cx + ',' + cy,
+        x: gx0 + px,
+        y: gy0 + py,
+        type: pick(rng, dna.items),
+      });
+    }
+  }
+  return { tiles, entities: ents, items: its };
+}
+
+/** 无限层级上的最近可行走格（螺旋搜索，越远越生成） */
+function nearestWalkableInfinite(level, x, y) {
+  for (let r = 0; r < 128; r++) {
+    for (let dy = -r; dy <= r; dy++) {
+      for (let dx = -r; dx <= r; dx++) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+        if (WALKABLE_TILES.has(level.getTile(x + dx, y + dy))) return { x: x + dx, y: y + dy };
+      }
+    }
+  }
+  return { x, y };
+}
+
+/** 创建无限层级：无边界、惰性分块、确定性重放 */
+export function createInfiniteLevel(dna, runSeed) {
+  const chunks = new Map();
+  const level = {
+    id: dna.id,
+    name: dna.name,
+    number: dna.number,
+    category: dna.category,
+    difficultyClass: dna.difficultyClass,
+    environment: dna.environment || 'corridors',
+    aesthetic: dna.aesthetic,
+    description: dna.description,
+    terrain: dna.terrain,
+    infinite: true,
+    spawn: { x: 0, y: 0 },
+    exits: [],
+    entities: [],
+    items: [],
+    setPieces: [],
+    props: [],
+    portals: [],
+    rooms: [],
+    doorLinks: [],
+    palette: dna.palette,
+    light: dna.light,
+    spaceRules: dna.spaceRules,
+    sanDrain: dna.sanDrain,
+    soundscape: dna.soundscape,
+    chunks,
+    chunkKeys: [],
+    takenItems: new Set(),
+    deadEntities: new Set(),
+    exitSet: new Set(),
+    playerChunkX: 0,
+    playerChunkY: 0,
+    getChunk(cx, cy) {
+      const k = cx + ',' + cy;
+      let c = chunks.get(k);
+      if (!c) {
+        c = buildChunk(dna, runSeed, cx, cy);
+        chunks.set(k, c);
+        level.chunkKeys.push(k);
+      }
+      return c;
+    },
+    getTile(x, y) {
+      const cx = Math.floor(x / CHUNK);
+      const cy = Math.floor(y / CHUNK);
+      const c = level.getChunk(cx, cy);
+      return c.tiles[y - cy * CHUNK][x - cx * CHUNK];
+    },
+  };
+  // 出生点 (0,0) 必须可行走
+  if (!WALKABLE_TILES.has(level.getTile(0, 0))) {
+    const p = nearestWalkableInfinite(level, 0, 0);
+    level.spawn = { x: p.x, y: p.y };
+  }
+  // 出口：2-4 个，距出生点 8-24 格，确定性方向
+  const er = mulberry32(hashString(`${runSeed}|${dna.id}|exits`));
+  const exitSpecs = dna.exits && dna.exits.length ? dna.exits : [{ kind: 'noclip', target: 'hub' }];
+  const n = Math.min(exitSpecs.length, randInt(er, 2, 4));
+  const placed = [];
+  for (let i = 0; i < n; i++) {
+    const spec = exitSpecs[i % exitSpecs.length];
+    const d = randInt(er, 8, 24);
+    const ang = (randInt(er, 0, 7) * Math.PI) / 4;
+    let x = Math.round(level.spawn.x + Math.cos(ang) * d);
+    let y = Math.round(level.spawn.y + Math.sin(ang) * d);
+    for (let t = 0; t < 60 && !WALKABLE_TILES.has(level.getTile(x, y)); t++) {
+      x += randInt(er, -1, 1);
+      y += randInt(er, -1, 1);
+    }
+    if (!WALKABLE_TILES.has(level.getTile(x, y))) {
+      const p = nearestWalkableInfinite(level, x, y);
+      x = p.x;
+      y = p.y;
+    }
+    if (placed.some((e) => Math.abs(e.x - x) + Math.abs(e.y - y) < 4)) continue;
+    placed.push({ x, y });
+    level.exitSet.add(x + ',' + y);
+    level.exits.push({
+      x,
+      y,
+      target: spec.target || 'hub',
+      kind: spec.kind || 'noclip',
+      hidden: !!spec.hidden,
+      danger: !!spec.danger,
+      description: spec.description || '',
+    });
+  }
+  // 出生点附近 6 格内不生成实体/物品
+  const nearSpawn = (a, b) => Math.abs(a - level.spawn.x) + Math.abs(b - level.spawn.y) < 6;
+  const c0 = level.getChunk(0, 0);
+  c0.entities = c0.entities.filter((e) => !nearSpawn(e.x, e.y));
+  c0.items = c0.items.filter((it) => !nearSpawn(it.x, it.y));
+  level.entities = c0.entities.slice();
+  level.items = c0.items.slice();
+  return level;
+}
+
+/** 玩家周围 3×3 chunk 激活：移入/移出实体与物品（稳定 id 记录取走/击杀） */
+export function updateActiveChunks(level, px, py) {
+  if (!level.infinite) return false;
+  const cx = Math.floor(px / CHUNK);
+  const cy = Math.floor(py / CHUNK);
+  if (cx === level.playerChunkX && cy === level.playerChunkY) return false;
+  level.playerChunkX = cx;
+  level.playerChunkY = cy;
+  const active = new Set();
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) active.add(cx + dx + ',' + (cy + dy));
+  }
+  level.entities = level.entities.filter((e) => active.has(e.chunkKey));
+  level.items = level.items.filter((it) => active.has(it.chunkKey));
+  for (const k of active) {
+    const comma = k.indexOf(',');
+    const ax = Number(k.slice(0, comma));
+    const ay = Number(k.slice(comma + 1));
+    const c = level.getChunk(ax, ay);
+    for (const e of c.entities) {
+      if (!level.deadEntities.has(e.id) && !level.entities.includes(e)) level.entities.push(e);
+    }
+    for (const it of c.items) {
+      if (!level.takenItems.has(it.id) && !level.exitSet.has(it.x + ',' + it.y) && !level.items.includes(it)) {
+        level.items.push(it);
+      }
+    }
+  }
+  return true;
 }

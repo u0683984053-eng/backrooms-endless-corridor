@@ -31,10 +31,11 @@
       "posters",
       "puddles",
       "wires"
-    ]
+    ],
+    "infinite": true
   },
   "spaceRules": [
-    "looping"
+    "euclidean"
   ],
   "entities": [
     {

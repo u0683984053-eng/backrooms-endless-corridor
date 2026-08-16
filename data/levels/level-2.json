@@ -9,34 +9,106 @@
   "light": "dim",
   "sanDrain": 0.12,
   "description": "错综复杂的巨型管道与蒸汽系统。热浪、嘶嘶声、锈蚀的铁梯。这里有杏仁水，但管道深处有什么东西在跟着管道里的声音移动。",
-  "palette": { "primary": "#6e6a5e", "secondary": "#57534a", "accent": "#8a3a2a", "light": "#b88a5a" },
-  "terrain": {
-    "width": 28, "height": 28,
-    "roomCount": 10, "roomSizeMin": 3, "roomSizeMax": 7,
-    "corridorWidth": 2,
-    "wallStyle": "metal", "floorStyle": "concrete",
-    "extraFeatures": ["pipes", "puddles", "stairwell", "elevator", "wires"]
+  "palette": {
+    "primary": "#6e6a5e",
+    "secondary": "#57534a",
+    "accent": "#8a3a2a",
+    "light": "#b88a5a"
   },
-  "spaceRules": ["euclidean"],
-  "entities": [
-    { "type": "hound", "density": 0.012, "aggression": "hostile" },
-    { "type": "moth", "density": 0.008, "aggression": "passive" },
-    { "type": "clump", "density": 0.004, "aggression": "curious" },
-    { "type": "deathmoth", "density": 0.008, "aggression": "hostile" }
+  "terrain": {
+    "width": 28,
+    "height": 28,
+    "roomCount": 10,
+    "roomSizeMin": 3,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "metal",
+    "floorStyle": "concrete",
+    "extraFeatures": [
+      "pipes",
+      "puddles",
+      "stairwell",
+      "elevator",
+      "wires"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
   ],
-  "items": ["almond-water", "battery", "flashlight", "crowbar", "note"],
+  "entities": [
+    {
+      "type": "hound",
+      "density": 0.012,
+      "aggression": "hostile"
+    },
+    {
+      "type": "moth",
+      "density": 0.008,
+      "aggression": "passive"
+    },
+    {
+      "type": "clump",
+      "density": 0.004,
+      "aggression": "curious"
+    },
+    {
+      "type": "deathmoth",
+      "density": 0.008,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "note"
+  ],
   "itemDensity": 0.15,
   "setPieces": [
-    { "type": "weird-room", "position": "far-corner", "text": "管道间里有一扇完全独立的小门，打开是干净整洁的厨房，炉子上炖着汤。没有人。", "sanityEffect": -8, "note": "管道深处有一间整洁的厨房，汤还在炉子上。这里不该有厨房。" },
-    { "type": "writing", "position": "random", "text": "蒸汽在金属壁上凝成字迹：『不要跑。它们听得到奔跑。』", "sanityEffect": -4, "note": "金属壁上凝着水珠形成的字：『不要跑。』" }
+    {
+      "type": "weird-room",
+      "position": "far-corner",
+      "text": "管道间里有一扇完全独立的小门，打开是干净整洁的厨房，炉子上炖着汤。没有人。",
+      "sanityEffect": -8,
+      "note": "管道深处有一间整洁的厨房，汤还在炉子上。这里不该有厨房。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "蒸汽在金属壁上凝成字迹：『不要跑。它们听得到奔跑。』",
+      "sanityEffect": -4,
+      "note": "金属壁上凝着水珠形成的字：『不要跑。』"
+    }
   ],
   "soundscape": {
-    "ambient": ["蒸汽嘶嘶声", "管道内部液体流动声", "远处金属敲击声"],
-    "startles": ["阀门突然喷出蒸汽", "管道里传来沉闷的撞击", "身后很近的呼吸声"],
+    "ambient": [
+      "蒸汽嘶嘶声",
+      "管道内部液体流动声",
+      "远处金属敲击声"
+    ],
+    "startles": [
+      "阀门突然喷出蒸汽",
+      "管道里传来沉闷的撞击",
+      "身后很近的呼吸声"
+    ],
     "silenceEvents": true
   },
   "exits": [
-    { "target": "level-3", "kind": "noclip", "hidden": false, "danger": false, "description": "一段墙皮剥落露出黑色空洞的墙壁，像被烧过。" },
-    { "target": "level-4", "kind": "hole", "hidden": true, "danger": true, "description": "地板上一处被锈穿的大洞，下方是漆黑的深井——跳下去会到 Level 4，如果你活着落地。" }
+    {
+      "target": "level-3",
+      "kind": "noclip",
+      "hidden": false,
+      "danger": false,
+      "description": "一段墙皮剥落露出黑色空洞的墙壁，像被烧过。"
+    },
+    {
+      "target": "level-4",
+      "kind": "hole",
+      "hidden": true,
+      "danger": true,
+      "description": "地板上一处被锈穿的大洞，下方是漆黑的深井——跳下去会到 Level 4，如果你活着落地。"
+    }
   ]
 }

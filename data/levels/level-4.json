@@ -32,7 +32,8 @@
       "posters",
       "doors",
       "windows"
-    ]
+    ],
+    "infinite": true
   },
   "spaceRules": [
     "euclidean"

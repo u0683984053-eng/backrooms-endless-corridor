@@ -32,7 +32,8 @@
       "furniture",
       "crates"
     ],
-    "topology": "warehouse"
+    "topology": "warehouse",
+    "infinite": true
   },
   "spaceRules": [
     "euclidean"

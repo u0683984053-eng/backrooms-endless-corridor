@@ -34,7 +34,8 @@
       "windows",
       "doors",
       "elevator"
-    ]
+    ],
+    "infinite": true
   },
   "spaceRules": [
     "euclidean"

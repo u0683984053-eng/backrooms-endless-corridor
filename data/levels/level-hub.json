@@ -9,35 +9,127 @@
   "light": "bright",
   "sanDrain": 0,
   "description": "紫色的灯光、光滑的地板、环绕四周的一圈门。这里是层级之间的中转站——只要知道要去哪里，这里就有通往那里的门。但没有人知道这里是谁建造的。",
-  "palette": { "primary": "#c8b8e8", "secondary": "#8a7ab0", "accent": "#b888f0", "light": "#d8c0f8" },
-  "terrain": {
-    "width": 28, "height": 28,
-    "roomCount": 6, "roomSizeMin": 6, "roomSizeMax": 10,
-    "corridorWidth": 3,
-    "wallStyle": "drywall", "floorStyle": "tile",
-    "extraFeatures": ["doors", "columns", "furniture", "fountain"]
+  "palette": {
+    "primary": "#c8b8e8",
+    "secondary": "#8a7ab0",
+    "accent": "#b888f0",
+    "light": "#d8c0f8"
   },
-  "spaceRules": ["euclidean"],
+  "terrain": {
+    "width": 28,
+    "height": 28,
+    "roomCount": 6,
+    "roomSizeMin": 6,
+    "roomSizeMax": 10,
+    "corridorWidth": 3,
+    "wallStyle": "drywall",
+    "floorStyle": "tile",
+    "extraFeatures": [
+      "doors",
+      "columns",
+      "furniture",
+      "fountain"
+    ],
+    "infinite": false
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
   "entities": [],
-  "items": ["almond-water", "royal-ration", "battery", "flashlight", "medkit", "note"],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
   "itemDensity": 0.3,
   "setPieces": [
-    { "type": "writing", "position": "center", "text": "大厅中央的铭牌：『门会通往你需要去的地方——前提是你真的想去。』", "sanityEffect": 2, "note": "枢纽的铭牌：门通往你需要去的地方。" },
-    { "type": "object", "position": "random", "text": "一扇门上贴着褪色的纸条：『通往 Level 0 的门今天换位置了。我们也是刚发现的。』", "sanityEffect": -2, "note": "枢纽的门偶尔会换位置。" },
-    { "type": "mural", "position": "far-corner", "text": "墙上的壁画：无数人形手拉手穿过一扇扇门，最远处的门里是白色的光。", "sanityEffect": 1, "note": "壁画：人们穿过门，走向白光。" }
+    {
+      "type": "writing",
+      "position": "center",
+      "text": "大厅中央的铭牌：『门会通往你需要去的地方——前提是你真的想去。』",
+      "sanityEffect": 2,
+      "note": "枢纽的铭牌：门通往你需要去的地方。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一扇门上贴着褪色的纸条：『通往 Level 0 的门今天换位置了。我们也是刚发现的。』",
+      "sanityEffect": -2,
+      "note": "枢纽的门偶尔会换位置。"
+    },
+    {
+      "type": "mural",
+      "position": "far-corner",
+      "text": "墙上的壁画：无数人形手拉手穿过一扇扇门，最远处的门里是白色的光。",
+      "sanityEffect": 1,
+      "note": "壁画：人们穿过门，走向白光。"
+    }
   ],
   "soundscape": {
-    "ambient": ["远处门开合的声音", "紫色灯光细微的电流声", "某个方向传来模糊的音乐"],
-    "startles": ["一扇门自己开了一条缝又关上", "脚步声在身后停下", "所有灯同时暗了一瞬"],
+    "ambient": [
+      "远处门开合的声音",
+      "紫色灯光细微的电流声",
+      "某个方向传来模糊的音乐"
+    ],
+    "startles": [
+      "一扇门自己开了一条缝又关上",
+      "脚步声在身后停下",
+      "所有灯同时暗了一瞬"
+    ],
     "silenceEvents": true
   },
   "exits": [
-    { "target": "level-0", "kind": "door", "hidden": false, "danger": false, "description": "标着『0』的门：门缝里透出黄色墙纸和荧光灯的光。" },
-    { "target": "level-1", "kind": "door", "hidden": false, "danger": false, "description": "标着『1』的门：门后是仓库的气息。" },
-    { "target": "level-2", "kind": "door", "hidden": false, "danger": false, "description": "标着『2』的门：门缝里渗出蒸汽。" },
-    { "target": "level-3", "kind": "door", "hidden": false, "danger": false, "description": "标着『3』的门：门后传来变压器低鸣。" },
-    { "target": "level-4", "kind": "door", "hidden": false, "danger": false, "description": "标着『4』的门：门后是办公室的空调风。" },
-    { "target": "level-5", "kind": "door", "hidden": false, "danger": false, "description": "标着『5』的门：门后飘来廉价香水味。" },
-    { "target": "level-11", "kind": "door", "hidden": false, "danger": false, "description": "标着『11』的门：门后是城市的路灯光。" }
+    {
+      "target": "level-0",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "标着『0』的门：门缝里透出黄色墙纸和荧光灯的光。"
+    },
+    {
+      "target": "level-1",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "标着『1』的门：门后是仓库的气息。"
+    },
+    {
+      "target": "level-2",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "标着『2』的门：门缝里渗出蒸汽。"
+    },
+    {
+      "target": "level-3",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "标着『3』的门：门后传来变压器低鸣。"
+    },
+    {
+      "target": "level-4",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "标着『4』的门：门后是办公室的空调风。"
+    },
+    {
+      "target": "level-5",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "标着『5』的门：门后飘来廉价香水味。"
+    },
+    {
+      "target": "level-11",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "标着『11』的门：门后是城市的路灯光。"
+    }
   ]
 }

@@ -13,6 +13,7 @@ import {
 } from '../engine/game.js';
 import { ITEM_META, viewRadiusOf } from '../engine/player.js';
 import { ENTITY_DEFS } from '../engine/entities.js';
+import { tileAt } from '../engine/generator.js';
 import { hashString } from '../engine/rng.js';
 // 程序化音频（AUDIO-SPEC v1.0）：零依赖 Web Audio，所有调用都 try/catch 包裹
 import {
@@ -1243,7 +1244,7 @@ function drawGame() {
   const oy = (H - viewRows * tile) / 2;
   const halfCols = Math.floor(viewCols / 2);
   const halfRows = Math.floor(viewRows / 2);
-  const looping = level.spaceRules.includes('looping');
+  const looping = level.spaceRules.includes('looping') && !level.infinite;
   const vc = visualCache;
 
   const visible = new Set(playerVisibleTiles(g).map((t) => t.x + ',' + t.y));
@@ -1267,11 +1268,11 @@ function drawGame() {
         gx = ((gx % level.width) + level.width) % level.width;
         gy = ((gy % level.height) + level.height) % level.height;
       }
-      if (gx < 0 || gy < 0 || gx >= level.width || gy >= level.height) continue;
+      if (!level.infinite && (gx < 0 || gy < 0 || gx >= level.width || gy >= level.height)) continue;
       const key = gx + ',' + gy;
       const tx = ox + sx * tile;
       const ty = oy + sy * tile;
-      const t = level.tiles[gy][gx];
+      const t = level.infinite ? tileAt(level, gx, gy) : level.tiles[gy][gx];
 
       if (visible.has(key)) {
         // ---- 视野内：程序化纹理（多版本轮换，打破平铺重复感） ----
@@ -1293,12 +1294,12 @@ function drawGame() {
           for (const [adx, ady, side] of adj) {
             let wx = gx + adx;
             let wy = gy + ady;
-            if (level.spaceRules.includes('looping')) {
+            if (level.spaceRules.includes('looping') && !level.infinite) {
               wx = ((wx % level.width) + level.width) % level.width;
               wy = ((wy % level.height) + level.height) % level.height;
             }
-            if (wx < 0 || wy < 0 || wx >= level.width || wy >= level.height) continue;
-            if (level.tiles[wy][wx] === '#') {
+            if (!level.infinite && (wx < 0 || wy < 0 || wx >= level.width || wy >= level.height)) continue;
+            if (tileAt(level, wx, wy) === '#') {
               ctx.fillStyle = 'rgba(0,0,0,0.28)';
               if (side === 'top') ctx.fillRect(tx, ty, tile, tile * 0.16);
               else if (side === 'bottom') ctx.fillRect(tx, ty + tile * 0.84, tile, tile * 0.16);
@@ -1469,7 +1470,7 @@ function drawGame() {
       tile * 1.2,
       px + tile / 2,
       py + tile / 2,
-      view * tile * 0.62
+      radius * tile * 0.9
     );
     grad.addColorStop(0, 'rgba(0,0,0,0)');
     grad.addColorStop(1, 'rgba(0,0,0,0.88)');
@@ -1772,10 +1773,48 @@ function drawMapModal() {
   const explored = g.explored[g.levelId];
   const W = mapCanvas.width;
   const H = mapCanvas.height;
-  const tw = W / level.width;
-  const th = H / level.height;
   mapCtx.fillStyle = '#050403';
   mapCtx.fillRect(0, 0, W, H);
+  if (level.infinite) {
+    // 无限层：局部地图（以玩家为中心的 41×41，走过的地方才显示）
+    const R = 20;
+    const tw = W / (R * 2 + 1);
+    const th = H / (R * 2 + 1);
+    for (let dy = -R; dy <= R; dy++) {
+      for (let dx = -R; dx <= R; dx++) {
+        const x = g.player.x + dx;
+        const y = g.player.y + dy;
+        const key = x + ',' + y;
+        if (!explored.has(key) && !(dx === 0 && dy === 0)) continue;
+        const t = tileAt(level, x, y);
+        let color = '#1d1a12';
+        if (t === '#') color = '#3a3424';
+        else if (t === '~') color = '#16324a';
+        else if (t === 'T') color = '#4a2a5a';
+        else if (t === 'D' || t === 'S') color = '#5a5038';
+        mapCtx.fillStyle = color;
+        mapCtx.fillRect((dx + R) * tw, (dy + R) * th, tw + 1, th + 1);
+      }
+    }
+    // 出口（仅玩家附近已发现的）
+    for (let i = 0; i < level.exits.length; i++) {
+      const ex = level.exits[i];
+      if (ex.hidden && !g.discoveredExits[g.levelId].has(i)) continue;
+      const dx = ex.x - g.player.x;
+      const dy = ex.y - g.player.y;
+      if (Math.abs(dx) > R || Math.abs(dy) > R) continue;
+      mapCtx.fillStyle = ex.hidden ? '#e8e08a' : '#8ad8a0';
+      mapCtx.fillRect((dx + R) * tw + tw * 0.25, (dy + R) * th + th * 0.25, tw * 0.5 + 1, th * 0.5 + 1);
+    }
+    // 玩家（中心）
+    mapCtx.fillStyle = '#f2f2f2';
+    mapCtx.beginPath();
+    mapCtx.arc(W / 2, H / 2, Math.max(2, tw * 0.4), 0, Math.PI * 2);
+    mapCtx.fill();
+    return;
+  }
+  const tw = W / level.width;
+  const th = H / level.height;
   for (let y = 0; y < level.height; y++) {
     for (let x = 0; x < level.width; x++) {
       const key = x + ',' + y;

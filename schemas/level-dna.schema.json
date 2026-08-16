@@ -29,8 +29,9 @@
       "type": "object",
       "required": ["width", "height", "wallStyle", "floorStyle"],
       "properties": {
-        "width": { "type": "integer", "minimum": 12, "maximum": 64 },
-        "height": { "type": "integer", "minimum": 12, "maximum": 64 },
+        "width": { "type": "integer", "minimum": 12, "maximum": 64, "description": "有限层尺寸；无限层忽略（仅作参考）" },
+        "height": { "type": "integer", "minimum": 12, "maximum": 64, "description": "有限层尺寸；无限层忽略（仅作参考）" },
+        "infinite": { "type": "boolean", "description": "true=无边界分块世界（Minecraft 式 16×16 chunk，走到哪里生成到哪里）；false/缺省=有限层级，边界一律为墙而非虚空" },
         "roomCount": { "type": "integer", "minimum": 1, "maximum": 40 },
         "roomSizeMin": { "type": "integer", "minimum": 3, "maximum": 12 },
         "roomSizeMax": { "type": "integer", "minimum": 3, "maximum": 24 },

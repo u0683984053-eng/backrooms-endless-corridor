@@ -3,6 +3,8 @@
 // 11 种实体：moth/smiler/hound/partygoer/skin-stealer/clump/faceling/watcher/duller/insanity/scratcher。
 // updateEntity(e, world) 修改实体自身状态并返回事件数组；world 由 game.js 注入（查 LOS/距离/玩家状态）。
 
+import { tileAt } from './generator.js';
+
 /** 实体定义表：行为、属性、感知 */
 export const ENTITY_DEFS = {
   moth: {
@@ -95,9 +97,7 @@ export function updateEntity(e, world) {
   const { level, player, entities, rng, dist, hasLos, isWalkable, isLit, noise, looking } = world;
   const def = ENTITY_DEFS[e.type] || {};
   const events = [];
-  const looping = level.spaceRules.includes('looping');
-  const W = level.width;
-  const H = level.height;
+  const looping = level.spaceRules.includes('looping') && !level.infinite;
 
   const d = dist(e.x, e.y, player.x, player.y);
   const adjacent = d <= 1;
@@ -404,9 +404,11 @@ export function updateEntity(e, world) {
     attackPlayer(world, events, def.dmg, def.name, def);
   }
 
-  // 防止坐标越界（looping 已 wrap，非 looping 靠 isWalkable 保证）
-  e.x = mod(e.x, W);
-  e.y = mod(e.y, H);
+  // 防止坐标越界（looping 已 wrap，非 looping 靠 isWalkable 保证；无限层无边界）
+  if (!level.infinite) {
+    e.x = mod(e.x, level.width);
+    e.y = mod(e.y, level.height);
+  }
   return events;
 }
 
@@ -462,9 +464,9 @@ function greedyStep(e, world) {
 /** 轻量 BFS 寻路：返回朝玩家的第一步；走不通返回 null */
 function pathStep(e, world) {
   const { level, player } = world;
+  const looping = level.spaceRules.includes('looping') && !level.infinite;
   const W = level.width;
   const H = level.height;
-  const looping = level.spaceRules.includes('looping');
   const startKey = e.x + ',' + e.y;
   if (startKey === player.x + ',' + player.y) return null;
   const depthLimit = Math.max(16, Math.max(Math.abs(player.x - e.x), Math.abs(player.y - e.y)) + 6);
@@ -488,12 +490,12 @@ function pathStep(e, world) {
       if (looping) {
         nx = mod(nx, W);
         ny = mod(ny, H);
-      } else if (nx < 0 || ny < 0 || nx >= W || ny >= H) {
+      } else if (!level.infinite && (nx < 0 || ny < 0 || nx >= W || ny >= H)) {
         continue;
       }
       const nk = nx + ',' + ny;
       if (seen.has(nk)) continue;
-      if (level.tiles[ny][nx] === '#') continue;
+      if (tileAt(level, nx, ny) === '#') continue;
       // 目标格允许踩玩家（贴脸攻击），其余格需可走
       if (!(nx === player.x && ny === player.y) && !world.isWalkable(nx, ny, e)) continue;
       seen.add(nk);

@@ -29,7 +29,8 @@
       "furniture",
       "columns"
     ],
-    "topology": "fields"
+    "topology": "fields",
+    "infinite": true
   },
   "spaceRules": [
     "euclidean"

@@ -9,34 +9,93 @@
   "light": "bright",
   "sanDrain": 0.4,
   "description": "红色墙壁、绿色『EXIT』标志、蜂鸣警报。这条走廊没有尽头，身后的笑声越来越近。别停下来。别回头看。跑。",
-  "palette": { "primary": "#8a2020", "secondary": "#6a1818", "accent": "#40ff40", "light": "#ff4040" },
-  "terrain": {
-    "width": 56, "height": 12,
-    "topology": "racetrack",
-    "roomCount": 3, "roomSizeMin": 3, "roomSizeMax": 5,
-    "corridorWidth": 3,
-    "wallStyle": "wallpaper", "floorStyle": "linoleum",
-    "extraFeatures": ["doors", "wires"]
+  "palette": {
+    "primary": "#8a2020",
+    "secondary": "#6a1818",
+    "accent": "#40ff40",
+    "light": "#ff4040"
   },
-  "spaceRules": ["euclidean"],
-  "specialMechanisms": ["endless-chase"],
-  "entities": [
-    { "type": "partygoer", "density": 0.04, "aggression": "hostile" },
-    { "type": "hound", "density": 0.015, "aggression": "hostile" }
+  "terrain": {
+    "width": 56,
+    "height": 12,
+    "topology": "racetrack",
+    "roomCount": 3,
+    "roomSizeMin": 3,
+    "roomSizeMax": 5,
+    "corridorWidth": 3,
+    "wallStyle": "wallpaper",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "doors",
+      "wires"
+    ],
+    "infinite": false
+  },
+  "spaceRules": [
+    "euclidean"
   ],
-  "items": ["almond-water"],
+  "specialMechanisms": [
+    "endless-chase"
+  ],
+  "entities": [
+    {
+      "type": "partygoer",
+      "density": 0.04,
+      "aggression": "hostile"
+    },
+    {
+      "type": "hound",
+      "density": 0.015,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water"
+  ],
   "itemDensity": 0.06,
   "setPieces": [
-    { "type": "writing", "position": "random", "text": "红色墙面上用白色油漆写着巨大的字：『RUN』。油漆还在往下淌。", "sanityEffect": -6, "note": "墙上的 RUN，油漆未干。" },
-    { "type": "object", "position": "center", "text": "地板上散落着一只鞋。鞋的主人显然在跑。你没有停下来捡它。", "sanityEffect": -4, "note": "一只跑丢的鞋。" },
-    { "type": "writing", "position": "far-corner", "text": "走廊尽头绿色的 EXIT 标志下方，有人用炭笔写着：『别信它。它只想看你跑。』", "sanityEffect": -7, "note": "EXIT 标志下的炭笔字。" }
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "红色墙面上用白色油漆写着巨大的字：『RUN』。油漆还在往下淌。",
+      "sanityEffect": -6,
+      "note": "墙上的 RUN，油漆未干。"
+    },
+    {
+      "type": "object",
+      "position": "center",
+      "text": "地板上散落着一只鞋。鞋的主人显然在跑。你没有停下来捡它。",
+      "sanityEffect": -4,
+      "note": "一只跑丢的鞋。"
+    },
+    {
+      "type": "writing",
+      "position": "far-corner",
+      "text": "走廊尽头绿色的 EXIT 标志下方，有人用炭笔写着：『别信它。它只想看你跑。』",
+      "sanityEffect": -7,
+      "note": "EXIT 标志下的炭笔字。"
+    }
   ],
   "soundscape": {
-    "ambient": ["警报蜂鸣（持续）", "自己的心跳与呼吸", "身后远处持续的笑声"],
-    "startles": ["笑声突然贴近", "警报声变调", "身后传来奔跑声——你也在跑"],
+    "ambient": [
+      "警报蜂鸣（持续）",
+      "自己的心跳与呼吸",
+      "身后远处持续的笑声"
+    ],
+    "startles": [
+      "笑声突然贴近",
+      "警报声变调",
+      "身后传来奔跑声——你也在跑"
+    ],
     "silenceEvents": false
   },
   "exits": [
-    { "target": "level-0", "kind": "noclip", "hidden": true, "danger": false, "description": "走廊尽头的绿色 EXIT 门——推开门，你跌在黄色墙纸和潮湿地毯上，大口喘气。你跑完了。" }
+    {
+      "target": "level-0",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": false,
+      "description": "走廊尽头的绿色 EXIT 门——推开门，你跌在黄色墙纸和潮湿地毯上，大口喘气。你跑完了。"
+    }
   ]
 }

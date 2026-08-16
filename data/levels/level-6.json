@@ -9,33 +9,101 @@
   "light": "pitch",
   "sanDrain": 0.35,
   "description": "荧光灯全部熄灭的黑暗走廊。你只能听见自己的呼吸、心跳，和地毯上极轻的、不属于你的脚步声。手电是你唯一的依靠——但手电的光会引来别的东西。",
-  "palette": { "primary": "#2e2e34", "secondary": "#1c1c20", "accent": "#6a6a74", "light": "#3a3a42" },
-  "terrain": {
-    "width": 36, "height": 36,
-    "roomCount": 18, "roomSizeMin": 4, "roomSizeMax": 9,
-    "corridorWidth": 2,
-    "wallStyle": "wallpaper", "floorStyle": "carpet",
-    "extraFeatures": ["doors", "furniture", "pipes", "wires"]
+  "palette": {
+    "primary": "#2e2e34",
+    "secondary": "#1c1c20",
+    "accent": "#6a6a74",
+    "light": "#3a3a42"
   },
-  "spaceRules": ["looping"],
-  "entities": [
-    { "type": "smiler", "density": 0.02, "aggression": "hostile" },
-    { "type": "clump", "density": 0.015, "aggression": "hostile" }
+  "terrain": {
+    "width": 36,
+    "height": 36,
+    "roomCount": 18,
+    "roomSizeMin": 4,
+    "roomSizeMax": 9,
+    "corridorWidth": 2,
+    "wallStyle": "wallpaper",
+    "floorStyle": "carpet",
+    "extraFeatures": [
+      "doors",
+      "furniture",
+      "pipes",
+      "wires"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
   ],
-  "items": ["battery", "flashlight", "note", "almond-water"],
+  "entities": [
+    {
+      "type": "smiler",
+      "density": 0.02,
+      "aggression": "hostile"
+    },
+    {
+      "type": "clump",
+      "density": 0.015,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "battery",
+    "flashlight",
+    "note",
+    "almond-water"
+  ],
   "itemDensity": 0.05,
   "setPieces": [
-    { "type": "writing", "position": "random", "text": "黑暗中有一行荧光涂料写的字，微弱地泛着绿光：『不要开灯。』下方还有一行更小的字：『它们怕光，但它们更喜欢看得见你的你。』", "sanityEffect": -6, "note": "荧光字：『不要开灯。』——第二行写：它们更喜欢看得见你的你。" },
-    { "type": "object", "position": "random", "text": "黑暗深处有一双反光的眼睛，一动不动。你盯着它，它也盯着你。你眨眼的瞬间它不见了——但你知道它只是换了位置。", "sanityEffect": -8, "note": "黑暗里的眼睛。眨眼之后不见了。" },
-    { "type": "object", "position": "far-corner", "text": "地板上散落着一盒火柴，火柴头全部烧过，只剩焦黑的梗。盒子内侧用炭笔写着：『我数到十，然后跑了。』", "sanityEffect": -4, "note": "一盒烧过的火柴，盒内写着：我数到十，然后跑了。" }
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "黑暗中有一行荧光涂料写的字，微弱地泛着绿光：『不要开灯。』下方还有一行更小的字：『它们怕光，但它们更喜欢看得见你的你。』",
+      "sanityEffect": -6,
+      "note": "荧光字：『不要开灯。』——第二行写：它们更喜欢看得见你的你。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "黑暗深处有一双反光的眼睛，一动不动。你盯着它，它也盯着你。你眨眼的瞬间它不见了——但你知道它只是换了位置。",
+      "sanityEffect": -8,
+      "note": "黑暗里的眼睛。眨眼之后不见了。"
+    },
+    {
+      "type": "object",
+      "position": "far-corner",
+      "text": "地板上散落着一盒火柴，火柴头全部烧过，只剩焦黑的梗。盒子内侧用炭笔写着：『我数到十，然后跑了。』",
+      "sanityEffect": -4,
+      "note": "一盒烧过的火柴，盒内写着：我数到十，然后跑了。"
+    }
   ],
   "soundscape": {
-    "ambient": ["绝对寂静——只剩你自己的呼吸声", "心跳在耳膜里鼓动", "极远处传来微弱的灯管嗡鸣（尽管没有一盏灯亮着）"],
-    "startles": ["很近的一声呼吸——不是你自己的", "黑暗中有什么东西被拖过地毯", "荧光灯『啪』地闪了一下，然后彻底熄灭"],
+    "ambient": [
+      "绝对寂静——只剩你自己的呼吸声",
+      "心跳在耳膜里鼓动",
+      "极远处传来微弱的灯管嗡鸣（尽管没有一盏灯亮着）"
+    ],
+    "startles": [
+      "很近的一声呼吸——不是你自己的",
+      "黑暗中有什么东西被拖过地毯",
+      "荧光灯『啪』地闪了一下，然后彻底熄灭"
+    ],
     "silenceEvents": true
   },
   "exits": [
-    { "target": "level-7", "kind": "noclip", "hidden": false, "danger": false, "description": "一段墙摸上去是湿的，水正从墙纸缝隙里渗出来。你用力挤过去——然后落进了齐腰深的冷水中。" },
-    { "target": "level-11", "kind": "noclip", "hidden": true, "danger": false, "description": "黑暗中有一段墙比其他地方更安静，静得像是墙后的世界被抽走了所有声音。你穿过去，踩到了路灯下的柏油路面。" }
+    {
+      "target": "level-7",
+      "kind": "noclip",
+      "hidden": false,
+      "danger": false,
+      "description": "一段墙摸上去是湿的，水正从墙纸缝隙里渗出来。你用力挤过去——然后落进了齐腰深的冷水中。"
+    },
+    {
+      "target": "level-11",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": false,
+      "description": "黑暗中有一段墙比其他地方更安静，静得像是墙后的世界被抽走了所有声音。你穿过去，踩到了路灯下的柏油路面。"
+    }
   ]
 }

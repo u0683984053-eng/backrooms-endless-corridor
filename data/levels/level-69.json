@@ -9,35 +9,116 @@
   "light": "bright",
   "sanDrain": 0.15,
   "description": "一座永不闭园的游乐园：旋转木马独自转动，摩天轮缓缓升起又落下，小丑音乐从每个角落传来。这里的一切都在邀请你玩——但你确定自己是游客吗？",
-  "palette": { "primary": "#c8a8c8", "secondary": "#8a6a8a", "accent": "#e8785a", "light": "#f0c0a0" },
-  "terrain": {
-    "width": 36, "height": 36,
-    "roomCount": 18, "roomSizeMin": 5, "roomSizeMax": 11,
-    "corridorWidth": 3,
-    "wallStyle": "drywall", "floorStyle": "tile",
-    "extraFeatures": ["counters", "shelves", "furniture", "doors", "fountain", "columns"]
+  "palette": {
+    "primary": "#c8a8c8",
+    "secondary": "#8a6a8a",
+    "accent": "#e8785a",
+    "light": "#f0c0a0"
   },
-  "spaceRules": ["euclidean"],
-  "entities": [
-    { "type": "partygoer", "density": 0.02, "aggression": "hostile" },
-    { "type": "smiler", "density": 0.008, "aggression": "hostile" },
-    { "type": "moth", "density": 0.01, "aggression": "passive" }
+  "terrain": {
+    "width": 36,
+    "height": 36,
+    "roomCount": 18,
+    "roomSizeMin": 5,
+    "roomSizeMax": 11,
+    "corridorWidth": 3,
+    "wallStyle": "drywall",
+    "floorStyle": "tile",
+    "extraFeatures": [
+      "counters",
+      "shelves",
+      "furniture",
+      "doors",
+      "fountain",
+      "columns"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
   ],
-  "items": ["almond-water", "royal-ration", "battery", "note", "key"],
+  "entities": [
+    {
+      "type": "partygoer",
+      "density": 0.02,
+      "aggression": "hostile"
+    },
+    {
+      "type": "smiler",
+      "density": 0.008,
+      "aggression": "hostile"
+    },
+    {
+      "type": "moth",
+      "density": 0.01,
+      "aggression": "passive"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "note",
+    "key"
+  ],
   "itemDensity": 0.16,
   "setPieces": [
-    { "type": "weird-room", "position": "center", "text": "旋转木马没有停过。每一匹马的背上都坐着一个纸人，纸人的脸被画成微笑。", "sanityEffect": -7, "note": "旋转木马上的纸人都在微笑。" },
-    { "type": "object", "position": "random", "text": "售票亭里没有人，窗口贴着一张字条：『票价：你的一小时。找零：你的记忆。』", "sanityEffect": -6, "note": "售票亭的字条：票价是一小时，找零是记忆。" },
-    { "type": "mural", "position": "far-corner", "text": "哈哈镜廊里，镜中的你比你先转身。现在你站在原地，不知道哪一个才是真的。", "sanityEffect": -8, "note": "哈哈镜里的我比我快。" }
+    {
+      "type": "weird-room",
+      "position": "center",
+      "text": "旋转木马没有停过。每一匹马的背上都坐着一个纸人，纸人的脸被画成微笑。",
+      "sanityEffect": -7,
+      "note": "旋转木马上的纸人都在微笑。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "售票亭里没有人，窗口贴着一张字条：『票价：你的一小时。找零：你的记忆。』",
+      "sanityEffect": -6,
+      "note": "售票亭的字条：票价是一小时，找零是记忆。"
+    },
+    {
+      "type": "mural",
+      "position": "far-corner",
+      "text": "哈哈镜廊里，镜中的你比你先转身。现在你站在原地，不知道哪一个才是真的。",
+      "sanityEffect": -8,
+      "note": "哈哈镜里的我比我快。"
+    }
   ],
   "soundscape": {
-    "ambient": ["旋转木马的音乐盒旋律（永远循环）", "摩天轮的机械声", "远处孩子的笑声"],
-    "startles": ["音乐突然变成倒放", "气球在耳边爆开", "旋转木马加速了一瞬间"],
+    "ambient": [
+      "旋转木马的音乐盒旋律（永远循环）",
+      "摩天轮的机械声",
+      "远处孩子的笑声"
+    ],
+    "startles": [
+      "音乐突然变成倒放",
+      "气球在耳边爆开",
+      "旋转木马加速了一瞬间"
+    ],
     "silenceEvents": true
   },
   "exits": [
-    { "target": "level-34", "kind": "door", "hidden": false, "danger": false, "description": "游乐园出口的旋转门，门后是食堂的灯光。" },
-    { "target": "level-666", "kind": "noclip", "hidden": true, "danger": true, "description": "鬼屋入口的黑色幕布——里面不是鬼屋。" },
-    { "target": "level-37", "kind": "noclip", "hidden": true, "danger": false, "description": "水滑梯的尽头通向的不是水池，而是泳池层的回音。" }
+    {
+      "target": "level-34",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "游乐园出口的旋转门，门后是食堂的灯光。"
+    },
+    {
+      "target": "level-666",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": true,
+      "description": "鬼屋入口的黑色幕布——里面不是鬼屋。"
+    },
+    {
+      "target": "level-37",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": false,
+      "description": "水滑梯的尽头通向的不是水池，而是泳池层的回音。"
+    }
   ]
 }

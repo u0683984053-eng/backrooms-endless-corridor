@@ -30,7 +30,8 @@
       "windows",
       "elevator"
     ],
-    "topology": "hotel"
+    "topology": "hotel",
+    "infinite": false
   },
   "spaceRules": [
     "non-euclidean"

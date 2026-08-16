@@ -9,36 +9,118 @@
   "light": "bright",
   "sanDrain": 0.03,
   "description": "无尽的室内泳池群：碧蓝的水、白瓷砖、暖黄的灯。水声温柔，回声空旷。这里很美——但水底有些池子比看起来深得多。",
-  "palette": { "primary": "#e8f0f0", "secondary": "#a8c8d0", "accent": "#5a9ab0", "light": "#d8e8e0" },
-  "terrain": {
-    "width": 28, "height": 28,
-    "roomCount": 14, "roomSizeMin": 4, "roomSizeMax": 9,
-    "corridorWidth": 3,
-    "wallStyle": "tile", "floorStyle": "water",
-    "extraFeatures": ["fountain", "columns", "doors", "puddles"]
+  "palette": {
+    "primary": "#e8f0f0",
+    "secondary": "#a8c8d0",
+    "accent": "#5a9ab0",
+    "light": "#d8e8e0"
   },
-  "spaceRules": ["euclidean"],
-  "entities": [
-    { "type": "duller", "density": 0.006, "aggression": "curious" },
-    { "type": "moth", "density": 0.01, "aggression": "passive" },
-    { "type": "insanity", "density": 0.003, "aggression": "curious" },
-    { "type": "glowfolk", "density": 0.004, "aggression": "passive" }
+  "terrain": {
+    "width": 28,
+    "height": 28,
+    "roomCount": 14,
+    "roomSizeMin": 4,
+    "roomSizeMax": 9,
+    "corridorWidth": 3,
+    "wallStyle": "tile",
+    "floorStyle": "water",
+    "extraFeatures": [
+      "fountain",
+      "columns",
+      "doors",
+      "puddles"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
   ],
-  "items": ["almond-water", "battery", "note", "flashlight"],
+  "entities": [
+    {
+      "type": "duller",
+      "density": 0.006,
+      "aggression": "curious"
+    },
+    {
+      "type": "moth",
+      "density": 0.01,
+      "aggression": "passive"
+    },
+    {
+      "type": "insanity",
+      "density": 0.003,
+      "aggression": "curious"
+    },
+    {
+      "type": "glowfolk",
+      "density": 0.004,
+      "aggression": "passive"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "battery",
+    "note",
+    "flashlight"
+  ],
   "itemDensity": 0.2,
   "setPieces": [
-    { "type": "weird-room", "position": "far-corner", "text": "泳池区深处有一格水池，水是深黑色的，水面倒映的不是天花板。", "sanityEffect": -7, "note": "一格倒映着别处的水池。水面下是另一片天空。" },
-    { "type": "writing", "position": "random", "text": "更衣室镜子上用防水笔写着：『水里没有东西。水里没有东西。水里没有东西。』最后一行是：『对不起。』", "sanityEffect": -5, "note": "更衣室镜子上的字：『水里没有东西。』——最后一行是道歉。" },
-    { "type": "object", "position": "center", "text": "池边的躺椅上放着一本摊开的书，书页被水泡皱，标题已无法辨认，只有一句话被圈出来：『继续游。』", "sanityEffect": -3, "note": "一本泡皱的书，圈着一句话：『继续游。』" }
+    {
+      "type": "weird-room",
+      "position": "far-corner",
+      "text": "泳池区深处有一格水池，水是深黑色的，水面倒映的不是天花板。",
+      "sanityEffect": -7,
+      "note": "一格倒映着别处的水池。水面下是另一片天空。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "更衣室镜子上用防水笔写着：『水里没有东西。水里没有东西。水里没有东西。』最后一行是：『对不起。』",
+      "sanityEffect": -5,
+      "note": "更衣室镜子上的字：『水里没有东西。』——最后一行是道歉。"
+    },
+    {
+      "type": "object",
+      "position": "center",
+      "text": "池边的躺椅上放着一本摊开的书，书页被水泡皱，标题已无法辨认，只有一句话被圈出来：『继续游。』",
+      "sanityEffect": -3,
+      "note": "一本泡皱的书，圈着一句话：『继续游。』"
+    }
   ],
   "soundscape": {
-    "ambient": ["泳池水循环泵声", "空荡的回声", "水珠滴落"],
-    "startles": ["远处有人入水的声音", "水花声突然逼近", "水泵停止运转三秒"],
+    "ambient": [
+      "泳池水循环泵声",
+      "空荡的回声",
+      "水珠滴落"
+    ],
+    "startles": [
+      "远处有人入水的声音",
+      "水花声突然逼近",
+      "水泵停止运转三秒"
+    ],
     "silenceEvents": true
   },
   "exits": [
-    { "target": "level-3999", "kind": "noclip", "hidden": true, "danger": false, "description": "一面贴着深蓝瓷砖的墙，瓷砖缝隙里透出商场灯光和音乐。" },
-    { "target": "level-11", "kind": "door", "hidden": false, "danger": false, "description": "泳池出口的玻璃门，外面是夜晚的城市街道。" },
-    { "target": "level-52", "kind": "noclip", "hidden": true, "danger": false, "description": "最深那格泳池的水面泛着金属光——潜下去，你浮出水面时在机库里。" }
+    {
+      "target": "level-3999",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": false,
+      "description": "一面贴着深蓝瓷砖的墙，瓷砖缝隙里透出商场灯光和音乐。"
+    },
+    {
+      "target": "level-11",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "泳池出口的玻璃门，外面是夜晚的城市街道。"
+    },
+    {
+      "target": "level-52",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": false,
+      "description": "最深那格泳池的水面泛着金属光——潜下去，你浮出水面时在机库里。"
+    }
   ]
 }

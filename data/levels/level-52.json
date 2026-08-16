@@ -9,34 +9,109 @@
   "light": "dim",
   "sanDrain": 0.2,
   "description": "一艘永远不会沉没、也永远不会靠岸的航空母舰。机库里的飞机没有发动机，舰桥的航海日志只写着同一句话。甲板尽头不是海——是另一艘航母。",
-  "palette": { "primary": "#5a6a6a", "secondary": "#3a4848", "accent": "#c87848", "light": "#a8b8b8" },
-  "terrain": {
-    "width": 32, "height": 32,
-    "roomCount": 14, "roomSizeMin": 5, "roomSizeMax": 10,
-    "corridorWidth": 3,
-    "wallStyle": "metal", "floorStyle": "metal",
-    "extraFeatures": ["pipes", "doors", "crates", "wires", "columns"]
+  "palette": {
+    "primary": "#5a6a6a",
+    "secondary": "#3a4848",
+    "accent": "#c87848",
+    "light": "#a8b8b8"
   },
-  "spaceRules": ["euclidean"],
-  "entities": [
-    { "type": "hound", "density": 0.012, "aggression": "hostile" },
-    { "type": "moth", "density": 0.01, "aggression": "passive" },
-    { "type": "watcher", "density": 0.006, "aggression": "curious" }
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 14,
+    "roomSizeMin": 5,
+    "roomSizeMax": 10,
+    "corridorWidth": 3,
+    "wallStyle": "metal",
+    "floorStyle": "metal",
+    "extraFeatures": [
+      "pipes",
+      "doors",
+      "crates",
+      "wires",
+      "columns"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
   ],
-  "items": ["battery", "flashlight", "almond-water", "royal-ration", "note", "crowbar"],
+  "entities": [
+    {
+      "type": "hound",
+      "density": 0.012,
+      "aggression": "hostile"
+    },
+    {
+      "type": "moth",
+      "density": 0.01,
+      "aggression": "passive"
+    },
+    {
+      "type": "watcher",
+      "density": 0.006,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "battery",
+    "flashlight",
+    "almond-water",
+    "royal-ration",
+    "note",
+    "crowbar"
+  ],
   "itemDensity": 0.12,
   "setPieces": [
-    { "type": "writing", "position": "center", "text": "舰桥的航海日志摊开着，每一页都写着同一句话：『航向不变。乘客未定。』", "sanityEffect": -5, "note": "航海日志：每一页都是同一句话。" },
-    { "type": "object", "position": "random", "text": "机库中央停着一架完整的战斗机——没有发动机，座舱里放着一杯还温的咖啡。", "sanityEffect": -6, "note": "没有发动机的战斗机，座舱里有温咖啡。" },
-    { "type": "mural", "position": "far-corner", "text": "瞭望塔的窗户外面不是海，而是另一艘一模一样的航母，正对着你。它的瞭望塔里也有一个人影，也在看你。", "sanityEffect": -8, "note": "窗外是另一艘航母，有人在看我。" }
+    {
+      "type": "writing",
+      "position": "center",
+      "text": "舰桥的航海日志摊开着，每一页都写着同一句话：『航向不变。乘客未定。』",
+      "sanityEffect": -5,
+      "note": "航海日志：每一页都是同一句话。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "机库中央停着一架完整的战斗机——没有发动机，座舱里放着一杯还温的咖啡。",
+      "sanityEffect": -6,
+      "note": "没有发动机的战斗机，座舱里有温咖啡。"
+    },
+    {
+      "type": "mural",
+      "position": "far-corner",
+      "text": "瞭望塔的窗户外面不是海，而是另一艘一模一样的航母，正对着你。它的瞭望塔里也有一个人影，也在看你。",
+      "sanityEffect": -8,
+      "note": "窗外是另一艘航母，有人在看我。"
+    }
   ],
   "soundscape": {
-    "ambient": ["金属船体的低鸣", "远处的警报（规律循环）", "海水拍打（但外面没有海）"],
-    "startles": ["警报突然响起三秒", "头顶传来奔跑声", "金属舱门砰地关上"],
+    "ambient": [
+      "金属船体的低鸣",
+      "远处的警报（规律循环）",
+      "海水拍打（但外面没有海）"
+    ],
+    "startles": [
+      "警报突然响起三秒",
+      "头顶传来奔跑声",
+      "金属舱门砰地关上"
+    ],
     "silenceEvents": true
   },
   "exits": [
-    { "target": "level-37", "kind": "noclip", "hidden": true, "danger": false, "description": "甲板边缘的栏杆外不是海——跳下去，是泳池的水花和回声。" },
-    { "target": "level-5", "kind": "noclip", "hidden": true, "danger": false, "description": "军官舱的走廊尽头一扇门，门后是红色地毯和香水味——非欧的捷径。" }
+    {
+      "target": "level-37",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": false,
+      "description": "甲板边缘的栏杆外不是海——跳下去，是泳池的水花和回声。"
+    },
+    {
+      "target": "level-5",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": false,
+      "description": "军官舱的走廊尽头一扇门，门后是红色地毯和香水味——非欧的捷径。"
+    }
   ]
 }

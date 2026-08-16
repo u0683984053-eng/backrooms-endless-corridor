@@ -35,6 +35,7 @@ let state = createGame({ levels, seed });
 // ---------- 渲染 ----------
 
 function tileChar(level, gx, gy) {
+  if (level.infinite) return level.getTile(gx, gy);
   return level.tiles[gy][gx];
 }
 
@@ -42,7 +43,7 @@ function tileChar(level, gx, gy) {
 function renderView(state, radiusOverride) {
   const { level, player } = state;
   const r = radiusOverride ?? viewRadiusOf(level, player);
-  const looping = level.spaceRules.includes('looping');
+  const looping = level.spaceRules.includes('looping') && !level.infinite;
   const visibleSet = new Set(playerVisibleTiles(state).map((t) => t.x + ',' + t.y));
   const explored = state.explored[state.levelId];
   const lines = [];
@@ -56,6 +57,10 @@ function renderView(state, radiusOverride) {
       if (looping) {
         gx = ((gx % level.width) + level.width) % level.width;
         gy = ((gy % level.height) + level.height) % level.height;
+      }
+      if (!level.infinite && (gx < 0 || gy < 0 || gx >= level.width || gy >= level.height)) {
+        row += ' ';
+        continue;
       }
       const key = gx + ',' + gy;
       let ch;
@@ -117,11 +122,25 @@ function renderLog() {
   return state.log.map((e) => `[${e.turn}] ${e.text}`).join('\n');
 }
 
-/** 完整地图（已探索区域） */
+/** 完整地图（已探索区域；无限层显示玩家周围 41×41 局部地图） */
 function renderMap() {
-  const { level } = state;
+  const { level, player } = state;
   const explored = state.explored[state.levelId];
   const lines = [];
+  if (level.infinite) {
+    const R = 20;
+    for (let y = player.y - R; y <= player.y + R; y++) {
+      let row = '';
+      for (let x = player.x - R; x <= player.x + R; x++) {
+        const key = x + ',' + y;
+        if (player.x === x && player.y === y) row += 'P';
+        else if (explored.has(key)) row += tileChar(level, x, y);
+        else row += ' ';
+      }
+      lines.push(row);
+    }
+    return lines.join('\n');
+  }
   for (let y = 0; y < level.height; y++) {
     let row = '';
     for (let x = 0; x < level.width; x++) {

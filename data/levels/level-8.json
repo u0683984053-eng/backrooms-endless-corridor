@@ -9,35 +9,107 @@
   "light": "dark",
   "sanDrain": 0.3,
   "description": "无边无际的黑暗洞穴。石灰岩在头顶结成尖利的牙齿，水滴声永远数不清来源。这里的黑暗是完整的，连记忆都会被它磨钝。",
-  "palette": { "primary": "#4a3a2a", "secondary": "#33281c", "accent": "#7a5a3a", "light": "#b08a5a" },
-  "terrain": {
-    "width": 36, "height": 36,
-    "topology": "caves",
-    "roomCount": 14, "roomSizeMin": 5, "roomSizeMax": 12,
-    "corridorWidth": 2,
-    "wallStyle": "brick", "floorStyle": "gravel",
-    "extraFeatures": ["puddles", "columns", "pipes", "wires"]
+  "palette": {
+    "primary": "#4a3a2a",
+    "secondary": "#33281c",
+    "accent": "#7a5a3a",
+    "light": "#b08a5a"
   },
-  "spaceRules": ["non-euclidean"],
-  "entities": [
-    { "type": "clump", "density": 0.02, "aggression": "hostile" },
-    { "type": "skin-stealer", "density": 0.01, "aggression": "curious" },
-    { "type": "moth", "density": 0.01, "aggression": "passive" }
+  "terrain": {
+    "width": 36,
+    "height": 36,
+    "topology": "caves",
+    "roomCount": 14,
+    "roomSizeMin": 5,
+    "roomSizeMax": 12,
+    "corridorWidth": 2,
+    "wallStyle": "brick",
+    "floorStyle": "gravel",
+    "extraFeatures": [
+      "puddles",
+      "columns",
+      "pipes",
+      "wires"
+    ],
+    "infinite": false
+  },
+  "spaceRules": [
+    "non-euclidean"
   ],
-  "items": ["battery", "flashlight", "note", "almond-water"],
+  "entities": [
+    {
+      "type": "clump",
+      "density": 0.02,
+      "aggression": "hostile"
+    },
+    {
+      "type": "skin-stealer",
+      "density": 0.01,
+      "aggression": "curious"
+    },
+    {
+      "type": "moth",
+      "density": 0.01,
+      "aggression": "passive"
+    }
+  ],
+  "items": [
+    "battery",
+    "flashlight",
+    "note",
+    "almond-water"
+  ],
   "itemDensity": 0.08,
   "setPieces": [
-    { "type": "mural", "position": "random", "text": "石壁上密密麻麻印着掌印，从婴儿手掌大小到成年人的手掌，层层叠叠，沿着岩壁一直延伸到黑暗深处看不清的地方。", "sanityEffect": -6, "note": "石壁上的手印，大小不一，层层叠叠伸向黑暗。" },
-    { "type": "object", "position": "far-corner", "text": "一小片苔藓在黑暗中发出柔和的蓝绿色光。这是这里唯一的光源，安静、温驯。你在它旁边坐了很久，第一次觉得洞穴也不算太糟。", "sanityEffect": 2, "note": "发光的苔藓。黑暗里难得的亮光。" },
-    { "type": "object", "position": "far-corner", "text": "洞穴深处传来一声呼唤，用的是你的名字。你循声走了很远，最终发现那只是你自己脚步声的回声，被石壁拉长、扭曲成了人声。", "sanityEffect": -5, "note": "深处有人叫你的名字。追过去才发现是回声。" }
+    {
+      "type": "mural",
+      "position": "random",
+      "text": "石壁上密密麻麻印着掌印，从婴儿手掌大小到成年人的手掌，层层叠叠，沿着岩壁一直延伸到黑暗深处看不清的地方。",
+      "sanityEffect": -6,
+      "note": "石壁上的手印，大小不一，层层叠叠伸向黑暗。"
+    },
+    {
+      "type": "object",
+      "position": "far-corner",
+      "text": "一小片苔藓在黑暗中发出柔和的蓝绿色光。这是这里唯一的光源，安静、温驯。你在它旁边坐了很久，第一次觉得洞穴也不算太糟。",
+      "sanityEffect": 2,
+      "note": "发光的苔藓。黑暗里难得的亮光。"
+    },
+    {
+      "type": "object",
+      "position": "far-corner",
+      "text": "洞穴深处传来一声呼唤，用的是你的名字。你循声走了很远，最终发现那只是你自己脚步声的回声，被石壁拉长、扭曲成了人声。",
+      "sanityEffect": -5,
+      "note": "深处有人叫你的名字。追过去才发现是回声。"
+    }
   ],
   "soundscape": {
-    "ambient": ["蝙蝠振翅声", "水滴落进钟乳石潭的回响", "风穿过狭窄岩缝的呜咽"],
-    "startles": ["岩石深处传来碎石滚落声", "蝙蝠群突然惊飞", "身后很近的呼吸声——那是石壁把你的呼吸弹了回来"],
+    "ambient": [
+      "蝙蝠振翅声",
+      "水滴落进钟乳石潭的回响",
+      "风穿过狭窄岩缝的呜咽"
+    ],
+    "startles": [
+      "岩石深处传来碎石滚落声",
+      "蝙蝠群突然惊飞",
+      "身后很近的呼吸声——那是石壁把你的呼吸弹了回来"
+    ],
     "silenceEvents": true
   },
   "exits": [
-    { "target": "level-9", "kind": "noclip", "hidden": false, "danger": false, "description": "洞穴尽头的石壁薄得能透出微光。你伸手一推，石壁像纸一样裂开——外面是黄昏的雾和街道。" },
-    { "target": "level-0.1", "kind": "noclip", "hidden": true, "danger": false, "description": "一段被落石封住大半的岩缝，缝隙里漏出楼梯间的灯光和回声。你侧身挤进去，脚下的碎石变成了水泥台阶。" }
+    {
+      "target": "level-9",
+      "kind": "noclip",
+      "hidden": false,
+      "danger": false,
+      "description": "洞穴尽头的石壁薄得能透出微光。你伸手一推，石壁像纸一样裂开——外面是黄昏的雾和街道。"
+    },
+    {
+      "target": "level-0.1",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": false,
+      "description": "一段被落石封住大半的岩缝，缝隙里漏出楼梯间的灯光和回声。你侧身挤进去，脚下的碎石变成了水泥台阶。"
+    }
   ]
 }

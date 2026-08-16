@@ -3,7 +3,7 @@
 // 回合经济学：玩家动作 → 出口切换 → 实体行动 → 状态结算 → 事件日志。
 
 import { mulberry32, hashString, chance, pick, DIRS } from './rng.js';
-import { generateLevel } from './generator.js';
+import { generateLevel, createInfiniteLevel, updateActiveChunks, tileAt } from './generator.js';
 import { updateEntity, ENTITY_DEFS } from './entities.js';
 import { createPlayer, applyPlayerAction, viewRadiusOf, isLitTile, pushLog } from './player.js';
 
@@ -87,6 +87,8 @@ export function step(state, action) {
   // ---- 玩家阶段 ----
   const playerEvents = applyPlayerAction(state, action, world);
   for (const x of playerEvents) events.push(x);
+  // 无限层：玩家移动后刷新激活 chunk 集（实体/物品进出视野半径）
+  if (state.level.infinite) updateActiveChunks(state.level, state.player.x, state.player.y);
 
   // ---- 出口切换（切换后重建 world） ----
   if (state.pendingExit) {
@@ -117,7 +119,14 @@ export function step(state, action) {
       for (const x of ev) events.push(x);
     }
   }
+  // 无限层：记录死亡实体的稳定 id（跨 chunk 重激活不复活）
+  if (state.level.infinite) {
+    for (const e of state.entities) {
+      if (e.hp <= 0 && e.id) state.level.deadEntities.add(e.id);
+    }
+  }
   state.entities = state.entities.filter((e) => e.hp > 0);
+  state.level.entities = state.entities;
 
   // ---- 状态结算 ----
   endTurn(state, events);
@@ -203,7 +212,7 @@ export function enterLevel(state, levelId, opts = {}) {
     pushLog(state, `出口通往未知之地（缺少 DNA：${levelId}）。`, 'system');
     return;
   }
-  const level = generateLevel(dna, state.runSeed);
+  const level = dna.terrain.infinite ? createInfiniteLevel(dna, state.runSeed) : generateLevel(dna, state.runSeed);
   state.previousLevelId = state.levelId;
   state.levelId = levelId;
   state.level = level;
@@ -214,8 +223,15 @@ export function enterLevel(state, levelId, opts = {}) {
   } else {
     state.player = createPlayer(level.spawn.x, level.spawn.y);
   }
-  state.entities = level.entities.map((e) => ({ ...e }));
-  state.items = level.items.map((it) => ({ ...it }));
+  if (level.infinite) {
+    // 无限层：实体/物品直接引用激活集（updateActiveChunks 维护进出）
+    state.entities = level.entities;
+    state.items = level.items;
+  } else {
+    state.entities = level.entities.map((e) => ({ ...e }));
+    state.items = level.items.map((it) => ({ ...it }));
+  }
+  if (level.infinite) updateActiveChunks(level, state.player.x, state.player.y);
   state.explored[levelId] = state.explored[levelId] || new Set();
   state.discoveredExits[levelId] = state.discoveredExits[levelId] || new Set();
   state.seenSetPieces[levelId] = state.seenSetPieces[levelId] || new Set();
@@ -248,7 +264,7 @@ export function enterLevel(state, levelId, opts = {}) {
 export function playerVisibleTiles(state) {
   const { level, player } = state;
   const radius = viewRadiusOf(level, player);
-  const looping = level.spaceRules.includes('looping');
+  const looping = level.spaceRules.includes('looping') && !level.infinite;
   const seen = new Set([player.x + ',' + player.y]);
   const tiles = [{ x: player.x, y: player.y }];
   const queue = [[player.x, player.y, 0]];
@@ -262,14 +278,14 @@ export function playerVisibleTiles(state) {
       if (looping) {
         nx = mod(nx, level.width);
         ny = mod(ny, level.height);
-      } else if (nx < 0 || ny < 0 || nx >= level.width || ny >= level.height) {
+      } else if (!level.infinite && (nx < 0 || ny < 0 || nx >= level.width || ny >= level.height)) {
         continue;
       }
       const k = nx + ',' + ny;
       if (seen.has(k)) continue;
       seen.add(k);
       tiles.push({ x: nx, y: ny });
-      if (level.tiles[ny][nx] !== '#') queue.push([nx, ny, d + 1]);
+      if (tileAt(level, nx, ny) !== '#') queue.push([nx, ny, d + 1]);
     }
   }
   return tiles;
@@ -303,13 +319,13 @@ function isTileWalkable(state, x, y, self) {
   const { level, player, entities } = state;
   let nx = x;
   let ny = y;
-  if (level.spaceRules.includes('looping')) {
+  if (level.spaceRules.includes('looping') && !level.infinite) {
     nx = mod(nx, level.width);
     ny = mod(ny, level.height);
-  } else if (x < 0 || y < 0 || x >= level.width || y >= level.height) {
+  } else if (!level.infinite && (x < 0 || y < 0 || x >= level.width || y >= level.height)) {
     return false;
   }
-  const t = level.tiles[ny][nx];
+  const t = tileAt(level, nx, ny);
   if (t === '#') return false;
   if (nx === player.x && ny === player.y) return false;
   for (const e of entities) {
@@ -327,8 +343,8 @@ function hasLineOfSight(level, x1, y1, x2, y2) {
   for (let i = 1; i < steps; i++) {
     const ix = Math.round(x1 + (dx * i) / steps);
     const iy = Math.round(y1 + (dy * i) / steps);
-    if (ix < 0 || iy < 0 || ix >= level.width || iy >= level.height) return false;
-    if (level.tiles[iy][ix] === '#') return false;
+    if (!level.infinite && (ix < 0 || iy < 0 || ix >= level.width || iy >= level.height)) return false;
+    if (tileAt(level, ix, iy) === '#') return false;
   }
   return true;
 }
@@ -365,11 +381,11 @@ function endTurn(state, events) {
     const d = dirs[Math.floor(state.rng() * dirs.length)];
     let nx = player.x + d.dx;
     let ny = player.y + d.dy;
-    if (rules.includes('looping')) {
+    if (rules.includes('looping') && !level.infinite) {
       nx = ((nx % level.width) + level.width) % level.width;
       ny = ((ny % level.height) + level.height) % level.height;
     }
-    if (nx >= 0 && ny >= 0 && nx < level.width && ny < level.height && level.tiles[ny][nx] !== '#') {
+    if ((level.infinite || (nx >= 0 && ny >= 0 && nx < level.width && ny < level.height)) && tileAt(level, nx, ny) !== '#') {
       const blocked = state.entities.some((e) => e.hp > 0 && e.x === nx && e.y === ny);
       if (!blocked) {
         player.x = nx;
@@ -502,7 +518,7 @@ function recordDeath(state) {
 
 /** 序列化当前状态（Set → 数组，供 localStorage / 存档文件使用） */
 export function serializeState(state) {
-  return {
+  const out = {
     v: 1,
     runSeed: state.runSeed,
     levelId: state.levelId,
@@ -524,6 +540,16 @@ export function serializeState(state) {
     achievements: [...(state.achievements || [])],
     stats: state.stats,
   };
+  // 无限层：记录已取/已杀集合（chunk 内容确定性，重放即可重建）
+  if (state.level && state.level.infinite) {
+    out.inf = {
+      ti: [...state.level.takenItems],
+      de: [...state.level.deadEntities],
+      pcx: state.level.playerChunkX,
+      pcy: state.level.playerChunkY,
+    };
+  }
+  return out;
 }
 
 /** 反序列化：state 必须已用 createGame 创建（含 levels 注册表） */
@@ -549,6 +575,14 @@ export function deserializeState(state, data) {
   );
   enterLevel(state, data.levelId || 'level-0', { keepPlayer: true });
   if (data.player) Object.assign(state.player, data.player);
+  // 无限层：恢复取走/击杀集合并刷新激活集（chunk 瓦片确定性重放）
+  if (data.inf && state.level && state.level.infinite) {
+    state.level.takenItems = new Set(data.inf.ti || []);
+    state.level.deadEntities = new Set(data.inf.de || []);
+    state.level.playerChunkX = data.inf.pcx || 0;
+    state.level.playerChunkY = data.inf.pcy || 0;
+    updateActiveChunks(state.level, state.player.x, state.player.y);
+  }
   return state;
 }
 

@@ -9,34 +9,107 @@
   "light": "flickering",
   "sanDrain": 0.2,
   "description": "灰色的机房走廊无限延伸，绿色终端的光在墙上投下字符。系统日志不停地滚动，有些条目记录的是你刚刚做过的事。错误：找不到该页面。错误：找不到该玩家。",
-  "palette": { "primary": "#5a5a5a", "secondary": "#3a3a3a", "accent": "#4aff4a", "light": "#6aff6a" },
-  "terrain": {
-    "width": 28, "height": 28,
-    "roomCount": 12, "roomSizeMin": 4, "roomSizeMax": 9,
-    "corridorWidth": 2,
-    "wallStyle": "metal", "floorStyle": "linoleum",
-    "extraFeatures": ["wires", "doors", "counters", "shelves", "columns"]
+  "palette": {
+    "primary": "#5a5a5a",
+    "secondary": "#3a3a3a",
+    "accent": "#4aff4a",
+    "light": "#6aff6a"
   },
-  "spaceRules": ["non-euclidean"],
-  "entities": [
-    { "type": "watcher", "density": 0.015, "aggression": "curious" },
-    { "type": "insanity", "density": 0.01, "aggression": "curious" },
-    { "type": "duller", "density": 0.006, "aggression": "hostile" }
+  "terrain": {
+    "width": 28,
+    "height": 28,
+    "roomCount": 12,
+    "roomSizeMin": 4,
+    "roomSizeMax": 9,
+    "corridorWidth": 2,
+    "wallStyle": "metal",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "wires",
+      "doors",
+      "counters",
+      "shelves",
+      "columns"
+    ],
+    "infinite": false
+  },
+  "spaceRules": [
+    "non-euclidean"
   ],
-  "items": ["battery", "flashlight", "note", "almond-water"],
+  "entities": [
+    {
+      "type": "watcher",
+      "density": 0.015,
+      "aggression": "curious"
+    },
+    {
+      "type": "insanity",
+      "density": 0.01,
+      "aggression": "curious"
+    },
+    {
+      "type": "duller",
+      "density": 0.006,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "battery",
+    "flashlight",
+    "note",
+    "almond-water"
+  ],
   "itemDensity": 0.1,
   "setPieces": [
-    { "type": "writing", "position": "random", "text": "终端屏幕上滚动着一行行日志：『12:03:41 玩家进入本层。12:03:42 玩家向左转。12:03:43 玩家看到了这行字。』", "sanityEffect": -7, "note": "系统日志记录了我的一举一动。" },
-    { "type": "weird-room", "position": "center", "text": "一扇门上挂着『404』的牌子。打开门，里面是另一扇挂着『404』的门。你数了十二扇。", "sanityEffect": -6, "note": "十二扇写着 404 的门。" },
-    { "type": "object", "position": "far-corner", "text": "一台老式打印机吐出一张纸：『您已在本层停留 3 分 42 秒。这比平均停留时间短 5%。请继续。』", "sanityEffect": -5, "note": "打印机知道我待了多久。" }
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "终端屏幕上滚动着一行行日志：『12:03:41 玩家进入本层。12:03:42 玩家向左转。12:03:43 玩家看到了这行字。』",
+      "sanityEffect": -7,
+      "note": "系统日志记录了我的一举一动。"
+    },
+    {
+      "type": "weird-room",
+      "position": "center",
+      "text": "一扇门上挂着『404』的牌子。打开门，里面是另一扇挂着『404』的门。你数了十二扇。",
+      "sanityEffect": -6,
+      "note": "十二扇写着 404 的门。"
+    },
+    {
+      "type": "object",
+      "position": "far-corner",
+      "text": "一台老式打印机吐出一张纸：『您已在本层停留 3 分 42 秒。这比平均停留时间短 5%。请继续。』",
+      "sanityEffect": -5,
+      "note": "打印机知道我待了多久。"
+    }
   ],
   "soundscape": {
-    "ambient": ["机柜风扇的低鸣", "终端键盘敲击声", "远处硬盘寻道声"],
-    "startles": ["终端突然发出蜂鸣", "打印机吐出纸", "系统语音：警告，检测到存在"],
+    "ambient": [
+      "机柜风扇的低鸣",
+      "终端键盘敲击声",
+      "远处硬盘寻道声"
+    ],
+    "startles": [
+      "终端突然发出蜂鸣",
+      "打印机吐出纸",
+      "系统语音：警告，检测到存在"
+    ],
     "silenceEvents": false
   },
   "exits": [
-    { "target": "level-3", "kind": "door", "hidden": false, "danger": false, "description": "一扇写着『返回上级』的金属门，门后是电气室的臭氧味。" },
-    { "target": "level-11", "kind": "noclip", "hidden": true, "danger": false, "description": "一堵闪烁绿光的墙——穿过它，是城市的路灯光。" }
+    {
+      "target": "level-3",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "一扇写着『返回上级』的金属门，门后是电气室的臭氧味。"
+    },
+    {
+      "target": "level-11",
+      "kind": "noclip",
+      "hidden": true,
+      "danger": false,
+      "description": "一堵闪烁绿光的墙——穿过它，是城市的路灯光。"
+    }
   ]
 }

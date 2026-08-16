@@ -33,7 +33,8 @@
       "plants",
       "posters"
     ],
-    "topology": "city-grid"
+    "topology": "city-grid",
+    "infinite": true
   },
   "spaceRules": [
     "euclidean"

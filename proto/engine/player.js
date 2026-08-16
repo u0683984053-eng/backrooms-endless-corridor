@@ -4,6 +4,7 @@
 
 import { randInt, chance, pick, DIRS } from './rng.js';
 import { ENTITY_DEFS } from './entities.js';
+import { tileAt } from './generator.js';
 
 /** 物品元数据（名称/图标/描述） */
 export const ITEM_META = {
@@ -62,6 +63,7 @@ function mod(n, m) {
 }
 
 function inBounds(level, x, y) {
+  if (level.infinite) return true;
   return x >= 0 && y >= 0 && x < level.width && y < level.height;
 }
 
@@ -134,6 +136,7 @@ export function applyPlayerAction(state, action, world) {
         break;
       }
       const it = state.items.splice(idx, 1)[0];
+      if (level.infinite && it.id) level.takenItems.add(it.id);
       player.inventory.push(it.type);
       state.stats.itemsPicked = (state.stats.itemsPicked || 0) + 1;
       const meta = ITEM_META[it.type] || { name: it.type };
@@ -272,7 +275,7 @@ export function applyPlayerAction(state, action, world) {
  */
 function tryMove(state, world, dx, dy, events, opts) {
   const { level, player } = state;
-  const looping = level.spaceRules.includes('looping');
+  const looping = level.spaceRules.includes('looping') && !level.infinite;
   let moved = 0;
   let teleported = false;
 
@@ -287,7 +290,7 @@ function tryMove(state, world, dx, dy, events, opts) {
       break;
     }
 
-    const tile = level.tiles[ny][nx];
+    const tile = tileAt(level, nx, ny);
     if (tile === '#') {
       events.push({ text: '墙挡住了你的去路。', kind: 'system' });
       break;
@@ -351,7 +354,7 @@ function tryMove(state, world, dx, dy, events, opts) {
           const tx = destIsFirst ? link.x2 : link.x1;
           const ty = destIsFirst ? link.y2 : link.y1;
           const blocked = state.entities.some((e) => e.x === tx && e.y === ty && e.hp > 0);
-          if (!blocked && level.tiles[ty] && level.tiles[ty][tx] !== '#') {
+          if (!blocked && tileAt(level, tx, ty) !== '#') {
             player.x = tx;
             player.y = ty;
             teleported = true;
