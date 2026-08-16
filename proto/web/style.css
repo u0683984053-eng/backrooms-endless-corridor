@@ -941,3 +941,34 @@ body.in-game #touch-pad {
   background: rgba(0, 0, 0, 0.25);
   border-radius: 0 6px 6px 0;
 }
+
+/* 成就解锁横幅 */
+.achieve-toast {
+  position: fixed;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 65;
+  background: rgba(20, 16, 8, 0.92);
+  border: 1px solid #d8c060;
+  color: #f0e0a0;
+  padding: 12px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-align: center;
+  max-width: 80vw;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.7), 0 0 24px rgba(216, 192, 96, 0.25);
+  animation: achieve-pop 0.35s ease;
+}
+.achieve-toast.hidden {
+  display: none;
+}
+@keyframes achieve-pop {
+  from { transform: translateX(-50%) scale(0.8); opacity: 0; }
+  to { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+.ev.k-achievement {
+  color: #f0d878;
+  font-weight: 600;
+}

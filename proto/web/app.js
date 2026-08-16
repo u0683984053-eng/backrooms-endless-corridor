@@ -9,6 +9,7 @@ import {
   serializeState,
   deserializeState,
   enterLevel,
+  ACHIEVEMENTS,
 } from '../engine/game.js';
 import { ITEM_META, viewRadiusOf } from '../engine/player.js';
 import { ENTITY_DEFS } from '../engine/entities.js';
@@ -1590,8 +1591,25 @@ function renderEvents(events) {
     while (log.childNodes.length > 80) log.removeChild(log.firstChild);
     // 幻觉事件：全屏闪现假消息 1.5s
     if (e.hallucination) flashHallucination(e.text);
+    // 成就解锁：全屏成就横幅 4s
+    if (e.kind === 'achievement') showAchievementToast(e.text);
   }
   log.scrollTop = log.scrollHeight;
+}
+
+/** 成就解锁横幅（Fandom 风：后室也会为你喝彩，这本身就很奇怪） */
+let achieveTimer = null;
+function showAchievementToast(text) {
+  const el = $('achieve-toast');
+  if (!el) return;
+  clearTimeout(achieveTimer);
+  el.textContent = text;
+  el.classList.remove('hidden');
+  el.classList.add('pop');
+  achieveTimer = setTimeout(() => {
+    el.classList.add('hidden');
+    el.classList.remove('pop');
+  }, 4000);
 }
 
 function renderAll() {
@@ -1615,7 +1633,7 @@ function fillLogModal() {
     `<div class="codex-summary">` +
     `<div class="cs-title">行记 Codex</div>` +
     `<div class="cs-line">已发现 ${Object.keys(c.levels || {}).length} 个层级：${levelNames || '仅 Level 0'}</div>` +
-    `<div class="cs-line">笔记 ${(c.notes || []).length} 条 · 死亡 ${(c.deaths || []).length} 次</div>` +
+    `<div class="cs-line">笔记 ${(c.notes || []).length} 条 · 死亡 ${(c.deaths || []).length} 次 · 成就 ${(game.achievements ? game.achievements.size : 0)}/${ACHIEVEMENTS.length} 个</div>` +
     (c.notes && c.notes.length
       ? `<div class="cs-notes">${c.notes.map((n) => `「${escapeHtml(String(n))}」`).join(' ')}</div>`
       : '') +

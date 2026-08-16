@@ -135,6 +135,7 @@ export function applyPlayerAction(state, action, world) {
       }
       const it = state.items.splice(idx, 1)[0];
       player.inventory.push(it.type);
+      state.stats.itemsPicked = (state.stats.itemsPicked || 0) + 1;
       const meta = ITEM_META[it.type] || { name: it.type };
       events.push({ text: `拾取了 ${meta.name}。`, kind: 'item' });
       break;
@@ -216,6 +217,7 @@ export function applyPlayerAction(state, action, world) {
         break;
       }
       events.push({ text: `你穿过${target.description}`, kind: 'level' });
+      state.stats.exitsUsed = (state.stats.exitsUsed || 0) + 1;
       state.pendingExit = { exit: target };
       break;
     }
@@ -335,6 +337,7 @@ function tryMove(state, world, dx, dy, events, opts) {
           } else {
             player.inventory.splice(keyIdx, 1);
             state.unlockedDoors.add(unlockKey);
+            state.stats.keysUsed = (state.stats.keysUsed || 0) + 1;
             events.push({ text: '钥匙咔哒一声，门开了。', kind: 'item' });
             const destIsFirst = link.x1 === player.x && link.y1 === player.y;
             player.x = destIsFirst ? link.x2 : link.x1;

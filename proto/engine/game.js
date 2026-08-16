@@ -44,6 +44,14 @@ export function createGame({ levels, seed }) {
     lastNoise: { level: 0, x: 0, y: 0 },
     pendingExit: null,
     unlockedDoors: new Set(), // 已用钥匙解锁的门（"层级ID:配对索引"）
+    achievements: new Set(), // 已解锁成就 id
+    stats: {
+      itemsPicked: 0,
+      keysUsed: 0,
+      exitsUsed: 0,
+      levelsTurns: {}, // levelId -> 累计回合
+      visited: {}, // levelId -> 进入次数
+    },
     rng: mulberry32(hashString('game:' + String(runSeed))),
   };
   enterLevel(state, 'level-0', { initial: true });
@@ -114,10 +122,49 @@ export function step(state, action) {
   // ---- 状态结算 ----
   endTurn(state, events);
   state.turn++;
+  state.stats.levelsTurns[state.levelId] = (state.stats.levelsTurns[state.levelId] || 0) + 1;
   updateExplored(state);
   checkDeath(state, events);
+  checkAchievements(state, events);
 
   return { events, over: state.over };
+}
+
+// ---------- Codex 成就（非线性，Fandom 风） ----------
+export const ACHIEVEMENTS = [
+  { id: 'first-steps', name: '第一步', desc: '第一次移动。后室的走廊记住了你。', test: (s) => s.turn >= 1 },
+  { id: 'l0-survivor', name: '教学关卡常客', desc: '在 Level 0 存活 50 回合。你开始习惯这里的黄色了。', test: (s) => s.turn >= 50 && (s.stats.levelsTurns['level-0'] || 0) >= 50 },
+  { id: 'explorer-5', name: '初探者', desc: '发现 5 个层级。', test: (s) => Object.keys(s.codex.levels || {}).length >= 5 },
+  { id: 'explorer-10', name: '测绘员', desc: '发现 10 个层级。', test: (s) => Object.keys(s.codex.levels || {}).length >= 10 },
+  { id: 'explorer-20', name: '流浪者', desc: '发现 20 个层级。你正在成为后室的一部分。', test: (s) => Object.keys(s.codex.levels || {}).length >= 20 },
+  { id: 'deep-diver', name: '深渊来客', desc: '进入 Level 666 或 Level -1 并活了下来。', test: (s) => (s.stats.visited['level-666'] || 0) > 0 && !s.over },
+  { id: 'sprinter', name: '跑者', desc: '进入 !层并存活 30 回合。别停下来。', test: (s) => (s.stats.levelsTurns['level-!'] || 0) >= 30 },
+  { id: 'hoarder', name: '拾荒者', desc: '拾取 20 件物品。', test: (s) => (s.stats.itemsPicked || 0) >= 20 },
+  { id: 'scholar', name: '书记官', desc: '收集 10 条笔记与文档。', test: (s) => (s.codex.notes || []).length >= 10 },
+  { id: 'survivor-200', name: '久居者', desc: '存活 200 回合。', test: (s) => s.turn >= 200 },
+  { id: 'keymaster', name: '开锁匠', desc: '用钥匙打开 3 扇锁着的门。', test: (s) => (s.stats.keysUsed || 0) >= 3 },
+  { id: 'noclip-master', name: '穿墙者', desc: '使用 5 次层级出口（卡出）。', test: (s) => (s.stats.exitsUsed || 0) >= 5 },
+  { id: 'first-death', name: '你还会回来的', desc: '第一次死亡。后室没有终点。', test: (s) => (s.codex.deaths || []).length >= 1 },
+  { id: 'hub-visitor', name: '中转站', desc: '发现枢纽（The Hub）。', test: (s) => (s.stats.visited['level-hub'] || 0) > 0 },
+  { id: 'codex-24', name: '行记圆满', desc: '发现全部层级。你见过的后室，比大多数人想象的都多。', test: (s) => Object.keys(s.codex.levels || {}).length >= 24 },
+];
+
+function checkAchievements(state, events) {
+  const earned = state.achievements || (state.achievements = new Set());
+  for (const a of ACHIEVEMENTS) {
+    if (earned.has(a.id)) continue;
+    let ok = false;
+    try {
+      ok = a.test(state);
+    } catch {
+      ok = false;
+    }
+    if (ok) {
+      earned.add(a.id);
+      pushLog(state, `【成就解锁】${a.name}：${a.desc}`, 'achievement');
+      events.push({ text: `🏆 成就解锁：${a.name}——${a.desc}`, kind: 'achievement' });
+    }
+  }
 }
 
 /** 把当前视野并入该层级的"已探索"集合（雾战争实现） */
@@ -149,6 +196,7 @@ export function enterLevel(state, levelId, opts = {}) {
   state.explored[levelId] = state.explored[levelId] || new Set();
   state.discoveredExits[levelId] = state.discoveredExits[levelId] || new Set();
   state.seenSetPieces[levelId] = state.seenSetPieces[levelId] || new Set();
+  state.stats.visited[levelId] = (state.stats.visited[levelId] || 0) + 1;
   state.lastNoise = { level: 0, x: state.player.x, y: state.player.y };
 
   // Codex 记录
@@ -416,6 +464,8 @@ export function serializeState(state) {
     discoveredExits: setsToArrays(state.discoveredExits),
     seenSetPieces: setsToArrays(state.seenSetPieces),
     unlockedDoors: [...(state.unlockedDoors || [])],
+    achievements: [...(state.achievements || [])],
+    stats: state.stats,
   };
 }
 
@@ -435,6 +485,11 @@ export function deserializeState(state, data) {
   state.discoveredExits = arraysToSets(data.discoveredExits);
   state.seenSetPieces = arraysToSets(data.seenSetPieces);
   state.unlockedDoors = new Set(data.unlockedDoors || []);
+  state.achievements = new Set(data.achievements || []);
+  state.stats = Object.assign(
+    { itemsPicked: 0, keysUsed: 0, exitsUsed: 0, levelsTurns: {}, visited: {} },
+    data.stats || {}
+  );
   enterLevel(state, data.levelId || 'level-0', { keepPlayer: true });
   if (data.player) Object.assign(state.player, data.player);
   return state;

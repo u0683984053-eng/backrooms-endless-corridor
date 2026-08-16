@@ -24,6 +24,7 @@ export const LEVEL_IDS = [
   'level-9',
   'level-10',
   'level-14',
+  'level-33',
   'level-34',
   'level-69',
   'level-404',

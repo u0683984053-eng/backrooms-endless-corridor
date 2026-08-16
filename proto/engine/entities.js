@@ -219,7 +219,14 @@ export function updateEntity(e, world) {
           events.push({ text: '派对客向你"友好"地挥手，笑容咧得太开了。', kind: 'entity' });
         }
         moveToward(e, world, def.speed);
-        if (adjacent) wantsAttack = true;
+        if (adjacent) {
+          wantsAttack = true;
+          // Fandom：派对客的微笑会侵蚀心智
+          if (world.player) {
+            world.player.sanity = Math.max(0, world.player.sanity - 2);
+            events.push({ text: '派对客微笑着注视你。它的笑容在邀请你留下来。（-2 理智）', kind: 'sanity' });
+          }
+        }
       } else {
         e.alert = false;
         if (e.wait > 0) e.wait--;

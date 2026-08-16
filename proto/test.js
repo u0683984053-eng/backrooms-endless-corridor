@@ -7,7 +7,7 @@ import path from 'node:path';
 import { loadLevels, LEVEL_IDS, mutateDna } from './engine/dna.js';
 import { generateLevel, verifyReachable } from './engine/generator.js';
 import { hashString } from './engine/rng.js';
-import { createGame, step, enterLevel, playerVisibleTiles } from './engine/game.js';
+import { createGame, step, enterLevel, playerVisibleTiles, serializeState, deserializeState } from './engine/game.js';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 
@@ -600,6 +600,34 @@ section('10. 特殊机制：!层无尽追击 / 666高温 / 直视笑魇');
   step(st3, { type: 'look' });
   check('直视笑魇 -5 理智', st3.player.sanity <= s0 - 5, `${s0}→${st3.player.sanity}`);
   check('直视笑魇被激怒（alert=true）', sm.alert === true);
+}
+
+// ---------- 11. Codex 成就 ----------
+section('11. 成就：非线性解锁');
+{
+  const st = createGame({ levels, seed: 3 });
+  step(st, { type: 'move', dx: 1, dy: 0 });
+  check('成就「第一步」解锁', st.achievements.has('first-steps'), [...st.achievements].join(','));
+  // 拾取 20 件物品 → 「拾荒者」
+  const st2 = createGame({ levels, seed: 3 });
+  st2.stats.itemsPicked = 20;
+  step(st2, { type: 'rest' });
+  check('成就「拾荒者」解锁', st2.achievements.has('hoarder'));
+  // 发现 5 层级 → 「初探者」
+  const st3 = createGame({ levels, seed: 3 });
+  st3.codex.levels = Object.fromEntries(
+    ['level-0', 'level-1', 'level-2', 'level-3', 'level-4'].map((id) => [id, { id, name: id, visits: 1 }])
+  );
+  step(st3, { type: 'rest' });
+  check('成就「初探者」解锁', st3.achievements.has('explorer-5'));
+  // 存档回环：成就与统计持久化
+  const st4 = createGame({ levels, seed: 3 });
+  st4.stats.itemsPicked = 20;
+  step(st4, { type: 'rest' });
+  const data = serializeState(st4);
+  const st5 = createGame({ levels, seed: 3 });
+  deserializeState(st5, data);
+  check('成就跨存档持久化', st5.achievements.has('hoarder') && st5.stats.itemsPicked === 20);
 }
 console.log(`\n====================`);
 console.log(`冒烟测试完成：通过 ${pass} 项，失败 ${fail} 项`);
