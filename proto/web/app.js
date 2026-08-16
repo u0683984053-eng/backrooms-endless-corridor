@@ -100,6 +100,11 @@ function saveCodex() {
 }
 
 function saveWildRegistry() {
+  // 上限 200 条：超出后丢弃最旧的野性层级记录（localStorage 体积保护）
+  const keys = Object.keys(wildRegistry);
+  if (keys.length > 200) {
+    for (const k of keys.slice(0, keys.length - 200)) delete wildRegistry[k];
+  }
   saveJSON(WILD_KEY, wildRegistry);
 }
 
@@ -1216,6 +1221,9 @@ function updateParticles() {
 }
 
 // ---------- 主渲染 ----------
+// 视野 BFS 缓存：玩家位置未变时复用（渲染每帧调用，BFS 只在移动后重算）
+let visibleCache = { key: '', set: new Set() };
+
 const EXIT_EMOJI = {
   door: '🚪',
   stairwell: '🪜',
@@ -1257,7 +1265,12 @@ function drawGame() {
   const looping = level.spaceRules.includes('looping') && !level.infinite;
   const vc = visualCache;
 
-  const visible = new Set(playerVisibleTiles(g).map((t) => t.x + ',' + t.y));
+  // 视野 BFS 缓存：玩家位置未变时复用（渲染每帧调用，BFS 只在移动后重算）
+  const vkey = g.levelId + '|' + player.x + ',' + player.y;
+  if (visibleCache.key !== vkey) {
+    visibleCache = { key: vkey, set: new Set(playerVisibleTiles(g).map((t) => t.x + ',' + t.y)) };
+  }
+  const visible = visibleCache.set;
   const explored = g.explored[g.levelId];
 
   // 道具/实体快速查找
