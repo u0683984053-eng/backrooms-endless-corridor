@@ -21,7 +21,8 @@
   "entities": [
     { "type": "duller", "density": 0.006, "aggression": "curious" },
     { "type": "moth", "density": 0.01, "aggression": "passive" },
-    { "type": "insanity", "density": 0.003, "aggression": "curious" }
+    { "type": "insanity", "density": 0.003, "aggression": "curious" },
+    { "type": "glowfolk", "density": 0.004, "aggression": "passive" }
   ],
   "items": ["almond-water", "battery", "note", "flashlight"],
   "itemDensity": 0.2,

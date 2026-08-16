@@ -34,6 +34,9 @@
 | Level 52 | 航空母舰 | The Aircraft Carrier | 永不靠岸的航母、无发动机的飞机、瞭望塔外的另一艘航母 | level-52.json |
 | Level 66 | 旅馆泳池 | The Hotel Pool | 恒温泳池、叠好的毛巾、舒服得让人不想走 | level-66.json |
 | Level 90 | 停车场 | The Parking Lot | 无尽多层停车场、温引擎盖的空车、循环车位号 | level-90.json |
+| Level 13 | 蓝色通道 | The Blue Channel | 蓝色荧光走廊、渗水的墙、比脚步慢半拍的回声 | level-13.json |
+| Level 18 | 储物间 | The Storage Rooms | 无尽储物架、贴着标签的柜子、浮尘 | level-18.json |
+| Level 922 | 温室 | The Greenhouse | 玻璃穹顶、疯长的植物、朝向你的向日葵 | level-922.json |
 
 ## 2. 实体（首批 11 种）
 

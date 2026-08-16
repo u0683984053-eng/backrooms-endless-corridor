@@ -1,0 +1,42 @@
+{
+  "id": "level-922",
+  "name": "Level 922 — 温室",
+  "number": 922,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "rooms",
+  "aesthetic": "poolcore",
+  "light": "bright",
+  "sanDrain": 0.1,
+  "description": "一座望不到头的温室：玻璃穹顶、湿润的空气、疯长的植物。光照永远恰到好处，土壤永远是湿的。植物们在缓慢地、确定地生长——包括那些不该长出来的形状。",
+  "palette": { "primary": "#7a9a5a", "secondary": "#52703c", "accent": "#c8d878", "light": "#e8f0c8" },
+  "terrain": {
+    "width": 32, "height": 32,
+    "roomCount": 14, "roomSizeMin": 5, "roomSizeMax": 10,
+    "corridorWidth": 3,
+    "wallStyle": "glass", "floorStyle": "tile",
+    "extraFeatures": ["plants", "fountain", "columns", "doors", "puddles", "counters"]
+  },
+  "spaceRules": ["euclidean"],
+  "entities": [
+    { "type": "moth", "density": 0.014, "aggression": "passive" },
+    { "type": "glowfolk", "density": 0.008, "aggression": "passive" },
+    { "type": "clump", "density": 0.004, "aggression": "curious" }
+  ],
+  "items": ["almond-water", "royal-ration", "battery", "note", "medkit"],
+  "itemDensity": 0.22,
+  "setPieces": [
+    { "type": "weird-room", "position": "center", "text": "温室中央长着一株向日葵，花盘朝向的不是光——而是你。你换了个方向，它跟着转。", "sanityEffect": -6, "note": "向日葵一直朝着我。" },
+    { "type": "writing", "position": "random", "text": "育苗盆上插着标签：『品种：记住。』『品种：忘记。』『品种：我。』", "sanityEffect": -5, "note": "育苗标签：记住、忘记、我。" },
+    { "type": "object", "position": "far-corner", "text": "园艺工具间里，一把铲子立在墙角，铲刃上沾着新鲜的土，但没有挖过的痕迹。", "sanityEffect": -4, "note": "沾着新土的铲子，没有挖过的痕迹。" }
+  ],
+  "soundscape": {
+    "ambient": ["水滴落在叶面上", "玻璃穹顶的风声", "植物的生长声（像细微的骨节声）"],
+    "startles": ["某株植物突然抽枝", "玻璃顶传来敲击声", "土壤深处传来咕嘟声"],
+    "silenceEvents": true
+  },
+  "exits": [
+    { "target": "level-14", "kind": "door", "hidden": false, "danger": false, "description": "温室尽头的玻璃门，门外是草地、阳光与河流——天堂。" },
+    { "target": "level-10", "kind": "door", "hidden": false, "danger": false, "description": "一扇通向户外田地的门，门外是麦浪与天空。" }
+  ]
+}

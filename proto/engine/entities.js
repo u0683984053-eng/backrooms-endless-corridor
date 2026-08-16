@@ -60,6 +60,16 @@ export const ENTITY_DEFS = {
     behavior: 'lurk-chase',
     desc: '潜伏的听觉猎手。靠近它，它才会暴露。',
   },
+  deathmoth: {
+    name: '死亡飞蛾', char: 'M', emoji: '🦇', hp: 25, dmg: 10, sight: 2, hears: 0, speed: 2,
+    behavior: 'swarm-attack',
+    desc: '巨大的致命飞蛾。它们很少单独出现——发现你时，会呼朋引伴。',
+  },
+  glowfolk: {
+    name: '发光者', char: 'g', emoji: '✨', hp: 30, dmg: 0, sight: 4, hears: 0, speed: 1,
+    behavior: 'guider',
+    desc: '温和的发光人形。它会试着为你引路——三次之后，它会指出一条隐藏的路。',
+  },
 };
 
 function mod(n, m) {
@@ -327,6 +337,55 @@ export function updateEntity(e, world) {
       } else if (noiseHere) {
         e.visible = true;
         events.push({ text: '你的动静惊动了潜伏的抓挠者！', kind: 'entity' });
+      }
+      break;
+    }
+
+    case 'swarm-attack': {
+      // 死亡飞蛾：高速游荡；发现玩家后追击攻击（Fandom：群袭，极少单独出现）
+      if (d <= def.sight && los) {
+        if (!e.alert) {
+          e.alert = true;
+          events.push({ text: '一只巨大的飞蛾扑闪着翅膀，复眼里映着你的轮廓。', kind: 'entity' });
+        }
+        moveToward(e, world, def.speed);
+        if (adjacent) wantsAttack = true;
+      } else {
+        e.alert = false;
+        if (e.wait > 0) e.wait--;
+        else {
+          wanderStep(e, world, 1);
+          e.wait = randInt(rng, 1, 2);
+        }
+      }
+      break;
+    }
+
+    case 'guider': {
+      // 发光者：温和引路者，永不攻击；三次指引后指出隐藏的路
+      if (e.guideCount >= 3) {
+        // 已给出关键指引：保持距离，继续发光
+        if (d > 3 && rng() < 0.5) moveToward(e, world, 1);
+        break;
+      }
+      if (adjacent) {
+        e.guideCount = (e.guideCount || 0) + 1;
+        const dir = ['北', '南', '东', '西'][randInt(rng, 0, 3)];
+        if (e.guideCount >= 3) {
+          events.push({
+            text: `发光者停在墙边，身上的光聚成一条细线，指向${dir}方——那里似乎藏着一条路。`,
+            kind: 'entity',
+          });
+        } else {
+          events.push({ text: `发光者轻轻碰了碰你，朝${dir}方飘去，像在说：跟我来。`, kind: 'entity' });
+        }
+      } else if (d <= def.sight && rng() < 0.4) {
+        moveToward(e, world, 1);
+      } else if (e.wait > 0) {
+        e.wait--;
+      } else {
+        wanderStep(e, world, 1);
+        e.wait = randInt(rng, 1, 4);
       }
       break;
     }

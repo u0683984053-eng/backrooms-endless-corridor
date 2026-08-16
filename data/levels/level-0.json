@@ -20,7 +20,8 @@
   "spaceRules": ["looping"],
   "entities": [
     { "type": "moth", "density": 0.015, "aggression": "passive" },
-    { "type": "smiler", "density": 0.004, "aggression": "curious" }
+    { "type": "smiler", "density": 0.004, "aggression": "curious" },
+    { "type": "deathmoth", "density": 0.006, "aggression": "curious" }
   ],
   "items": ["almond-water", "battery", "note", "flashlight"],
   "itemDensity": 0.12,
@@ -36,6 +37,7 @@
   },
   "exits": [
     { "target": "level-1", "kind": "noclip", "hidden": true, "danger": false, "description": "一面墙纸微微闪烁的墙壁，像信号不好的屏幕。" },
-    { "target": "level-0", "kind": "noclip", "hidden": true, "danger": false, "description": "另一面闪烁的墙壁——它通往……另一个 Level 0。你记住了这个位置。" }
+    { "target": "level-0", "kind": "noclip", "hidden": true, "danger": false, "description": "另一面闪烁的墙壁——它通往……另一个 Level 0。你记住了这个位置。" },
+    { "target": "level-13", "kind": "noclip", "hidden": true, "danger": false, "description": "一处墙纸裂缝透出蓝光——穿过去，是蓝色灯管的通道。" }
   ]
 }

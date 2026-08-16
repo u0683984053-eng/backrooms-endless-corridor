@@ -21,7 +21,8 @@
   "entities": [
     { "type": "hound", "density": 0.012, "aggression": "hostile" },
     { "type": "moth", "density": 0.008, "aggression": "passive" },
-    { "type": "clump", "density": 0.004, "aggression": "curious" }
+    { "type": "clump", "density": 0.004, "aggression": "curious" },
+    { "type": "deathmoth", "density": 0.008, "aggression": "hostile" }
   ],
   "items": ["almond-water", "battery", "flashlight", "crowbar", "note"],
   "itemDensity": 0.15,

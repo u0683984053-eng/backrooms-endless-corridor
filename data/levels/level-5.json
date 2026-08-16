@@ -21,7 +21,8 @@
   "entities": [
     { "type": "smiler", "density": 0.014, "aggression": "hostile" },
     { "type": "partygoer", "density": 0.008, "aggression": "hostile" },
-    { "type": "skin-stealer", "density": 0.005, "aggression": "curious" }
+    { "type": "skin-stealer", "density": 0.005, "aggression": "curious" },
+    { "type": "deathmoth", "density": 0.006, "aggression": "curious" }
   ],
   "items": ["key", "almond-water", "flashlight", "battery", "note"],
   "itemDensity": 0.08,

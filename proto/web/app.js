@@ -25,6 +25,7 @@ import {
   onSanityStage,
   onHeartbeat,
   setMuted,
+  setVolume,
   isAudioReady,
   startle,
 } from './audio.js';
@@ -1010,6 +1011,35 @@ function makeEntityTexture(type) {
       g.beginPath(); g.arc(38, 16, 1.5, 0, Math.PI * 2); g.fill();
       break;
     }
+    case 'deathmoth': {
+      // 死亡飞蛾：大翅膀 + 暗色身体 + 红色复眼
+      g.fillStyle = 'rgba(30,25,35,0.95)';
+      g.beginPath(); g.ellipse(24, 24, 8, 12, 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = 'rgba(45,35,55,0.9)';
+      g.beginPath(); g.ellipse(13, 18, 11, 6, -0.5, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.ellipse(35, 18, 11, 6, 0.5, 0, Math.PI * 2); g.fill();
+      g.fillStyle = 'rgba(60,45,75,0.8)';
+      g.beginPath(); g.ellipse(11, 30, 9, 4, -0.4, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.ellipse(37, 30, 9, 4, 0.4, 0, Math.PI * 2); g.fill();
+      g.fillStyle = 'rgba(220,40,40,0.95)';
+      g.beginPath(); g.arc(21, 22, 2, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.arc(27, 22, 2, 0, Math.PI * 2); g.fill();
+      break;
+    }
+    case 'glowfolk': {
+      // 发光者：柔和的人形光晕
+      const glow = g.createRadialGradient(24, 26, 2, 24, 26, 22);
+      glow.addColorStop(0, 'rgba(200,235,255,0.5)');
+      glow.addColorStop(1, 'rgba(200,235,255,0)');
+      g.fillStyle = glow;
+      g.beginPath(); g.arc(24, 26, 22, 0, Math.PI * 2); g.fill();
+      g.fillStyle = 'rgba(230,246,255,0.95)';
+      g.beginPath(); g.ellipse(24, 14, 6, 8, 0, 0, Math.PI * 2); g.fill();
+      g.fillRect(18, 22, 12, 20);
+      g.fillStyle = 'rgba(255,255,255,0.7)';
+      g.beginPath(); g.arc(24, 15, 2, 0, Math.PI * 2); g.fill();
+      break;
+    }
     default: {
       g.fillStyle = '#888';
       g.fillRect(12, 12, 24, 24);
@@ -1612,6 +1642,20 @@ function showAchievementToast(text) {
   }, 4000);
 }
 
+/** 实体图鉴（Codex 的"活体博物馆"） */
+function renderBestiary(c) {
+  const best = (c && c.bestiary) || {};
+  const keys = Object.keys(best);
+  if (keys.length === 0) return '';
+  const lines = keys
+    .map((t) => {
+      const b = best[t];
+      return `<div class="beast-line"><span class="beast-emoji">${b.emoji || '❓'}</span><b>${escapeHtml(b.name)}</b> — 目击 ${b.seen} 次<span class="beast-desc">${escapeHtml(b.desc || '')}</span></div>`;
+    })
+    .join('');
+  return `<div class="codex-summary"><div class="cs-title">实体图鉴（${keys.length}/13）</div>${lines}</div>`;
+}
+
 function renderAll() {
   if (!game) return;
   renderHud();
@@ -1638,6 +1682,7 @@ function fillLogModal() {
       ? `<div class="cs-notes">${c.notes.map((n) => `「${escapeHtml(String(n))}」`).join(' ')}</div>`
       : '') +
     `</div>` +
+    renderBestiary(c) +
     game.log
       .map((e) => `<div class="ev k-${e.kind || 'system'}">[${e.turn}] ${escapeHtml(e.text)}</div>`)
       .join('');
@@ -2034,6 +2079,19 @@ function toggleMute() {
   }
 }
 
+// ---------- 音量滑杆 ----------
+function wireVolumeSlider() {
+  const slider = $('vol-slider');
+  if (!slider) return;
+  slider.addEventListener('input', () => {
+    try {
+      setVolume(Number(slider.value) / 100);
+    } catch (err) {
+      /* 忽略 */
+    }
+  });
+}
+
 // ---------- 动画循环（60fps：粒子 + 灯光明暗 + 理智闪烁） ----------
 function animate() {
   now = performance.now();
@@ -2072,6 +2130,7 @@ function logClick(id, extra) {
 function wireButtons() {
   // 静音开关（🔊/🔇，点击切换）
   $('btn-mute').addEventListener('click', toggleMute);
+  wireVolumeSlider();
   $('btn-new').addEventListener('click', () => {
     logClick('btn-new', '开始新游戏');
     safeRun(newGame);

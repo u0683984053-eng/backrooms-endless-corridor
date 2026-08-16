@@ -1,0 +1,42 @@
+{
+  "id": "level-13",
+  "name": "Level 13 — 蓝色通道",
+  "number": 13,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "corridors",
+  "aesthetic": "dreamcore",
+  "light": "flickering",
+  "sanDrain": 0.2,
+  "description": "蓝色荧光灯下的无尽通道，墙壁渗着水汽，回声比脚步慢半拍。这里的蓝色不是安宁的蓝——是显示器待机屏的蓝，是医院走廊凌晨三点的蓝。",
+  "palette": { "primary": "#4a6a8a", "secondary": "#32465c", "accent": "#8ad8e8", "light": "#6ab8e8" },
+  "terrain": {
+    "width": 30, "height": 30,
+    "roomCount": 12, "roomSizeMin": 4, "roomSizeMax": 9,
+    "corridorWidth": 3,
+    "wallStyle": "wallpaper", "floorStyle": "linoleum",
+    "extraFeatures": ["doors", "puddles", "pipes", "furniture"]
+  },
+  "spaceRules": ["euclidean"],
+  "entities": [
+    { "type": "duller", "density": 0.01, "aggression": "curious" },
+    { "type": "moth", "density": 0.01, "aggression": "passive" },
+    { "type": "glowfolk", "density": 0.006, "aggression": "passive" }
+  ],
+  "items": ["battery", "flashlight", "almond-water", "note"],
+  "itemDensity": 0.12,
+  "setPieces": [
+    { "type": "writing", "position": "random", "text": "墙上的蓝漆字：『蓝色是最安静的颜色。安静到你能听见自己的念头。』", "sanityEffect": -4, "note": "蓝漆字：蓝色是最安静的颜色。" },
+    { "type": "object", "position": "center", "text": "通道中央放着一台老式显示器，屏幕是待机蓝，角落里一行小字：『信号来自 Level 0。』", "sanityEffect": -5, "note": "待机蓝的显示器，信号来自 Level 0。" },
+    { "type": "mural", "position": "far-corner", "text": "墙上的水渍组成一张脸的轮廓，轮廓的嘴在慢慢扩大——水渍是湿的。", "sanityEffect": -6, "note": "水渍组成的脸，嘴在扩大。" }
+  ],
+  "soundscape": {
+    "ambient": ["蓝色灯管的嗡鸣（比黄色灯管低半音）", "墙壁渗水的滴答", "自己的回声"],
+    "startles": ["回声比脚步慢了半拍", "某段通道的灯管全灭", "水里传来咕噜声"],
+    "silenceEvents": true
+  },
+  "exits": [
+    { "target": "level-0", "kind": "noclip", "hidden": true, "danger": false, "description": "一道泛着黄色光的墙缝——穿过去，是黄色墙纸和潮湿地毯。蓝色世界在身后愈合。" },
+    { "target": "level-37", "kind": "door", "hidden": false, "danger": false, "description": "通道尽头的门，门缝里透出泳池的水光和回声。" }
+  ]
+}

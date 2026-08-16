@@ -17,7 +17,7 @@
     "wallStyle": "concrete", "floorStyle": "concrete",
     "extraFeatures": ["stairwell", "doors", "wires"]
   },
-  "spaceRules": ["non-euclidean", "looping"],
+  "spaceRules": ["non-euclidean", "looping", "time-anomaly"],
   "entities": [
     { "type": "skin-stealer", "density": 0.01, "aggression": "curious" },
     { "type": "moth", "density": 0.005, "aggression": "passive" }

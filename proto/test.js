@@ -629,6 +629,64 @@ section('11. 成就：非线性解锁');
   deserializeState(st5, data);
   check('成就跨存档持久化', st5.achievements.has('hoarder') && st5.stats.itemsPicked === 20);
 }
+
+// ---------- 12. 新实体 + 图鉴 + 空间异常 ----------
+section('12. 新实体/实体图鉴/时间与重力异常');
+{
+  // deathmoth：视野内发现玩家后追击（alert）
+  const st = createGame({ levels, seed: 3 });
+  const dm = {
+    x: st.player.x + 1, y: st.player.y, type: 'deathmoth', hp: 25, aggression: 'hostile',
+    state: 'idle', visible: true, alert: false, wait: 0, revealed: false,
+  };
+  st.entities.push(dm);
+  step(st, { type: 'rest' });
+  check('死亡飞蛾发现玩家后追击（alert）', dm.alert === true);
+
+  // glowfolk：三次相邻引导后给出隐藏路提示（guideCount）
+  const st2 = createGame({ levels, seed: 3 });
+  st2.entities = [];
+  const gf = {
+    x: st2.player.x, y: st2.player.y, type: 'glowfolk', hp: 30, aggression: 'passive',
+    state: 'idle', visible: true, alert: false, wait: 0, revealed: false,
+  };
+  st2.entities.push(gf);
+  for (let i = 0; i < 3; i++) {
+    gf.x = st2.player.x;
+    gf.y = st2.player.y;
+    step(st2, { type: 'rest' });
+  }
+  check('发光者三次指引后提示隐藏路线', (gf.guideCount || 0) >= 3);
+
+  // 实体图鉴：视野内实体被记录
+  const st3 = createGame({ levels, seed: 3 });
+  // 把玩家附近放一只 moth，step 后 bestiary 应记录
+  const mth = { x: st3.player.x + 1, y: st3.player.y, type: 'moth', hp: 10, aggression: 'passive', state: 'idle', visible: true, alert: false, wait: 0, revealed: false };
+  st3.entities.push(mth);
+  step(st3, { type: 'rest' });
+  check('实体图鉴记录目击', !!(st3.codex.bestiary && st3.codex.bestiary.moth && st3.codex.bestiary.moth.seen >= 1));
+
+  // time-anomaly：Level 0.1 每 25 回合恢复少量状态
+  const st4 = createGame({ levels, seed: 3 });
+  enterLevel(st4, 'level-0.1', { keepPlayer: true });
+  st4.entities = [];
+  st4.player.sanity = 30;
+  st4.player.stamina = 30;
+  for (let i = 0; i < 25; i++) step(st4, { type: 'rest' });
+  // 25 回合基础侵蚀 0.18×25=4.5；时间异常 +2 → 期望 ≈27.5（高于纯侵蚀的 25.5）
+  check('时间异常：25 回合后触发恢复（净高于纯侵蚀）', st4.player.sanity >= 27, `${st4.player.sanity}`);
+
+  // gravity-anomaly：Level -1 每 30 回合重力翻转（产生事件或位移）
+  const st5 = createGame({ levels, seed: 3 });
+  enterLevel(st5, 'level--1', { keepPlayer: true });
+  st5.entities = [];
+  let gravityEvent = false;
+  for (let i = 0; i < 30; i++) {
+    const r = step(st5, { type: 'rest' });
+    if (r.events.some((e) => e.text.includes('重力'))) gravityEvent = true;
+  }
+  check('重力异常：30 回合触发翻转事件', gravityEvent);
+}
 console.log(`\n====================`);
 console.log(`冒烟测试完成：通过 ${pass} 项，失败 ${fail} 项`);
 process.exitCode = fail > 0 ? 1 : 0;

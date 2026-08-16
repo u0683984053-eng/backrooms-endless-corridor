@@ -21,7 +21,8 @@
   "entities": [
     { "type": "faceling", "density": 0.015, "aggression": "passive" },
     { "type": "clump", "density": 0.003, "aggression": "passive" },
-    { "type": "watcher", "density": 0.003, "aggression": "curious" }
+    { "type": "watcher", "density": 0.003, "aggression": "curious" },
+    { "type": "glowfolk", "density": 0.006, "aggression": "passive" }
   ],
   "items": ["almond-water", "royal-ration", "medkit", "battery", "flashlight", "note", "key"],
   "itemDensity": 0.3,

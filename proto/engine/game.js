@@ -124,10 +124,32 @@ export function step(state, action) {
   state.turn++;
   state.stats.levelsTurns[state.levelId] = (state.stats.levelsTurns[state.levelId] || 0) + 1;
   updateExplored(state);
+  recordBestiary(state);
   checkDeath(state, events);
   checkAchievements(state, events);
 
   return { events, over: state.over };
+}
+
+/** Codex 实体图鉴：记录视野内目击的实体（"活体博物馆"理念） */
+function recordBestiary(state) {
+  const codex = state.codex;
+  if (!codex.bestiary) codex.bestiary = {};
+  const radius = viewRadiusOf(state.level, state.player);
+  for (const e of state.entities) {
+    if (e.hp <= 0 || !e.visible) continue;
+    const d = Math.abs(e.x - state.player.x) + Math.abs(e.y - state.player.y);
+    if (d > radius) continue;
+    const def = ENTITY_DEFS[e.type] || {};
+    const rec = codex.bestiary[e.type] || {
+      name: def.name || e.type,
+      seen: 0,
+      desc: def.desc || '',
+      emoji: def.emoji || '❓',
+    };
+    rec.seen++;
+    codex.bestiary[e.type] = rec;
+  }
 }
 
 // ---------- Codex 成就（非线性，Fandom 风） ----------
@@ -147,6 +169,7 @@ export const ACHIEVEMENTS = [
   { id: 'first-death', name: '你还会回来的', desc: '第一次死亡。后室没有终点。', test: (s) => (s.codex.deaths || []).length >= 1 },
   { id: 'hub-visitor', name: '中转站', desc: '发现枢纽（The Hub）。', test: (s) => (s.stats.visited['level-hub'] || 0) > 0 },
   { id: 'codex-24', name: '行记圆满', desc: '发现全部层级。你见过的后室，比大多数人想象的都多。', test: (s) => Object.keys(s.codex.levels || {}).length >= 24 },
+  { id: 'naturalist', name: '博物学家', desc: '目击全部 13 种实体。你是活的图鉴。', test: (s) => Object.keys((s.codex && s.codex.bestiary) || {}).length >= 13 },
 ];
 
 function checkAchievements(state, events) {
@@ -321,6 +344,40 @@ function endTurn(state, events) {
   if (mechs.includes('heat-drain') && (state.turn + 1) % 10 === 0) {
     player.hp = Math.max(0, player.hp - 1);
     events.push({ text: '空气灼热得发烫，高温正在消耗你的生命（-1 HP）。', kind: 'sanity' });
+  }
+
+  // 空间规则机制：time-anomaly（时间异常）——每 25 回合"时间打了个盹"
+  const rules = level.spaceRules || [];
+  if (rules.includes('time-anomaly') && (state.turn + 1) % 25 === 0) {
+    player.sanity = Math.min(100, player.sanity + 2);
+    player.stamina = Math.min(100, player.stamina + 5);
+    events.push({ text: '时间打了个盹。你的疲劳与恐惧似乎被偷走了片刻。（+2 理智 / +5 体力）', kind: 'sanity' });
+  }
+  // 空间规则机制：gravity-anomaly（重力异常）——每 30 回合一次重力翻转
+  if (rules.includes('gravity-anomaly') && (state.turn + 1) % 30 === 0) {
+    events.push({ text: '重力突然翻转了一瞬——你被抛向一侧，撞上了墙。', kind: 'sanity' });
+    const dirs = [
+      { dx: 0, dy: -1 },
+      { dx: -1, dy: 0 },
+      { dx: 0, dy: 1 },
+      { dx: 1, dy: 0 },
+    ];
+    const d = dirs[Math.floor(state.rng() * dirs.length)];
+    let nx = player.x + d.dx;
+    let ny = player.y + d.dy;
+    if (rules.includes('looping')) {
+      nx = ((nx % level.width) + level.width) % level.width;
+      ny = ((ny % level.height) + level.height) % level.height;
+    }
+    if (nx >= 0 && ny >= 0 && nx < level.width && ny < level.height && level.tiles[ny][nx] !== '#') {
+      const blocked = state.entities.some((e) => e.hp > 0 && e.x === nx && e.y === ny);
+      if (!blocked) {
+        player.x = nx;
+        player.y = ny;
+        player.hp = Math.max(0, player.hp - 1);
+        events.push({ text: '你被甩向墙壁，擦伤了（-1 HP）。', kind: 'combat' });
+      }
+    }
   }
 
   // 理智：基础侵蚀；安全层（sanDrain<=0.03 且 bright）每回合 +1

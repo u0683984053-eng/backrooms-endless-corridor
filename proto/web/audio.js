@@ -51,7 +51,7 @@ export function initAudio() {
   comp.attack.value = 0.003;
   comp.release.value = 0.25;
   master = ctx.createGain();
-  master.gain.value = muted ? 0 : 0.8;
+  master.gain.value = muted ? 0 : 0.8 * volume;
   master.connect(comp);
   comp.connect(ctx.destination);
 
@@ -74,13 +74,24 @@ export function isAudioReady() {
   return !!ctx && ctx.state !== 'closed';
 }
 
+let volume = 1; // 用户音量（0-1），与静音开关叠加
+
+/** 设置用户音量（0-1）。静音时保持记忆，取消静音后生效。 */
+export function setVolume(v) {
+  volume = Math.min(1, Math.max(0, Number(v) || 0));
+  if (!ctx || !master) return;
+  const t = ctx.currentTime;
+  master.gain.cancelScheduledValues(t);
+  master.gain.setValueAtTime(muted ? 0 : 0.8 * volume, t);
+}
+
 /** 全局静音：仅操作 master 增益（所有音色都经它输出） */
 export function setMuted(m) {
   muted = !!m;
   if (!ctx || !master) return;
   const t = ctx.currentTime;
   master.gain.cancelScheduledValues(t);
-  master.gain.setValueAtTime(muted ? 0 : 0.8, t);
+  master.gain.setValueAtTime(muted ? 0 : 0.8 * volume, t);
 }
 
 // ---------- 节点小工具 ----------

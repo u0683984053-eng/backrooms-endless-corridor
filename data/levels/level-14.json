@@ -33,6 +33,7 @@
   },
   "exits": [
     { "target": "level-0", "kind": "noclip", "hidden": true, "danger": false, "description": "河对岸的草地有一片颜色不对的阴影，像一块贴上去的补丁。你踩进去，脚下变成了发黄的墙纸和潮湿的地毯——你回到了这一切开始的地方。" },
-    { "target": "level-10", "kind": "door", "hidden": false, "danger": true, "description": "一扇立在草地上的木门，门框上缠着野花。推开门，是金黄的麦田。你回头，身后只剩草地。" }
+    { "target": "level-10", "kind": "door", "hidden": false, "danger": true, "description": "一扇立在草地上的木门，门框上缠着野花。推开门，是金黄的麦田。你回头，身后只剩草地。" },
+    { "target": "level-922", "kind": "door", "hidden": true, "danger": false, "description": "树林尽头一座玻璃温室，阳光透过穹顶——绿色的香气从门缝里溢出来。" }
   ]
 }

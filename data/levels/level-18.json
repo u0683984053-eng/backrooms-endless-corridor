@@ -1,0 +1,42 @@
+{
+  "id": "level-18",
+  "name": "Level 18 — 储物间",
+  "number": 18,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "rooms",
+  "aesthetic": "weirdcore",
+  "light": "dim",
+  "sanDrain": 0.15,
+  "description": "无穷无尽的储物间：铁架、纸箱、贴着标签的柜子。标签上的字都看不清，但每个箱子都沉得不像话。灰尘在灯光里悬浮，像时间本身。",
+  "palette": { "primary": "#8a8478", "secondary": "#625e54", "accent": "#c8a860", "light": "#c8c0a8" },
+  "terrain": {
+    "width": 30, "height": 30,
+    "roomCount": 18, "roomSizeMin": 4, "roomSizeMax": 9,
+    "corridorWidth": 2,
+    "wallStyle": "concrete", "floorStyle": "concrete",
+    "extraFeatures": ["shelves", "crates", "doors", "wires", "counters"]
+  },
+  "spaceRules": ["euclidean"],
+  "entities": [
+    { "type": "clump", "density": 0.012, "aggression": "curious" },
+    { "type": "faceling", "density": 0.008, "aggression": "passive" },
+    { "type": "moth", "density": 0.01, "aggression": "passive" }
+  ],
+  "items": ["almond-water", "royal-ration", "battery", "key", "note", "crowbar", "medkit"],
+  "itemDensity": 0.2,
+  "setPieces": [
+    { "type": "object", "position": "center", "text": "一个贴着『私人』标签的柜子，锁着。柜门上刻满了划痕，全是同一个日期。", "sanityEffect": -5, "note": "锁着的『私人』柜子，划痕全是同一天。" },
+    { "type": "writing", "position": "random", "text": "铁架上的纸箱侧面写着：『第 7 次搬家。这一箱还是原封未动。』", "sanityEffect": -4, "note": "纸箱上的字：第 7 次搬家。" },
+    { "type": "corpse", "position": "far-corner", "text": "一个纸箱里放着一副眼镜和一枚婚戒，像被妥善保存的遗物。箱子上写着：『别打开。』", "sanityEffect": -7, "note": "纸箱里的眼镜与婚戒，写着别打开。" }
+  ],
+  "soundscape": {
+    "ambient": ["灰尘悬浮的寂静", "铁架偶尔的吱呀", "某处纸箱被拖动的声音"],
+    "startles": ["柜门自己弹开一条缝", "纸箱滑落的声音", "身后传来撕胶带的声音"],
+    "silenceEvents": true
+  },
+  "exits": [
+    { "target": "level-1", "kind": "door", "hidden": false, "danger": false, "description": "一扇写着『仓库』的宽门，门后是板条箱与暖光——宜居地带。" },
+    { "target": "level-33", "kind": "stairwell", "hidden": true, "danger": false, "description": "货架后一道向下的楼梯，楼梯口结着霜——地下室。" }
+  ]
+}

@@ -972,3 +972,27 @@ body.in-game #touch-pad {
   color: #f0d878;
   font-weight: 600;
 }
+
+/* 实体图鉴 */
+.beast-line {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+.beast-emoji {
+  margin-right: 4px;
+}
+.beast-desc {
+  display: block;
+  color: #8a8468;
+  font-size: 11px;
+  margin-left: 18px;
+}
+
+/* 音量滑杆 */
+.vol-slider {
+  width: 90px;
+  accent-color: #d8c060;
+  cursor: pointer;
+  background: transparent;
+}

@@ -20,7 +20,8 @@
   "spaceRules": ["euclidean"],
   "entities": [
     { "type": "clump", "density": 0.003, "aggression": "curious" },
-    { "type": "faceling", "density": 0.004, "aggression": "passive" }
+    { "type": "faceling", "density": 0.004, "aggression": "passive" },
+    { "type": "glowfolk", "density": 0.005, "aggression": "passive" }
   ],
   "items": ["almond-water", "royal-ration", "medkit", "battery", "crowbar", "note"],
   "itemDensity": 0.25,
@@ -38,6 +39,7 @@
     { "target": "level-2", "kind": "door", "hidden": false, "danger": false, "description": "一扇标着'2'的铁门，门缝里透出蒸汽。" },
     { "target": "level-0", "kind": "noclip", "hidden": true, "danger": false, "description": "仓库角落一面发黄剥落的墙纸——穿过去，你回到了那个黄色世界。" },
     { "target": "level-0.1", "kind": "stairwell", "hidden": false, "danger": false, "description": "一截通往地下的楼梯，阶梯数好像永远数不完。" },
-    { "target": "level-33", "kind": "stairwell", "hidden": true, "danger": false, "description": "仓库角落一道不起眼的铁门，门后是霉味和滴水声——地下室的入口。" }
+    { "target": "level-33", "kind": "stairwell", "hidden": true, "danger": false, "description": "仓库角落一道不起眼的铁门，门后是霉味和滴水声——地下室的入口。" },
+    { "target": "level-18", "kind": "door", "hidden": true, "danger": false, "description": "仓库深处的另一道门，门后是无穷无尽的储物架——储物间。" }
   ]
 }
