@@ -1234,10 +1234,15 @@ function drawGame() {
   const W = canvas.width;
   const H = canvas.height;
   const radius = viewRadiusOf(level, player);
-  const view = radius * 2 + 1;
-  const tile = Math.max(6, Math.floor(Math.min(W, H) / view));
-  const ox = (W - view * tile) / 2;
-  const oy = (H - view * tile) / 2;
+  // 矩形视口：按画布宽高计算行列（横屏时水平显示更多瓦片，画面不再被压缩成小方块）
+  const tile = 48;
+  const minView = radius * 2 + 1;
+  const viewCols = Math.max(minView, Math.floor(W / tile));
+  const viewRows = Math.max(minView, Math.floor(H / tile));
+  const ox = (W - viewCols * tile) / 2;
+  const oy = (H - viewRows * tile) / 2;
+  const halfCols = Math.floor(viewCols / 2);
+  const halfRows = Math.floor(viewRows / 2);
   const looping = level.spaceRules.includes('looping');
   const vc = visualCache;
 
@@ -1251,13 +1256,13 @@ function drawGame() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, W, H);
 
-  const px = ox + radius * tile; // 玩家屏幕坐标（左偏移基准）
-  const py = oy + radius * tile;
+  const px = ox + halfCols * tile; // 玩家屏幕坐标（居中）
+  const py = oy + halfRows * tile;
 
-  for (let sy = 0; sy < view; sy++) {
-    for (let sx = 0; sx < view; sx++) {
-      let gx = player.x - radius + sx;
-      let gy = player.y - radius + sy;
+  for (let sy = 0; sy < viewRows; sy++) {
+    for (let sx = 0; sx < viewCols; sx++) {
+      let gx = player.x - halfCols + sx;
+      let gy = player.y - halfRows + sy;
       if (looping) {
         gx = ((gx % level.width) + level.width) % level.width;
         gy = ((gy % level.height) + level.height) % level.height;
@@ -1366,9 +1371,9 @@ function drawGame() {
 
   // ---- 物品（emoji） ----
   for (const it of g.items) {
-    const dx = it.x - (player.x - radius);
-    const dy = it.y - (player.y - radius);
-    if (dx < 0 || dy < 0 || dx >= view || dy >= view) continue;
+    const dx = it.x - (player.x - halfCols);
+    const dy = it.y - (player.y - halfRows);
+    if (dx < 0 || dy < 0 || dx >= viewCols || dy >= viewRows) continue;
     if (!visible.has(it.x + ',' + it.y)) continue;
     const meta = ITEM_META[it.type] || { emoji: '❓' };
     drawEmoji(meta.emoji, ox + dx * tile, oy + dy * tile, tile, '#fff');
@@ -1377,9 +1382,9 @@ function drawGame() {
   // ---- 实体（F 版剪影，带轻微浮动） ----
   for (const e of g.entities) {
     if (e.hp <= 0 || !e.visible) continue;
-    const dx = e.x - (player.x - radius);
-    const dy = e.y - (player.y - radius);
-    if (dx < 0 || dy < 0 || dx >= view || dy >= view) continue;
+    const dx = e.x - (player.x - halfCols);
+    const dy = e.y - (player.y - halfRows);
+    if (dx < 0 || dy < 0 || dx >= viewCols || dy >= viewRows) continue;
     if (!visible.has(e.x + ',' + e.y)) continue;
     const tex = vc.entities.get(e.type);
     if (!tex) continue;
@@ -1695,13 +1700,46 @@ function renderBestiary(c) {
   return `<div class="codex-summary"><div class="cs-title">实体图鉴（${keys.length}/13）</div>${lines}</div>`;
 }
 
+/** 画布自适应：按可用区域调整分辨率（横屏时矩形视口，画面最大化且不变形） */
+let lastCanvasSize = '';
+function resizeCanvas() {
+  const c = $('game-canvas');
+  const wrap = $('stage-wrap');
+  if (!c || !wrap) return;
+  const availW = wrap.clientWidth || c.width;
+  const availH = wrap.clientHeight || c.height;
+  if (availW < 80 || availH < 80) return;
+  const cols = Math.max(9, Math.floor(availW / 48));
+  const rows = Math.max(9, Math.floor(availH / 48));
+  const key = cols + 'x' + rows;
+  if (key === lastCanvasSize) return;
+  lastCanvasSize = key;
+  c.width = cols * 48;
+  c.height = rows * 48;
+}
+
 function renderAll() {
   if (!game) return;
+  resizeCanvas();
   renderHud();
   drawGame();
   // 开局/读档/野性层级：建立理智阶段基线 + 心跳判定
   audioCheckSanity();
   audioCheckHeartbeat();
+}
+
+// 窗口尺寸/方向变化时自适应画布
+window.addEventListener('resize', () => {
+  resizeCanvas();
+  if (game && !game.over) drawGame();
+});
+if (typeof window.matchMedia === 'function') {
+  window.matchMedia('(orientation: landscape)').addEventListener?.('change', () => {
+    setTimeout(() => {
+      resizeCanvas();
+      if (game && !game.over) drawGame();
+    }, 120);
+  });
 }
 
 // ---------- 弹窗内容 ----------

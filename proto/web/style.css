@@ -659,7 +659,7 @@ body.in-game #touch-pad {
   display: block;
 }
 
-/* 手机横屏：画布撑满、HUD 紧凑、方向键/动作键收拢 */
+/* 手机横屏：画布撑满可用区域（矩形视口，画面最大化）、HUD 紧凑、触屏键半透明悬浮 */
 @media (max-height: 560px) and (orientation: landscape) {
   #hud {
     padding: 6px 10px;
@@ -675,12 +675,20 @@ body.in-game #touch-pad {
   }
 
   #game-canvas {
-    max-height: calc(100dvh - 92px);
-    max-width: calc(100vw - 220px);
+    max-height: none;
+    max-width: none;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
   }
 
   #event-log {
     max-height: calc(100dvh - 92px);
+  }
+
+  #stage {
+    padding: 6px;
+    gap: 8px;
   }
 
   #dpad {
