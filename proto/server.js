@@ -47,7 +47,12 @@ const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://localhost');
     let pathname = url.pathname;
-    if (pathname === '/') pathname = '/web/index.html';
+    // 根路径重定向到 /web/：保证页面基准 URL 与 GitHub Pages 一致（相对资源解析相同）
+    if (pathname === '/') {
+      res.writeHead(302, { Location: '/web/' });
+      res.end();
+      return;
+    }
     // 目录请求 → 目录内 index.html（与 GitHub Pages 行为一致）
     if (pathname.endsWith('/')) pathname += 'index.html';
 
