@@ -265,44 +265,59 @@ function buildLevel(dna, rng) {
     }
   }
   if (extra.includes('doors') || isOutdoors) {
-    // 每间房开 1-3 扇门（各 85% 概率尝试；原版设定"房间靠门洞互相连通"）
+    // 门 = 墙上的真实开口：一侧邻房间地板、另一侧邻可走区域（走廊/其他房间）的墙瓦片，
+    // 打通为 'D'（可通行）。杜绝"门通向死缝"的假门。
+    const roomSet = new Set();
     for (const room of rooms) {
-      const doorTarget = randInt(rng, 1, 3);
-      let opened = 0;
-      for (let attempt = 0; attempt < doorTarget * 2 && opened < doorTarget; attempt++) {
-        // 找一个房间边界上的地板格，改为门（户外层记录为窗户）
-        const edge = pick(rng, ['top', 'bottom', 'left', 'right']);
-        let px, py;
-        if (edge === 'top') {
-          px = room.x + randInt(rng, 0, room.w - 1);
-          py = room.y;
-        } else if (edge === 'bottom') {
-          px = room.x + randInt(rng, 0, room.w - 1);
-          py = room.y + room.h - 1;
-        } else if (edge === 'left') {
-          px = room.x;
-          py = room.y + randInt(rng, 0, room.h - 1);
-        } else {
-          px = room.x + room.w - 1;
-          py = room.y + randInt(rng, 0, room.h - 1);
+      for (let y = room.y; y < room.y + room.h; y++) {
+        for (let x = room.x; x < room.x + room.w; x++) roomSet.add(x + ',' + y);
+      }
+    }
+    const isDoorSpot = (x, y) => {
+      if (tiles[y][x] !== '#') return false;
+      let inRoom = false;
+      let outWalk = false;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+        const inside = roomSet.has(nx + ',' + ny);
+        const walk = tiles[ny][nx] !== '#';
+        if (inside && walk) inRoom = true;
+        else if (!inside && walk) outWalk = true;
+      }
+      return inRoom && outWalk;
+    };
+    // 概率散布（氛围感：不是每面墙都开门）
+    for (let y = 1; y < H - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        if (isDoorSpot(x, y) && chance(rng, 0.3)) {
+          tiles[y][x] = 'D';
+          props.push({ x, y, kind: isOutdoors ? 'window' : 'door' });
         }
-        if (px < 1 || py < 1 || px >= W - 1 || py >= H - 1) continue;
-        if (tiles[py][px] === '.') {
-          tiles[py][px] = 'D';
-          props.push({ x: px, y: py, kind: isOutdoors ? 'window' : 'door' });
-          // 门是真正的通道：向外打通一格（如果邻格是墙），避免"装饰门"假承诺
-          const out = {
-            top: [px, py - 1],
-            bottom: [px, py + 1],
-            left: [px - 1, py],
-            right: [px + 1, py],
-          }[edge];
-          const ox = out[0];
-          const oy = out[1];
-          if (ox >= 1 && oy >= 1 && ox < W - 1 && oy < H - 1 && tiles[oy][ox] === '#') {
-            tiles[oy][ox] = '.';
-          }
-          opened++;
+      }
+    }
+    // 每间房保底 1 扇门（确定性：固定顺序找第一处合法门位）
+    for (const room of rooms) {
+      const walls = [];
+      for (let x = room.x - 1; x <= room.x + room.w; x++) {
+        walls.push([x, room.y - 1]);
+        walls.push([x, room.y + room.h]);
+      }
+      for (let y = room.y; y < room.y + room.h; y++) {
+        walls.push([room.x - 1, y]);
+        walls.push([room.x + room.w, y]);
+      }
+      const hasDoor = walls.some(
+        ([x, y]) => x >= 1 && y >= 1 && x < W - 1 && y < H - 1 && tiles[y][x] === 'D'
+      );
+      if (hasDoor) continue;
+      for (const [x, y] of walls) {
+        if (x < 1 || y < 1 || x >= W - 1 || y >= H - 1) continue;
+        if (isDoorSpot(x, y)) {
+          tiles[y][x] = 'D';
+          props.push({ x, y, kind: isOutdoors ? 'window' : 'door' });
+          break;
         }
       }
     }
@@ -511,13 +526,21 @@ function buildLevel(dna, rng) {
         }
       }
       if (seamX < 0) {
-        // 终极兜底：上下边缘若全封闭，在"内侧可走"的列直接开辟接缝通道
-        for (let x = 0; x < W; x++) {
-          if (tiles[1][x] !== '#') {
+        // 终极兜底：找每列最靠近顶/底的可行走格，把中间的墙打通成接缝通道
+        // （房间不会触及 y=0/H-1，故必须显式开辟）
+        for (let x = 0; x < W && seamX < 0; x++) {
+          let topY = -1;
+          let botY = -1;
+          for (let y = 0; y < H; y++) {
+            if (tiles[y][x] !== '#') { topY = y; break; }
+          }
+          for (let y = H - 1; y >= 0; y--) {
+            if (tiles[y][x] !== '#') { botY = y; break; }
+          }
+          if (topY >= 0 || botY >= 0) {
             seamX = x;
-            tiles[0][x] = '.';
-            if (tiles[H - 1][x] === '#') tiles[H - 1][x] = '.';
-            break;
+            if (topY >= 0) for (let yy = 0; yy < topY; yy++) tiles[yy][x] = '.';
+            if (botY >= 0) for (let yy = botY + 1; yy < H; yy++) tiles[yy][x] = '.';
           }
         }
       }
@@ -536,13 +559,20 @@ function buildLevel(dna, rng) {
         }
       }
       if (seamY < 0) {
-        // 终极兜底：左右边缘若全封闭，在"内侧可走"的行直接开辟接缝通道
-        for (let y = 0; y < H; y++) {
-          if (tiles[y][1] !== '#') {
+        // 终极兜底：找每行最靠近左/右的可行走格，把中间的墙打通成接缝通道
+        for (let y = 0; y < H && seamY < 0; y++) {
+          let leftX = -1;
+          let rightX = -1;
+          for (let x = 0; x < W; x++) {
+            if (tiles[y][x] !== '#') { leftX = x; break; }
+          }
+          for (let x = W - 1; x >= 0; x--) {
+            if (tiles[y][x] !== '#') { rightX = x; break; }
+          }
+          if (leftX >= 0 || rightX >= 0) {
             seamY = y;
-            tiles[y][0] = '.';
-            if (tiles[y][W - 1] === '#') tiles[y][W - 1] = '.';
-            break;
+            if (leftX >= 0) for (let xx = 0; xx < leftX; xx++) tiles[y][xx] = '.';
+            if (rightX >= 0) for (let xx = rightX + 1; xx < W; xx++) tiles[y][xx] = '.';
           }
         }
       }

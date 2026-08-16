@@ -650,17 +650,24 @@ function makePropTexture(kind, pal) {
       break;
     }
     case 'door': {
+      // 半开的门洞：门框 + 向内开的门扇 + 门洞阴影（明确"可通行"的暗示）
+      g.fillStyle = 'rgba(0,0,0,0.55)'; // 门洞内的阴影
+      g.fillRect(4, 2, 40, 44);
       g.strokeStyle = shade(prim, -36);
       g.lineWidth = 3;
-      g.strokeRect(4, 2, 40, 44);
+      g.strokeRect(4, 2, 40, 44); // 门框
       g.fillStyle = shade(prim, -8);
-      g.fillRect(7, 5, 34, 41);
+      g.save();
+      g.translate(36, 24);
+      g.rotate(-0.55); // 半开的门扇（向内打开）
+      g.fillRect(-14, -17, 28, 34);
+      g.restore();
       g.strokeStyle = 'rgba(0,0,0,0.35)';
       g.lineWidth = 1.5;
-      g.strokeRect(10, 8, 28, 35);
+      g.strokeRect(9, 8, 26, 32);
       g.fillStyle = acc;
       g.beginPath();
-      g.arc(36, 26, 2.2, 0, Math.PI * 2);
+      g.arc(13, 24, 2, 0, Math.PI * 2); // 门把手（在开着的门扇上）
       g.fill();
       break;
     }

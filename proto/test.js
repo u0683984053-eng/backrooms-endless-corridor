@@ -439,6 +439,21 @@ section('8. Level 0 房间模式：大小多样 + 全联通 + 门可通行');
   check('门数量充足（≥10）', doors >= 10, `${doors} 扇门`);
   const dTiles = l0.tiles.flat().filter((t) => t === 'D').length;
   check('D 瓦片与门道具一致', dTiles === doors, `${dTiles}/${doors}`);
+  // 门必须是"墙上的真开口"：每扇门至少 2 个可走邻居（房间侧 + 外侧），且本身在墙位
+  const doorOnWall = (l0.props || [])
+    .filter((p) => p.kind === 'door')
+    .every((p) => {
+      if (l0.tiles[p.y][p.x] !== 'D') return false;
+      let walkNb = 0;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = p.x + dx;
+        const ny = p.y + dy;
+        if (nx < 0 || ny < 0 || nx >= l0.width || ny >= l0.height) continue;
+        if (l0.tiles[ny][nx] !== '#') walkNb++;
+      }
+      return walkNb >= 2;
+    });
+  check('全部门为真开口（≥2 个可走邻居）', doorOnWall);
   check('确定性：同种子两次生成哈希一致', levelHash(generateLevel(levels['level-0'], 42)) === levelHash(l0));
   let allOk = true;
   for (let s = 1; s <= 5; s++) {
