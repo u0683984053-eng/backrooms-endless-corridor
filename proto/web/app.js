@@ -298,6 +298,17 @@ function showDeath() {
   const discovered = Object.keys(g.codex.levels || {});
   const deaths = (g.codex.deaths || []).length;
   const notes = (g.codex.notes || []).length;
+  const EPILOGUES = [
+    '后室不会记得你。但 Codex 会。',
+    '每一层都在等你。它们有的是时间。',
+    '你的脚步声还留在走廊里。',
+    '这里没有墓碑，只有下一次醒来。',
+    '理智是一种消耗品。你刚才用完了。',
+    '有人会找到你的笔记。希望那对他有用。',
+    '走廊会记住你路过的样子。',
+    '这不是结束——后室没有结束。',
+  ];
+  const epilogue = EPILOGUES[Math.floor(Math.random() * EPILOGUES.length)];
   $('death-body').innerHTML = `
     <div class="death-stats">
       <div class="ds">死因：<b>${g.deathCause || '未知'}</b></div>
@@ -307,6 +318,7 @@ function showDeath() {
       <div class="ds">死亡记录：<b>${deaths}</b> 次</div>
       <div class="ds">最终位置：<b>${g.codex.levels[g.levelId] ? g.codex.levels[g.levelId].name : g.levelId}</b></div>
     </div>
+    <p class="death-epilogue">${epilogue}</p>
     <p class="hint">Codex 已更新：本次发现已写入存档。</p>
   `;
   showOverlay('death-modal');
@@ -1505,9 +1517,23 @@ function renderAll() {
 // ---------- 弹窗内容 ----------
 function fillLogModal() {
   if (!game) return;
-  $('log-body').innerHTML = game.log
-    .map((e) => `<div class="ev k-${e.kind || 'system'}">[${e.turn}] ${escapeHtml(e.text)}</div>`)
-    .join('');
+  const g = game;
+  const c = g.codex || {};
+  const levelNames = Object.keys(c.levels || {})
+    .map((id) => c.levels[id].name || id)
+    .join('、');
+  $('log-body').innerHTML =
+    `<div class="codex-summary">` +
+    `<div class="cs-title">行记 Codex</div>` +
+    `<div class="cs-line">已发现 ${Object.keys(c.levels || {}).length} 个层级：${levelNames || '仅 Level 0'}</div>` +
+    `<div class="cs-line">笔记 ${(c.notes || []).length} 条 · 死亡 ${(c.deaths || []).length} 次</div>` +
+    (c.notes && c.notes.length
+      ? `<div class="cs-notes">${c.notes.map((n) => `「${escapeHtml(String(n))}」`).join(' ')}</div>`
+      : '') +
+    `</div>` +
+    game.log
+      .map((e) => `<div class="ev k-${e.kind || 'system'}">[${e.turn}] ${escapeHtml(e.text)}</div>`)
+      .join('');
 }
 
 function drawMapModal() {
@@ -2010,6 +2036,11 @@ function wireButtons() {
   $('start-codex').textContent = discovered
     ? `Codex：已发现 ${discovered} 个层级 · 死亡 ${deaths} 次 · 笔记 ${(codex.notes || []).length} 条`
     : '';
+  // 首次运行自动展示操作说明（一次性，关闭后不再弹出）
+  if (!loadJSON('backrooms.guide.v1', false)) {
+    saveJSON('backrooms.guide.v1', true);
+    showOverlay('help-modal');
+  }
 }
 
 // ---------- 启动 ----------

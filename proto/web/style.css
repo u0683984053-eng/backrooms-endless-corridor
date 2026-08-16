@@ -902,3 +902,42 @@ body.in-game #touch-pad {
   transform: translateY(1px);
   filter: brightness(1.25);
 }
+
+/* 行记 Codex 摘要（日志弹窗顶部） */
+.codex-summary {
+  background: rgba(232, 224, 138, 0.06);
+  border: 1px solid #3a3424;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+.cs-title {
+  color: var(--amber);
+  letter-spacing: 2px;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.cs-line {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+.cs-notes {
+  font-size: 12px;
+  color: #c8b888;
+  line-height: 1.7;
+  margin-top: 4px;
+}
+
+/* 死亡结算：Fandom 风临终语 */
+.death-epilogue {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-left: 2px solid var(--amber-dim);
+  color: #c8b888;
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.7;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 0 6px 6px 0;
+}
