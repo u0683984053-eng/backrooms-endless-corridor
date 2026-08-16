@@ -1735,6 +1735,10 @@ function wireButtons() {
 }
 
 // ---------- 启动 ----------
+// 启动标记：无头浏览器/诊断用（body[data-boot] 证明模块已执行、数据已加载）
+document.body.dataset.boot = 'ok';
+document.body.dataset.levels = String(Object.keys(levels || {}).length);
+logClick('boot', `模块已加载，${Object.keys(levels || {}).length} 个层级就绪`);
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Shift') shiftHeld = true;
   handleKey(e);
