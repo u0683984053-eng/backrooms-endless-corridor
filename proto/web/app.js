@@ -2417,7 +2417,7 @@ window.addEventListener('pointerdown', () => audioInitSafe());
 wireButtons();
 animate();
 
-// 深链调试：?autostart=1 自动开局（无头浏览器截图/自动化测试用；对普通玩家无影响）
+// 深链调试：?autostart=1 自动开局，可选 &level=level-19 指定层级（无头浏览器截图/自动化测试用；对普通玩家无影响）
 try {
   if (new URLSearchParams(location.search).get('autostart') === '1') {
     document.body.dataset.autostart = 'queued';
@@ -2425,6 +2425,11 @@ try {
       document.body.dataset.autostart = 'running';
       try {
         newGame();
+        const want = new URLSearchParams(location.search).get('level');
+        if (want && game.levels[want]) {
+          enterLevel(game, want, {});
+          rebuildVisuals();
+        }
         document.body.classList.add('in-game');
         renderAll();
         document.body.dataset.autostart = 'done';
