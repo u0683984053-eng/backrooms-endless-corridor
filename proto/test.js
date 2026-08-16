@@ -7,7 +7,7 @@ import path from 'node:path';
 import { loadLevels, LEVEL_IDS, mutateDna } from './engine/dna.js';
 import { generateLevel, verifyReachable } from './engine/generator.js';
 import { hashString } from './engine/rng.js';
-import { createGame, step, playerVisibleTiles } from './engine/game.js';
+import { createGame, step, enterLevel, playerVisibleTiles } from './engine/game.js';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 
@@ -569,7 +569,38 @@ section('9. 出口图：全部出口指向存在的层级，从 Level 0 可达�
   check('层级总数 ≥ 22（全面打磨目标）', Object.keys(levels).length >= 22, `${Object.keys(levels).length} 层`);
 }
 
-// ---------- 汇总 ----------
+// ---------- 10. 特殊层级机制 ----------
+section('10. 特殊机制：!层无尽追击 / 666高温 / 直视笑魇');
+{
+  // !层 endless-chase：敌对实体持续 alert
+  const st = createGame({ levels, seed: 3 });
+  enterLevel(st, 'level-!', { keepPlayer: true });
+  st.entities = [
+    { x: st.player.x + 3, y: st.player.y, type: 'hound', hp: 50, aggression: 'hostile', state: 'idle', visible: true, alert: false, wait: 0, revealed: false },
+  ];
+  step(st, { type: 'rest' });
+  check('!层：敌对实体保持追击（alert=true）', st.entities[0].alert === true);
+
+  // 666 heat-drain：10 回合高温灼烧 -1 HP
+  const st2 = createGame({ levels, seed: 3 });
+  enterLevel(st2, 'level-666', { keepPlayer: true });
+  st2.entities = [];
+  const hp0 = st2.player.hp;
+  for (let i = 0; i < 10; i++) step(st2, { type: 'rest' });
+  check('666：10 回合高温 -1 HP', st2.player.hp === hp0 - 1, `${hp0}→${st2.player.hp}`);
+
+  // 直视笑魇：look 时 LOS 内（≤6 格）smiler → -5 理智且被激怒
+  const st3 = createGame({ levels, seed: 3 });
+  const sm = {
+    x: st3.player.x + 2, y: st3.player.y, type: 'smiler', hp: 60, aggression: 'hostile',
+    state: 'idle', visible: true, alert: false, wait: 0, revealed: false,
+  };
+  st3.entities.push(sm);
+  const s0 = st3.player.sanity;
+  step(st3, { type: 'look' });
+  check('直视笑魇 -5 理智', st3.player.sanity <= s0 - 5, `${s0}→${st3.player.sanity}`);
+  check('直视笑魇被激怒（alert=true）', sm.alert === true);
+}
 console.log(`\n====================`);
 console.log(`冒烟测试完成：通过 ${pass} 项，失败 ${fail} 项`);
 process.exitCode = fail > 0 ? 1 : 0;

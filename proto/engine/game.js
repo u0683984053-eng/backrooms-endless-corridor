@@ -4,7 +4,7 @@
 
 import { mulberry32, hashString, chance, pick, DIRS } from './rng.js';
 import { generateLevel } from './generator.js';
-import { updateEntity } from './entities.js';
+import { updateEntity, ENTITY_DEFS } from './entities.js';
 import { createPlayer, applyPlayerAction, viewRadiusOf, isLitTile, pushLog } from './player.js';
 
 /** 免费动作：不消耗回合、不进入实体阶段 */
@@ -94,6 +94,15 @@ export function step(state, action) {
   }
 
   // ---- 实体阶段 ----
+  // 特殊机制：endless-chase（!层"跑"）——所有敌对实体持续追击，永不冷静
+  const mechs = (state.levels[state.levelId] && state.levels[state.levelId].specialMechanisms) || [];
+  if (mechs.includes('endless-chase')) {
+    for (const e of state.entities) {
+      if (e.hp > 0 && (e.aggression === 'hostile' || (ENTITY_DEFS[e.type] && ENTITY_DEFS[e.type].dmg > 0))) {
+        e.alert = true;
+      }
+    }
+  }
   for (const e of state.entities) {
     if (e.hp > 0) {
       const ev = updateEntity(e, world);
@@ -257,6 +266,14 @@ function hasLineOfSight(level, x1, y1, x2, y2) {
 
 function endTurn(state, events) {
   const { player, level } = state;
+
+  // 特殊机制：heat-drain（666 地狱）——高温每 10 回合灼烧 1 HP
+  // （endTurn 在 turn++ 之前执行，故用 turn+1 判定"本回合完成后"的计数）
+  const mechs = (state.levels[state.levelId] && state.levels[state.levelId].specialMechanisms) || [];
+  if (mechs.includes('heat-drain') && (state.turn + 1) % 10 === 0) {
+    player.hp = Math.max(0, player.hp - 1);
+    events.push({ text: '空气灼热得发烫，高温正在消耗你的生命（-1 HP）。', kind: 'sanity' });
+  }
 
   // 理智：基础侵蚀；安全层（sanDrain<=0.03 且 bright）每回合 +1
   if (level.sanDrain <= 0.03 && level.light === 'bright') {

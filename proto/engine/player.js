@@ -225,6 +225,16 @@ export function applyPlayerAction(state, action, world) {
       world.looking = true;
       revealNearby(state, world, events, viewRadiusOf(level, player) + 2);
       triggerSetPieces(state, events, 2);
+      // Fandom 细节：直视笑魇是危险的——LOS 内（≤6 格）有 smiler 时理智受创，它还会被激怒
+      // （直接改 state.entities：look 是免费动作，world 是每回合的临时副本）
+      const smilers = (state.entities || []).filter(
+        (e) => e.type === 'smiler' && e.hp > 0 && Math.abs(e.x - player.x) + Math.abs(e.y - player.y) <= 6
+      );
+      if (smilers.length > 0) {
+        player.sanity = Math.max(0, player.sanity - 5);
+        for (const s of smilers) s.alert = true;
+        events.push({ text: '你直视了它。它在笑。它记住了你。（-5 理智）', kind: 'sanity' });
+      }
       if (chance(world.rng, 0.35)) {
         const pool = (level.soundscape && level.soundscape.ambient) || [];
         if (pool.length > 0) {

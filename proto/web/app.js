@@ -227,15 +227,18 @@ function continueGame() {
   if (game.over) showDeath();
 }
 
-/** 进入野性层级：对 Level 0 做 DNA 变异（seed 随机），注册后可跨会话重建 */
+/** 进入野性层级：随机基底层级做 DNA 变异（seed 随机），注册后可跨会话重建 */
 function enterWild() {
   if (!game) newGame();
   if (game.over) newGame(); // 死亡后需先开新局
   const wildSeed = Math.floor(Math.random() * 1e6);
-  const base = levels['level-0'];
+  // 基底随机：23 个层级任选其一（野性 = 任何层级都有"另一个版本"）
+  const baseIds = Object.keys(levels);
+  const baseId = baseIds[Math.floor(Math.random() * baseIds.length)];
+  const base = levels[baseId];
   const dna = mutateDna(base, wildSeed);
   levels[dna.id] = dna;
-  wildRegistry[dna.id] = { baseId: 'level-0', seed: wildSeed };
+  wildRegistry[dna.id] = { baseId, seed: wildSeed };
   saveWildRegistry();
   const prev = game.levelId;
   enterLevel(game, dna.id, { keepPlayer: true });

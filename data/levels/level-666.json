@@ -18,6 +18,7 @@
     "extraFeatures": ["pipes", "wires", "doors", "columns", "puddles"]
   },
   "spaceRules": ["euclidean"],
+  "specialMechanisms": ["heat-drain"],
   "entities": [
     { "type": "smiler", "density": 0.025, "aggression": "hostile" },
     { "type": "clump", "density": 0.02, "aggression": "hostile" },

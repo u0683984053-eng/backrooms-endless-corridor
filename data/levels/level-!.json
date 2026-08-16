@@ -18,6 +18,7 @@
     "extraFeatures": ["doors", "wires"]
   },
   "spaceRules": ["euclidean"],
+  "specialMechanisms": ["endless-chase"],
   "entities": [
     { "type": "partygoer", "density": 0.04, "aggression": "hostile" },
     { "type": "hound", "density": 0.015, "aggression": "hostile" }
