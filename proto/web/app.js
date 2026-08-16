@@ -975,7 +975,13 @@ function rebuildVisuals() {
   const pal = level.palette || {};
   visualCache = {
     wall: makeWallTexture(level.terrain.wallStyle || 'wallpaper', pal),
+    wallVariants: Array.from({ length: 4 }, () =>
+      makeWallTexture(level.terrain.wallStyle || 'wallpaper', pal)
+    ),
     floor: makeFloorTexture(level.terrain.floorStyle || 'carpet', pal),
+    floorVariants: Array.from({ length: 3 }, () =>
+      makeFloorTexture(level.terrain.floorStyle || 'carpet', pal)
+    ),
     waterTex: makeFloorTexture('water', pal),
     props: new Map(),
     entities: new Map(),
@@ -1140,12 +1146,39 @@ function drawGame() {
       const t = level.tiles[gy][gx];
 
       if (visible.has(key)) {
-        // ---- 视野内：程序化纹理 ----
+        // ---- 视野内：程序化纹理（多版本轮换，打破平铺重复感） ----
         let tex = null;
-        if (t === '#') tex = vc.wall;
+        const variant = (gx * 7 + gy * 13) % 4;
+        if (t === '#') tex = (vc.wallVariants && vc.wallVariants[variant % vc.wallVariants.length]) || vc.wall;
         else if (t === '~') tex = vc.waterTex || vc.floor;
-        else tex = vc.floor;
+        else tex = (vc.floorVariants && vc.floorVariants[variant % vc.floorVariants.length]) || vc.floor;
         if (tex) ctx.drawImage(tex, tx, ty, tile, tile);
+
+        // 墙壁投影：相邻墙的地板格压暗边缘（纵深与阈限空间感）
+        if (t !== '#') {
+          const adj = [
+            [0, -1, 'top'],
+            [0, 1, 'bottom'],
+            [-1, 0, 'left'],
+            [1, 0, 'right'],
+          ];
+          for (const [adx, ady, side] of adj) {
+            let wx = gx + adx;
+            let wy = gy + ady;
+            if (level.spaceRules.includes('looping')) {
+              wx = ((wx % level.width) + level.width) % level.width;
+              wy = ((wy % level.height) + level.height) % level.height;
+            }
+            if (wx < 0 || wy < 0 || wx >= level.width || wy >= level.height) continue;
+            if (level.tiles[wy][wx] === '#') {
+              ctx.fillStyle = 'rgba(0,0,0,0.28)';
+              if (side === 'top') ctx.fillRect(tx, ty, tile, tile * 0.16);
+              else if (side === 'bottom') ctx.fillRect(tx, ty + tile * 0.84, tile, tile * 0.16);
+              else if (side === 'left') ctx.fillRect(tx, ty, tile * 0.16, tile);
+              else ctx.fillRect(tx + tile * 0.84, ty, tile * 0.16, tile);
+            }
+          }
+        }
 
         // 水面动画高光
         if (t === '~') {
