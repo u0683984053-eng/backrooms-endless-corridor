@@ -35,6 +35,7 @@
   },
   "exits": [
     { "target": "level-1", "kind": "stairwell", "hidden": false, "danger": false, "description": "一段向上走的楼梯，尽头是仓库的灯光。" },
-    { "target": "level-0", "kind": "stairwell", "hidden": true, "danger": false, "description": "一段向下走的楼梯，尽头是黄色墙纸和地毯。你回到了起点——或者从没离开过。" }
+    { "target": "level-0", "kind": "stairwell", "hidden": true, "danger": false, "description": "一段向下走的楼梯，尽头是黄色墙纸和地毯。你回到了起点——或者从没离开过。" },
+    { "target": "level--1", "kind": "stairwell", "hidden": true, "danger": true, "description": "一段更深的楼梯，扶手结了霜。楼下没有光，只有极低的气温。" }
   ]
 }

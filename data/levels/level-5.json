@@ -37,6 +37,7 @@
   },
   "exits": [
     { "target": "level-11", "kind": "noclip", "hidden": true, "danger": false, "description": "电梯门打开，里面不是电梯井，而是夜晚的城市街道。" },
-    { "target": "level-3", "kind": "elevator", "hidden": false, "danger": true, "description": "一部向下走的电梯，按键只有一个'3'，但楼层牌写着'B1'。" }
+    { "target": "level-3", "kind": "elevator", "hidden": false, "danger": true, "description": "一部向下走的电梯，按键只有一个'3'，但楼层牌写着'B1'。" },
+    { "target": "level-6", "kind": "noclip", "hidden": true, "danger": false, "description": "走廊尽头一扇没上锁的门，门后是彻底的黑暗——你听到自己的呼吸被吞没。" }
   ]
 }

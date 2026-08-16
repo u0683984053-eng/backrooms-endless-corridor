@@ -37,6 +37,7 @@
   },
   "exits": [
     { "target": "level-4", "kind": "noclip", "hidden": false, "danger": false, "description": "一面墙上的瓷砖像棋盘一样错位，摸上去是凉的。" },
-    { "target": "level-5", "kind": "elevator", "hidden": false, "danger": false, "description": "一部亮着'5'的电梯，里面铺着红色地毯，有一股香水味。" }
+    { "target": "level-5", "kind": "elevator", "hidden": false, "danger": false, "description": "一部亮着'5'的电梯，里面铺着红色地毯，有一股香水味。" },
+    { "target": "level-404", "kind": "door", "hidden": false, "danger": false, "description": "一扇标着『系统机房』的金属门，门缝里透出绿色的终端光。" }
   ]
 }

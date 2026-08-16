@@ -18,6 +18,18 @@
 | Level 37 | 泳池天堂 | Poolrooms | 泳池群、白瓷砖、回声 | level-37.json |
 | Level 3999 | 真核商场 | The True Hub | 商场、背景音乐、红色按钮→Level 0 | level-3999.json |
 | Level -1 | 黑暗之地 | The Dark Place | 绝对黑暗、低语 | level--1.json |
+| Level 6 | 灯灭 | Lights Out | 荧光灯全部熄灭、绝对黑暗、声音引敌 | level-6.json |
+| Level 7 | 洪水 | Flooded Level | 走廊被齐腰深的水淹没、深海恐惧 | level-7.json |
+| Level 8 | 洞穴系统 | Cave System | 无尽黑暗洞穴、滴水与回声 | level-8.json |
+| Level 9 | 郊区 | Suburbia | 永恒黄昏、浓雾、空无一人的街道 | level-9.json |
+| Level 10 | 田野 | The Fields | 无尽农田、白昼、相对安全 | level-10.json |
+| Level 14 | 天堂 | Paradise | 绿草河流阳光、过于完美而令人不安、安全层 | level-14.json |
+| Level 34 | 食堂 | Dining Hall | 无尽宴会厅、长桌烛台、食物永不腐坏 | level-34.json |
+| Level 69 | 游乐园 | Carnivale | 旋转木马、摩天轮、小丑音乐、反常的快乐 | level-69.json |
+| Level 404 | 错误页 | ERROR | 灰色机房、绿色终端、错误日志 | level-404.json |
+| Level 666 | 地狱 | Hell | 焦黑走廊、高温盐霜、持续低吟 | level-666.json |
+| 枢纽 | 枢纽 | The Hub | 紫色灯光、通往 0/1/2/3/4/5/11 的门、安全中转 | level-hub.json |
+| Level ! | 跑 | Run For Your Life | 红色走廊、绿色 EXIT、派对客成群追击 | level-!.json |
 
 ## 2. 实体（首批 11 种）
 

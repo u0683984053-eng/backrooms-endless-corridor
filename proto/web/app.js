@@ -13,6 +13,20 @@ import {
 import { ITEM_META, viewRadiusOf } from '../engine/player.js';
 import { ENTITY_DEFS } from '../engine/entities.js';
 import { hashString } from '../engine/rng.js';
+// 程序化音频（AUDIO-SPEC v1.0）：零依赖 Web Audio，所有调用都 try/catch 包裹
+import {
+  initAudio,
+  setLevelSound,
+  onPlayerMove,
+  onDoor,
+  onExit,
+  onHit,
+  onSanityStage,
+  onHeartbeat,
+  setMuted,
+  isAudioReady,
+  startle,
+} from './audio.js';
 
 // ---------- DOM ----------
 const $ = (id) => document.getElementById(id);
@@ -955,6 +969,8 @@ let visualCache = null;
 
 function rebuildVisuals() {
   if (!game) return;
+  // 音频：进入/切换层级 → 切换音景（交叉淡化 2s）+ 重置随机突发音效定时器
+  audioSetLevelSafe();
   const level = game.level;
   const pal = level.palette || {};
   visualCache = {
@@ -1448,6 +1464,9 @@ function renderAll() {
   if (!game) return;
   renderHud();
   drawGame();
+  // 开局/读档/野性层级：建立理智阶段基线 + 心跳判定
+  audioCheckSanity();
+  audioCheckHeartbeat();
 }
 
 // ---------- 弹窗内容 ----------
@@ -1613,10 +1632,18 @@ function doAction(action) {
   }
 
   const prevLevelId = game.levelId;
+  const prevX = game.player.x;
+  const prevY = game.player.y;
   const res = step(game, action);
   const events = res.events;
 
   renderEvents(events);
+
+  // 音频：事件音效 + 移动脚步声（位置变化才算移动成功）
+  const moved =
+    (action.type === 'move' || action.type === 'run') &&
+    (game.player.x !== prevX || game.player.y !== prevY);
+  audioAfterStep(events, moved, action.type === 'run');
 
   // 层级切换 → 故障过渡遮罩
   if (game.levelId !== prevLevelId) {
@@ -1629,7 +1656,216 @@ function doAction(action) {
   drawGame();
   saveGame();
 
-  if (game.over) showDeath();
+  // 每回合结算：理智跨阶段检测 + 危险实体心跳检测
+  audioCheckSanity();
+  audioCheckHeartbeat();
+
+  if (game.over) {
+    // 死亡：停止心跳与随机突发音效定时器
+    try {
+      onHeartbeat(false);
+    } catch (err) {
+      /* 忽略 */
+    }
+    stopStartles();
+    showDeath();
+  }
+}
+
+// ============================================================
+// 音频接入（AUDIO-SPEC §4）：所有调用 try/catch 包裹，
+// AudioContext 未初始化 / 浏览器不支持时静默失败，绝不影响游戏逻辑。
+// ============================================================
+
+/** 首次用户手势创建 AudioContext（幂等） */
+function audioInitSafe() {
+  try {
+    initAudio();
+  } catch (err) {
+    /* 音频失败不影响游戏 */
+  }
+}
+
+/** 层级切换：切换音景 + 重置随机突发音效定时器 */
+function audioSetLevelSafe() {
+  try {
+    if (game) setLevelSound(game.levels[game.levelId]);
+  } catch (err) {
+    /* 忽略 */
+  }
+  scheduleStartles();
+}
+
+/** 事件文本命中突发音效关键词才触发（与 audio.js 内部匹配表对齐） */
+const STARTLE_KEYWORDS = /(脚步声|咔哒|刮擦|抓挠|低语|水滴|滴水|水珠|水花|滴落|碰撞|敲击|撞击|金属|寂静|安静|敲门|门|呼吸|窃笑|叹息|蒸汽|噼啪|入水)/;
+
+/**
+ * 每回合结算后的音频联动（AUDIO-SPEC §4.4）：
+ *  含"穿过" → onExit（卡出）；门/传送门 → onDoor；受击 → onHit；
+ *  移动成功 → onPlayerMove(run)；其余事件命中关键词 → startle。
+ */
+function audioAfterStep(events, moved, ran) {
+  if (!isAudioReady()) return; // 未初始化：静默
+  let teleported = false; // 门/传送门（播放 onDoor，抑制脚步）
+  let exited = false; // 卡出
+  let hit = false; // 受击
+  const startles = [];
+  for (const e of events || []) {
+    const t = e.text || '';
+    if (/穿过/.test(t)) {
+      exited = true;
+      continue;
+    }
+    if ((e.kind === 'level' || e.kind === 'system') && /(门|吱呀|空间扭曲)/.test(t)) {
+      teleported = true;
+      continue;
+    }
+    if (e.kind === 'combat' && /(攻击了你|反击了你|受了伤)/.test(t)) {
+      hit = true;
+      continue;
+    }
+    if (STARTLE_KEYWORDS.test(t)) startles.push(t);
+  }
+  try {
+    if (exited) onExit();
+    if (hit) onHit();
+    if (teleported) onDoor();
+    else if (!exited && moved) onPlayerMove(ran, playerOnWater()); // 卡出时不再叠加脚步
+    for (const t of startles) startle(t);
+  } catch (err) {
+    /* 音频失败不影响游戏 */
+  }
+}
+
+/** 玩家当前所在格是否为水格（脚步更闷） */
+function playerOnWater() {
+  const lv = game && game.level;
+  if (!lv || !lv.tiles) return false;
+  const row = lv.tiles[game.player.y];
+  return !!(row && row[game.player.x] === '~');
+}
+
+// ---------- 理智阶段检测（每回合结算后比较，跨阶段才调用） ----------
+
+let lastAudioSanity = null; // 上次通知过的阶段
+
+function audioSanityStageOf(s) {
+  if (s > 50) return 'calm';
+  if (s > 30) return 'unsettled';
+  if (s > 15) return 'fear';
+  return 'collapse';
+}
+
+function audioCheckSanity() {
+  if (!game || !isAudioReady()) return;
+  const stage = audioSanityStageOf(game.player.sanity);
+  if (stage === lastAudioSanity) return;
+  lastAudioSanity = stage;
+  try {
+    onSanityStage(stage);
+  } catch (err) {
+    /* 忽略 */
+  }
+}
+
+// ---------- 危险实体心跳（hostile 且距离 <6） ----------
+
+// 会主动追击/近身攻击的实体行为表（wander/watch/civilian 不算）
+const AGGRESSIVE_BEHAVIORS = new Set([
+  'dark-chase',
+  'noise-chase',
+  'lit-ambush',
+  'stealth-ambush',
+  'slow-wander',
+  'light-attract',
+  'madness',
+  'lurk-chase',
+]);
+
+function isHostileEntity(e) {
+  if (!e || e.hp <= 0) return false;
+  if (e.aggression === 'hostile') return true; // 层级 DNA 显式标记
+  const def = ENTITY_DEFS[e.type] || {};
+  return (def.dmg || 0) > 0 && AGGRESSIVE_BEHAVIORS.has(def.behavior);
+}
+
+function audioCheckHeartbeat() {
+  if (!game || !isAudioReady()) return;
+  const p = game.player;
+  const lv = game.level;
+  const looping = lv && lv.spaceRules && lv.spaceRules.includes('looping');
+  const W = lv ? lv.width : 1;
+  const H = lv ? lv.height : 1;
+  let near = false;
+  for (const e of game.entities || []) {
+    if (!isHostileEntity(e)) continue;
+    let dx = Math.abs(e.x - p.x);
+    let dy = Math.abs(e.y - p.y);
+    if (looping) {
+      // 环形层级按环绕距离计算
+      dx = Math.min(dx, W - dx);
+      dy = Math.min(dy, H - dy);
+    }
+    if (Math.max(dx, dy) < 6) {
+      near = true;
+      break;
+    }
+  }
+  try {
+    onHeartbeat(near);
+  } catch (err) {
+    /* 忽略 */
+  }
+}
+
+// ---------- 随机突发音效（DNA soundscape.startles，25-60s，理智越低越频繁） ----------
+
+let startleTimer = null;
+
+function scheduleStartles() {
+  clearTimeout(startleTimer);
+  startleTimer = null;
+  if (!game || game.over || !isAudioReady()) return;
+  const dna = game.levels[game.levelId];
+  const pool = dna && dna.soundscape && dna.soundscape.startles;
+  if (!pool || pool.length === 0) return;
+  const s = Math.max(0, Math.min(100, game.player.sanity));
+  const base = 60 - (s / 100) * 35; // 25..60s
+  const factor = s < 15 ? 0.55 : s < 30 ? 0.75 : 1; // 理智越低频率越高
+  const interval = (base * factor + Math.random() * 15) * 1000;
+  startleTimer = setTimeout(() => {
+    startleTimer = null;
+    try {
+      startle(pool[Math.floor(Math.random() * pool.length)]);
+    } catch (err) {
+      /* 忽略 */
+    }
+    scheduleStartles();
+  }, interval);
+}
+
+function stopStartles() {
+  clearTimeout(startleTimer);
+  startleTimer = null;
+}
+
+// ---------- 静音开关 ----------
+
+let audioMuted = false;
+
+function toggleMute() {
+  audioMuted = !audioMuted;
+  try {
+    setMuted(audioMuted);
+  } catch (err) {
+    /* 忽略 */
+  }
+  const btn = $('btn-mute');
+  if (btn) {
+    btn.textContent = audioMuted ? '🔇' : '🔊';
+    btn.classList.toggle('muted', audioMuted);
+    btn.title = audioMuted ? '已静音（点击恢复）' : '静音';
+  }
 }
 
 // ---------- 动画循环（60fps：粒子 + 灯光明暗 + 理智闪烁） ----------
@@ -1668,6 +1904,8 @@ function logClick(id, extra) {
 }
 
 function wireButtons() {
+  // 静音开关（🔊/🔇，点击切换）
+  $('btn-mute').addEventListener('click', toggleMute);
   $('btn-new').addEventListener('click', () => {
     logClick('btn-new', '开始新游戏');
     safeRun(newGame);
@@ -1747,12 +1985,16 @@ document.body.dataset.boot = 'ok';
 document.body.dataset.levels = String(Object.keys(levels || {}).length);
 logClick('boot', `模块已加载，${Object.keys(levels || {}).length} 个层级就绪`);
 window.addEventListener('keydown', (e) => {
+  // 首次用户手势：创建 AudioContext（幂等，浏览器自动播放策略要求）
+  audioInitSafe();
   if (e.key === 'Shift') shiftHeld = true;
   handleKey(e);
 });
 window.addEventListener('keyup', (e) => {
   if (e.key === 'Shift') shiftHeld = false;
 });
+// 触屏/鼠标首次点击同样初始化音频
+window.addEventListener('pointerdown', () => audioInitSafe());
 
 wireButtons();
 animate();

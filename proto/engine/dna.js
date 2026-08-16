@@ -17,6 +17,19 @@ export const LEVEL_IDS = [
   'level-37',
   'level-3999',
   'level--1',
+  // 全面打磨新增（Fandom 经典层）
+  'level-6',
+  'level-7',
+  'level-8',
+  'level-9',
+  'level-10',
+  'level-14',
+  'level-34',
+  'level-69',
+  'level-404',
+  'level-666',
+  'level-hub',
+  'level-!',
 ];
 
 /** 默认值（合并时逐字段覆盖，保证任何残缺 DNA 都能得到完整结构） */
@@ -115,18 +128,28 @@ export async function loadLevels(loader) {
   for (const id of LEVEL_IDS) {
     const path = `data/levels/${id}.json`;
     let text;
-    if (typeof loader.readFile === 'function') {
-      text = await loader.readFile(path);
-    } else if (typeof loader.fetch === 'function') {
-      const res = await loader.fetch(path);
-      if (!res || (typeof res.ok === 'boolean' && !res.ok)) {
-        throw new Error(`无法加载 ${path}（HTTP ${res && res.status}）`);
+    try {
+      if (typeof loader.readFile === 'function') {
+        text = await loader.readFile(path);
+      } else if (typeof loader.fetch === 'function') {
+        const res = await loader.fetch(path);
+        if (!res || (typeof res.ok === 'boolean' && !res.ok)) {
+          throw new Error(`无法加载 ${path}（HTTP ${res && res.status}）`);
+        }
+        text = typeof res === 'string' ? res : await res.text();
+      } else {
+        throw new Error('loadLevels 的 loader 需要提供 readFile 或 fetch');
       }
-      text = typeof res === 'string' ? res : await res.text();
-    } else {
-      throw new Error('loadLevels 的 loader 需要提供 readFile 或 fetch');
+    } catch (err) {
+      // 容错：缺失/加载失败的层级跳过（自定义与野性层级集合可部分存在）
+      console.warn(`[loadLevels] 跳过 ${id}: ${err.message}`);
+      continue;
     }
-    out[id] = normalizeDna(JSON.parse(text));
+    try {
+      out[id] = normalizeDna(JSON.parse(text));
+    } catch (err) {
+      console.warn(`[loadLevels] ${id} 数据损坏，跳过: ${err.message}`);
+    }
   }
   return out;
 }

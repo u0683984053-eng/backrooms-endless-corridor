@@ -184,14 +184,23 @@ export function updateEntity(e, world) {
     }
 
     case 'noise-chase': {
-      // 猎犬：听声辨位，高速追击
+      // 猎犬：听声辨位，高速追击；群猎——一只警觉时附近同类同步警觉（Fandom 设定）
       if (noiseHere || (e.alert && d <= 6)) e.alert = true;
+      if (e.alert && !e.packed) {
+        e.packed = true;
+        for (const other of world.entities) {
+          if (other === e || other.hp <= 0 || other.type !== e.type) continue;
+          const od = Math.abs(other.x - e.x) + Math.abs(other.y - e.y);
+          if (od <= 5) other.alert = true; // 群猎警报传播
+        }
+      }
       if (e.alert) {
         if (d <= 6 || noiseHere) {
           moveToward(e, world, def.speed);
           if (adjacent) wantsAttack = true;
         } else {
           e.alert = false;
+          e.packed = false;
         }
       } else if (e.wait > 0) {
         e.wait--;

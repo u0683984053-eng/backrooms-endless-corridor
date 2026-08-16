@@ -1,0 +1,42 @@
+{
+  "id": "level-666",
+  "name": "Level 666 — 地狱",
+  "number": 666,
+  "category": "normal",
+  "difficultyClass": 5,
+  "environment": "industrial",
+  "aesthetic": "traumacore",
+  "light": "dark",
+  "sanDrain": 0.45,
+  "description": "焦黑的走廊在红光中延伸，空气灼热得发烫，墙壁上结着盐霜。远处传来持续的低吟，像是什么巨大的东西在呻吟。这里是后室的地狱——而且它知道你在。",
+  "palette": { "primary": "#3a1a1a", "secondary": "#2a1212", "accent": "#e8402a", "light": "#c03020" },
+  "terrain": {
+    "width": 26, "height": 26,
+    "roomCount": 10, "roomSizeMin": 4, "roomSizeMax": 9,
+    "corridorWidth": 2,
+    "wallStyle": "concrete", "floorStyle": "concrete",
+    "extraFeatures": ["pipes", "wires", "doors", "columns", "puddles"]
+  },
+  "spaceRules": ["euclidean"],
+  "entities": [
+    { "type": "smiler", "density": 0.025, "aggression": "hostile" },
+    { "type": "clump", "density": 0.02, "aggression": "hostile" },
+    { "type": "partygoer", "density": 0.012, "aggression": "hostile" }
+  ],
+  "items": ["almond-water", "battery"],
+  "itemDensity": 0.04,
+  "setPieces": [
+    { "type": "writing", "position": "random", "text": "盐霜的墙面上有烧灼出的字迹：『第 9 次来这里。上一次是 2003 年。』", "sanityEffect": -9, "note": "墙上的字：有人第 9 次来到这里。" },
+    { "type": "object", "position": "center", "text": "走廊中央立着一支温度计，刻度停在 666°。水银是黑色的。", "sanityEffect": -8, "note": "一支停在 666° 的温度计。" },
+    { "type": "corpse", "position": "far-corner", "text": "一具蜷缩的焦黑轮廓，手边画着一幅完整的出口地图——但地图上的所有路都通向这里。", "sanityEffect": -10, "note": "焦黑的身影画过一张地图，所有路都通向这里。" }
+  ],
+  "soundscape": {
+    "ambient": ["远处持续的低吟", "火焰燃烧的噼啪", "金属受热变形的声音"],
+    "startles": ["低吟突然变成笑声", "脚下地板发烫了一瞬", "黑暗中有东西在拖行"],
+    "silenceEvents": true
+  },
+  "exits": [
+    { "target": "level-0", "kind": "noclip", "hidden": true, "danger": false, "description": "一道墙缝——挤过去，是黄色墙纸和荧光灯。你活着出来了。这一次。" },
+    { "target": "level-69", "kind": "noclip", "hidden": true, "danger": true, "description": "地板上一道裂缝，下面是旋转木马的音乐——如果你能活着落地。" }
+  ]
+}

@@ -135,6 +135,31 @@ body {
   color: var(--text-dim);
 }
 
+.mute-btn {
+  margin-top: 2px;
+  font-size: 14px;
+  line-height: 1;
+  padding: 4px 8px;
+  background: #201c14;
+  border: 1px solid #3a3424;
+  border-radius: 6px;
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.mute-btn:hover {
+  background: #2a2518;
+  border-color: #5a5038;
+}
+
+.mute-btn.muted {
+  background: #2a1a14;
+  border-color: #7a3a2a;
+  color: #c88a6a;
+}
+
 .inv {
   display: flex;
   gap: 4px;

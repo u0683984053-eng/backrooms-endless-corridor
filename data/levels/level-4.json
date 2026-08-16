@@ -37,6 +37,7 @@
   },
   "exits": [
     { "target": "level-5", "kind": "door", "hidden": false, "danger": false, "description": "一扇贴着'员工通道'的防火门，门后飘来廉价香水的气味。" },
-    { "target": "level-11", "kind": "window", "hidden": true, "danger": false, "description": "一扇窗户外面不是街道，而是一片灯火通明的城市夜景——玻璃可以穿过。" }
+    { "target": "level-11", "kind": "window", "hidden": true, "danger": false, "description": "一扇窗户外面不是街道，而是一片灯火通明的城市夜景——玻璃可以穿过。" },
+    { "target": "level-34", "kind": "door", "hidden": false, "danger": false, "description": "员工食堂的大门，门缝里飘出食物的香气——但里面从没有人用餐。" }
   ]
 }

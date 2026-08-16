@@ -11,7 +11,7 @@
     "number": { "type": ["integer", "null"], "description": "层级编号；隐秘层级为 null" },
     "category": { "enum": ["normal", "sub", "enigmatic", "negative"], "description": "分类：普通/子/隐秘/负数" },
     "difficultyClass": { "type": "integer", "minimum": 0, "maximum": 5, "description": "生存难度 Class 0-5" },
-    "environment": { "enum": ["corridors", "rooms", "outdoors", "mixed", "aquatic", "industrial", "void"] },
+    "environment": { "enum": ["corridors", "rooms", "outdoors", "mixed", "aquatic", "industrial", "void", "caves"] },
     "aesthetic": { "type": "string", "description": "核类美学：weirdcore/dreamcore/poolcore/traumacore/mallcore 等" },
     "light": { "enum": ["bright", "dim", "dark", "flickering", "pitch"] },
     "sanDrain": { "type": "number", "minimum": 0, "description": "每回合理智基础侵蚀" },

@@ -1,0 +1,41 @@
+{
+  "id": "level-7",
+  "name": "Level 7 — 洪水",
+  "number": 7,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "aquatic",
+  "aesthetic": "poolcore",
+  "light": "dim",
+  "sanDrain": 0.25,
+  "description": "走廊被齐腰深的冷水淹没。水面平静得像一面黑色的镜子，天花板灯在水里碎成一片片光斑。水下有什么东西在移动——或者只是你的错觉。",
+  "palette": { "primary": "#1c2b4a", "secondary": "#14203a", "accent": "#4a7a9a", "light": "#8ab0c8" },
+  "terrain": {
+    "width": 32, "height": 32,
+    "roomCount": 12, "roomSizeMin": 4, "roomSizeMax": 9,
+    "corridorWidth": 3,
+    "wallStyle": "tile", "floorStyle": "water",
+    "extraFeatures": ["puddles", "fountain", "pipes", "doors", "stairwell"]
+  },
+  "spaceRules": ["euclidean"],
+  "entities": [
+    { "type": "duller", "density": 0.01, "aggression": "curious" },
+    { "type": "moth", "density": 0.01, "aggression": "passive" }
+  ],
+  "items": ["almond-water", "battery", "flashlight", "note", "royal-ration"],
+  "itemDensity": 0.15,
+  "setPieces": [
+    { "type": "object", "position": "random", "text": "水下一臂深的地方有一排金属扶手，锈迹斑斑，沿着走廊一直延伸向黑暗。它本该出现在台阶旁——但这里没有台阶。", "sanityEffect": -4, "note": "水面下的扶手，沿着走廊伸向黑暗。没有台阶，它扶着谁？" },
+    { "type": "object", "position": "random", "text": "几页纸漂浮在水面上，墨迹晕开大半。最后一行勉强可读：『水位在涨。别再回头看了。』", "sanityEffect": -3, "note": "漂浮的纸页：『水位在涨。别再回头看了。』" },
+    { "type": "weird-room", "position": "far-corner", "text": "走廊尽头的天花板灯倒映在水里，但倒影里的灯比头顶多了一盏——多出的那一盏沉在更深的水底，朝你眨了一下。", "sanityEffect": -6, "note": "水底的倒影里多了一盏灯。它在看你。" }
+  ],
+  "soundscape": {
+    "ambient": ["水轻轻拍打墙壁", "水面下的管道传来咕噜声", "远处水滴落回水面的回声"],
+    "startles": ["齐腰深的水突然搅动", "水下传来一声沉闷的撞击", "天花板滴下一大滴冷水"],
+    "silenceEvents": false
+  },
+  "exits": [
+    { "target": "level-8", "kind": "stairwell", "hidden": false, "danger": true, "description": "水面下露出一截向下的阶梯，通往更深、更黑的地方。水在阶梯口打着旋，像在催促。" },
+    { "target": "level-37", "kind": "noclip", "hidden": true, "danger": false, "description": "一堵墙面的瓷砖松动脱落，后面不是砖石，而是碧蓝的水光和空旷的回声。你挤过去，落在了干燥的池边。" }
+  ]
+}

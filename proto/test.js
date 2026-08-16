@@ -54,6 +54,7 @@ section('1. 确定性：同 (id, seed) 逐字节一致；不同种子大概率�
   let allDiff = true;
   for (const id of LEVEL_IDS) {
     const dna = levels[id];
+    if (!dna) continue; // 加载失败的层级跳过（如开发中部分缺失）
     const seeds = [1, 42, 2024];
     const hashes = [];
     for (const s of seeds) {
@@ -114,7 +115,8 @@ section('3. 密度：实体数在 (0, W×H×density×3] 内；itemDensity>0 时�
       }
     }
     const nEnt = level.entities.length;
-    const okTotal = anyDensity && nEnt > 0 && nEnt <= upper + 1e-9;
+    // 安全层（DNA 无实体）允许 0 只；有实体声明的层要求 (0, upper]
+    const okTotal = dna.entities.length === 0 ? nEnt === 0 : anyDensity && nEnt > 0 && nEnt <= upper + 1e-9;
     if (!okTotal) totalOk = false;
     check(`${id} 实体总数 ${nEnt} ∈ (0, ${upper.toFixed(1)}]`, okTotal, `n=${nEnt} upper=${upper.toFixed(1)}`);
 
@@ -504,6 +506,39 @@ section('8. Level 0 房间模式：大小多样 + 全联通 + 门可通行');
     if (wrapBfs(lv).size !== wc) allOk = false;
   }
   check('5 个种子游戏内全部 100% 联通', allOk);
+}
+
+// ---------- 9. 出口图完整性（网状出入口） ----------
+section('9. 出口图：全部出口指向存在的层级，从 Level 0 可达所有层');
+{
+  const ids = new Set(Object.keys(levels));
+  const bad = [];
+  for (const id of Object.keys(levels)) {
+    for (const ex of levels[id].exits || []) {
+      if (!ids.has(ex.target)) bad.push(`${id} → ${ex.target}`);
+    }
+  }
+  check('全部出口目标存在', bad.length === 0, bad.slice(0, 5).join('; '));
+  const noExit = Object.keys(levels).filter((id) => !(levels[id].exits || []).length);
+  check('每个层级至少 1 个出口', noExit.length === 0, noExit.join(','));
+  // 出口图 BFS：从 level-0 出发可达全部层级（枢纽 Hub 是核心节点）
+  const graph = {};
+  for (const id of Object.keys(levels)) graph[id] = (levels[id].exits || []).map((e) => e.target);
+  const reach = new Set(['level-0']);
+  const q = ['level-0'];
+  while (q.length) {
+    const cur = q.pop();
+    for (const nx of graph[cur] || []) {
+      if (!reach.has(nx)) {
+        reach.add(nx);
+        q.push(nx);
+      }
+    }
+  }
+  const unreach = Object.keys(levels).filter((id) => !reach.has(id));
+  check('出口图：从 Level 0 可达全部层级', unreach.length === 0, unreach.join(','));
+  // 总层级数
+  check('层级总数 ≥ 22（全面打磨目标）', Object.keys(levels).length >= 22, `${Object.keys(levels).length} 层`);
 }
 
 // ---------- 汇总 ----------

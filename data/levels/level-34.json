@@ -1,0 +1,43 @@
+{
+  "id": "level-34",
+  "name": "Level 34 — 食堂",
+  "number": 34,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "mixed",
+  "aesthetic": "traumacore",
+  "light": "bright",
+  "sanDrain": 0.1,
+  "description": "一座没有尽头的宴会厅：长桌、吊灯、烛台。餐盘上的食物永远不会腐坏，也永远不会有人来吃。菜单上的字会自己变化。",
+  "palette": { "primary": "#b8a888", "secondary": "#8a7a5e", "accent": "#c8a050", "light": "#e8d8a8" },
+  "terrain": {
+    "width": 32, "height": 32,
+    "roomCount": 16, "roomSizeMin": 5, "roomSizeMax": 12,
+    "corridorWidth": 3,
+    "wallStyle": "wallpaper", "floorStyle": "tile",
+    "extraFeatures": ["counters", "furniture", "columns", "doors", "fountain"]
+  },
+  "spaceRules": ["euclidean"],
+  "entities": [
+    { "type": "partygoer", "density": 0.012, "aggression": "hostile" },
+    { "type": "faceling", "density": 0.008, "aggression": "passive" }
+  ],
+  "items": ["royal-ration", "almond-water", "key", "note", "crowbar"],
+  "itemDensity": 0.22,
+  "setPieces": [
+    { "type": "weird-room", "position": "center", "text": "一张长桌上摆着几十副餐具，每把椅子前都放着一杯还温着的茶。椅子全部背对桌子。", "sanityEffect": -6, "note": "几十杯温茶，椅子背对餐桌。" },
+    { "type": "writing", "position": "random", "text": "菜单上印着：『今日特供：遗忘。配菜：悔恨。甜点：明天。』", "sanityEffect": -4, "note": "菜单上写着奇怪的特供菜。" },
+    { "type": "object", "position": "far-corner", "text": "角落里一台服务铃，按下去会响，但没有人来。你按了三次。它响了三次。", "sanityEffect": -5, "note": "角落的服务铃。我按了三次。它响了三次。没有人来。" }
+  ],
+  "soundscape": {
+    "ambient": ["远处餐具碰撞声", "吊灯烛火噼啪", "某个房间传来钢琴声"],
+    "startles": ["餐刀突然落在盘子上", "椅子被拉开的声音", "背后有人轻声说：请慢用"],
+    "silenceEvents": true
+  },
+  "exits": [
+    { "target": "level-4", "kind": "door", "hidden": false, "danger": false, "description": "一扇通往厨房的门，门后是废弃办公室的走廊。" },
+    { "target": "level-5", "kind": "door", "hidden": false, "danger": false, "description": "宴会厅侧门，门外是旅馆的红地毯。" },
+    { "target": "level-69", "kind": "noclip", "hidden": true, "danger": false, "description": "甜品台后的墙壁微微发亮，穿过它，你听到旋转木马的音乐。" },
+    { "target": "level-!", "kind": "noclip", "hidden": true, "danger": false, "description": "厨房冷藏室的金属门内侧用油漆写着『RUN』。推开门，是红色走廊和警报声。" }
+  ]
+}
