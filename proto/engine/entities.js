@@ -151,6 +151,19 @@ export function updateEntity(e, world) {
           e.alert = true;
         }
       } else {
+        // Fandom 细节：假面像普通人一样生活——偶尔会"打招呼"，让你怀疑自己是不是疯了
+        if (d <= 3 && rng() < 0.05 && !e.greeted) {
+          e.greeted = true;
+          events.push({
+            text: pick(rng, [
+              '一个假面朝你点了点头，像在街上遇到熟人。你不认识它。',
+              '假面对你说："今天天气不错。"这里没有天气。',
+              '一个假面侧身给你让路，礼貌得可怕。',
+              '假面停下来问你几点了。你没有手表，它也没有。',
+            ]),
+            kind: 'entity',
+          });
+        }
         if (e.wait > 0) e.wait--;
         else {
           if (rng() < 0.6) wanderStep(e, world, 1);
@@ -505,6 +518,12 @@ function attackPlayer(world, events, dmg, name, def) {
 /** 供其他模块使用的随机整数（实体 AI 内部用） */
 function randInt(rng, min, max) {
   return min + Math.floor(rng() * (max - min + 1));
+}
+
+/** 从数组中随机取一个元素（实体 AI 内部用） */
+function pick(rng, arr) {
+  if (!arr || arr.length === 0) return undefined;
+  return arr[Math.floor(rng() * arr.length) % arr.length];
 }
 
 /** 取实体显示字符 */

@@ -37,6 +37,7 @@
   },
   "exits": [
     { "target": "level-3999", "kind": "noclip", "hidden": true, "danger": false, "description": "一面贴着深蓝瓷砖的墙，瓷砖缝隙里透出商场灯光和音乐。" },
-    { "target": "level-11", "kind": "door", "hidden": false, "danger": false, "description": "泳池出口的玻璃门，外面是夜晚的城市街道。" }
+    { "target": "level-11", "kind": "door", "hidden": false, "danger": false, "description": "泳池出口的玻璃门，外面是夜晚的城市街道。" },
+    { "target": "level-52", "kind": "noclip", "hidden": true, "danger": false, "description": "最深那格泳池的水面泛着金属光——潜下去，你浮出水面时在机库里。" }
   ]
 }

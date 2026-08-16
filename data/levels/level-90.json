@@ -1,0 +1,42 @@
+{
+  "id": "level-90",
+  "name": "Level 90 — 停车场",
+  "number": 90,
+  "category": "normal",
+  "difficultyClass": 3,
+  "environment": "mixed",
+  "aesthetic": "traumacore",
+  "light": "dim",
+  "sanDrain": 0.25,
+  "description": "一座没有尽头的多层停车场。荧光灯坏了一半，地面有油渍和轮胎印。每一辆车都是空的，但引擎盖都是温的。停车位编号从 0001 排到 9999，然后从 0001 重新开始。",
+  "palette": { "primary": "#6a6a62", "secondary": "#48483f", "accent": "#a87838", "light": "#b8b090" },
+  "terrain": {
+    "width": 32, "height": 32,
+    "roomCount": 16, "roomSizeMin": 5, "roomSizeMax": 10,
+    "corridorWidth": 3,
+    "wallStyle": "concrete", "floorStyle": "concrete",
+    "extraFeatures": ["columns", "doors", "wires", "puddles", "crates"]
+  },
+  "spaceRules": ["looping"],
+  "entities": [
+    { "type": "clump", "density": 0.016, "aggression": "hostile" },
+    { "type": "skin-stealer", "density": 0.008, "aggression": "curious" },
+    { "type": "watcher", "density": 0.006, "aggression": "curious" }
+  ],
+  "items": ["battery", "flashlight", "almond-water", "key", "note", "crowbar"],
+  "itemDensity": 0.1,
+  "setPieces": [
+    { "type": "object", "position": "center", "text": "一辆黑色轿车停在正中央，引擎还在运转，发出轻柔的怠速声。驾驶座是空的。你打开车门——车里的空调还开着，很冷。", "sanityEffect": -7, "note": "怠速的空车，空调开着。" },
+    { "type": "writing", "position": "random", "text": "墙上用喷漆写着：『我的车位在 5731。我已经找了 2000 层。』", "sanityEffect": -6, "note": "喷漆字：有人在找自己的车位。" },
+    { "type": "object", "position": "far-corner", "text": "角落停着一辆婴儿车，车里的不是婴儿，而是一盒还在冒热气的薯条。", "sanityEffect": -8, "note": "婴儿车里的薯条还冒着热气。" }
+  ],
+  "soundscape": {
+    "ambient": ["远处引擎怠速声", "荧光灯电流声", "轮胎压过积水的声音"],
+    "startles": ["某辆车突然鸣笛", "轮胎摩擦声逼近", "头顶楼层传来脚步声"],
+    "silenceEvents": true
+  },
+  "exits": [
+    { "target": "level-11", "kind": "door", "hidden": false, "danger": false, "description": "出口坡道的尽头不是收费站——是城市街道的路灯光。" },
+    { "target": "level-4", "kind": "stairwell", "hidden": true, "danger": false, "description": "楼梯间的门写着『办公楼』，门后是办公楼的空调风。" }
+  ]
+}

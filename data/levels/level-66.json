@@ -1,0 +1,41 @@
+{
+  "id": "level-66",
+  "name": "Level 66 — 旅馆泳池",
+  "number": 66,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "aquatic",
+  "aesthetic": "poolcore",
+  "light": "bright",
+  "sanDrain": 0.05,
+  "description": "一家五星级旅馆的泳池区，泳池永远恒温，灯光永远柔和。躺椅空着，毛巾叠得整整齐齐。这里太舒服了——舒服得让人想留下来，再也不走。",
+  "palette": { "primary": "#e8f0f0", "secondary": "#a8c8d0", "accent": "#c8a868", "light": "#f0e8d0" },
+  "terrain": {
+    "width": 28, "height": 28,
+    "roomCount": 12, "roomSizeMin": 4, "roomSizeMax": 9,
+    "corridorWidth": 3,
+    "wallStyle": "tile", "floorStyle": "water",
+    "extraFeatures": ["fountain", "columns", "doors", "furniture", "plants"]
+  },
+  "spaceRules": ["euclidean"],
+  "entities": [
+    { "type": "duller", "density": 0.008, "aggression": "curious" },
+    { "type": "moth", "density": 0.008, "aggression": "passive" }
+  ],
+  "items": ["almond-water", "royal-ration", "battery", "note", "flashlight"],
+  "itemDensity": 0.18,
+  "setPieces": [
+    { "type": "weird-room", "position": "center", "text": "泳池底部有一个排水口。你俯身去看——排水口下面还有一个泳池，里面也有人俯身在看。", "sanityEffect": -7, "note": "排水口下面是另一个泳池，和另一个俯身的我。" },
+    { "type": "object", "position": "random", "text": "躺椅上放着一条叠好的毛巾，毛巾下压着一张房卡。房卡上的房间号是 404。", "sanityEffect": -4, "note": "毛巾下的房卡：404 房。" },
+    { "type": "writing", "position": "far-corner", "text": "更衣室镜子上用雾气写着：『水温永远正好。你确定要走吗？』", "sanityEffect": -5, "note": "镜子上的雾字：水温永远正好。" }
+  ],
+  "soundscape": {
+    "ambient": ["水循环泵轻柔的嗡鸣", "水面反光的水声", "远处电梯叮咚"],
+    "startles": ["有人入水的声音——但泳池里没人", "灯光闪了一下", "排水口发出咕噜声"],
+    "silenceEvents": true
+  },
+  "exits": [
+    { "target": "level-37", "kind": "door", "hidden": false, "danger": false, "description": "泳池区的玻璃门，门后是另一个泳池——泳池层的回声。" },
+    { "target": "level-5", "kind": "door", "hidden": false, "danger": false, "description": "更衣室通往旅馆大堂的门，门后是红色地毯。" }
+  ]
+}

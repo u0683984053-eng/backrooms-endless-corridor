@@ -30,6 +30,10 @@
 | Level 666 | 地狱 | Hell | 焦黑走廊、高温盐霜、持续低吟 | level-666.json |
 | 枢纽 | 枢纽 | The Hub | 紫色灯光、通往 0/1/2/3/4/5/11 的门、安全中转 | level-hub.json |
 | Level ! | 跑 | Run For Your Life | 红色走廊、绿色 EXIT、派对客成群追击 | level-!.json |
+| Level 33 | 地下室 | The Basement | 无尽黑暗潮湿地下室、锅炉、低矮天花板 | level-33.json |
+| Level 52 | 航空母舰 | The Aircraft Carrier | 永不靠岸的航母、无发动机的飞机、瞭望塔外的另一艘航母 | level-52.json |
+| Level 66 | 旅馆泳池 | The Hotel Pool | 恒温泳池、叠好的毛巾、舒服得让人不想走 | level-66.json |
+| Level 90 | 停车场 | The Parking Lot | 无尽多层停车场、温引擎盖的空车、循环车位号 | level-90.json |
 
 ## 2. 实体（首批 11 种）
 

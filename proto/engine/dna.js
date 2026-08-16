@@ -15,7 +15,10 @@ export const LEVEL_IDS = [
   'level-0.1',
   'level-11',
   'level-37',
+  'level-52',
+  'level-66',
   'level-3999',
+  'level-90',
   'level--1',
   // 全面打磨新增（Fandom 经典层）
   'level-6',

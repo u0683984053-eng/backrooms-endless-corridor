@@ -566,7 +566,7 @@ section('9. 出口图：全部出口指向存在的层级，从 Level 0 可达�
   const unreach = Object.keys(levels).filter((id) => !reach.has(id));
   check('出口图：从 Level 0 可达全部层级', unreach.length === 0, unreach.join(','));
   // 总层级数
-  check('层级总数 ≥ 22（全面打磨目标）', Object.keys(levels).length >= 22, `${Object.keys(levels).length} 层`);
+  check('层级总数 ≥ 26（全面打磨目标）', Object.keys(levels).length >= 26, `${Object.keys(levels).length} 层`);
 }
 
 // ---------- 10. 特殊层级机制 ----------
