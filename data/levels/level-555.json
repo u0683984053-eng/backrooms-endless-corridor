@@ -1,0 +1,97 @@
+{
+  "id": "level-555",
+  "name": "Level 555 — 超市",
+  "number": 555,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "mixed",
+  "aesthetic": "mallcore",
+  "light": "bright",
+  "sanDrain": 0.05,
+  "description": "一家永远在营业的超市：日光灯惨白，广播循环播放着同一首没人记得的歌，货架上的商品全是没见过的牌子。冰柜的雾气在走廊里弥漫，货架深处有东西在把商品一件一件地放回原位。",
+  "palette": {
+    "primary": "#c8d0c0",
+    "secondary": "#8a968a",
+    "accent": "#4a5a4a",
+    "light": "#f0f8f0"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 12,
+    "roomSizeMin": 5,
+    "roomSizeMax": 9,
+    "corridorWidth": 3,
+    "wallStyle": "tile",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "shelves",
+      "counters",
+      "crates",
+      "papers",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "faceling",
+      "density": 0.005,
+      "aggression": "curious"
+    },
+    {
+      "type": "partygoer",
+      "density": 0.002,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.025,
+  "setPieces": [
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "促销海报：『今日特价：离开这里。全场五折，仅限今天。』印刷日期是三十年前。",
+      "sanityEffect": -3,
+      "note": "促销海报：『今日特价：离开这里。』"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "广播里循环播放的同一首歌",
+      "冰柜压缩机的低鸣"
+    ],
+    "startles": [
+      "广播突然停顿了一拍，然后继续播放",
+      "货架尽头滚来一个罐头，砸在你脚边"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "door",
+      "target": "level-11",
+      "hidden": true,
+      "danger": false,
+      "description": "超市的自动门——门外不是街道，是另一座城市的十字路口。"
+    },
+    {
+      "kind": "elevator",
+      "target": "level-hub",
+      "hidden": true,
+      "danger": false,
+      "description": "员工通道里的货梯，按钮上只有一个『H』。"
+    }
+  ]
+}

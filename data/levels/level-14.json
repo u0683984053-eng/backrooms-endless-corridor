@@ -102,6 +102,13 @@
       "hidden": true,
       "danger": false,
       "description": "树林尽头一座玻璃温室，阳光透过穹顶——绿色的香气从门缝里溢出来。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-231",
+      "hidden": true,
+      "danger": false,
+      "description": "田野里一口枯井——你滑下去，落在深夜的游乐场。"
     }
   ]
 }

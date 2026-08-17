@@ -1,0 +1,96 @@
+{
+  "id": "level-22",
+  "name": "Level 22 — 无尽走廊酒店",
+  "number": 22,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "rooms",
+  "aesthetic": "traumacore",
+  "light": "dim",
+  "sanDrain": 0.06,
+  "description": "一条永远走不到头的酒店走廊：暗红色的地毯，暖黄色的壁灯，两侧是数不清的房间门。每扇门后面都是另一条几乎相同的走廊——或者一间住着什么东西的房间。",
+  "palette": {
+    "primary": "#8a4e42",
+    "secondary": "#5c342e",
+    "accent": "#2e1c18",
+    "light": "#e8b8a0"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 10,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "wallpaper",
+    "floorStyle": "carpet",
+    "extraFeatures": [
+      "doors",
+      "furniture",
+      "posters",
+      "puddles"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "partygoer",
+      "density": 0.004,
+      "aggression": "hostile"
+    },
+    {
+      "type": "faceling",
+      "density": 0.005,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note",
+    "key"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "一扇半开的房门——里面摆着一桌没动过的晚餐，两只椅子，桌上有两套餐具。椅子上没有人，但餐具是湿的。",
+      "sanityEffect": -4,
+      "note": "一间摆着两人晚餐的空房间。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "走廊尽头的壁灯电流声",
+      "地毯上不知谁的脚步声"
+    ],
+    "startles": [
+      "你经过的一扇门突然从里面被敲响",
+      "走廊尽头闪过一个人影，随即消失"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "door",
+      "target": "level-5",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇标着『5』的房间门——推开，是熟悉的酒店大堂。"
+    },
+    {
+      "kind": "elevator",
+      "target": "level-hub",
+      "hidden": true,
+      "danger": false,
+      "description": "走廊尽头的员工电梯，按钮亮着『H』。"
+    }
+  ]
+}

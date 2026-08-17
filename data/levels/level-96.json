@@ -1,0 +1,98 @@
+{
+  "id": "level-96",
+  "name": "Level 96 — 办公楼",
+  "number": 96,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "mixed",
+  "aesthetic": "liminal",
+  "light": "bright",
+  "sanDrain": 0.05,
+  "description": "无尽延伸的办公楼：灰色隔间、空调的嗡鸣、日光灯管的白光。桌上有没喝完的咖啡和没关机的电脑，屏幕上停着你离开那天的文档。这里的安静不是没有人，而是所有人都在你进来之前离开了。",
+  "palette": {
+    "primary": "#9a9a94",
+    "secondary": "#6a6a64",
+    "accent": "#3e3e3a",
+    "light": "#e8e8e0"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 12,
+    "roomSizeMin": 4,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "drywall",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "furniture",
+      "counters",
+      "papers",
+      "doors",
+      "columns"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "insanity",
+      "density": 0.004,
+      "aggression": "hostile"
+    },
+    {
+      "type": "scratcher",
+      "density": 0.003,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note",
+    "key"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "白板上的日程表：『周一：开周会。周二：开周会。周三：开周会。周四：开周会。周五：找到出去的路。周六：……』后面的字被水渍晕开了。",
+      "sanityEffect": -3,
+      "note": "白板日程：周五写着『找到出去的路』。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "空调管道的气流声",
+      "电脑风扇的转动声"
+    ],
+    "startles": [
+      "某台打印机突然吐出一张全黑的纸",
+      "隔间里传来椅子转动的声音"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-4",
+      "hidden": true,
+      "danger": false,
+      "description": "电梯间的一面墙——你穿过去，是另一栋办公楼的走廊。"
+    },
+    {
+      "kind": "stairwell",
+      "target": "level-34",
+      "hidden": true,
+      "danger": false,
+      "description": "消防楼梯盘旋而下，尽头的门缝透出昏黄的光。"
+    }
+  ]
+}

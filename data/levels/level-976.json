@@ -1,0 +1,79 @@
+{
+  "id": "level-976",
+  "name": "Level 976 — 极简室",
+  "number": 976,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "rooms",
+  "aesthetic": "weirdcore",
+  "light": "bright",
+  "sanDrain": 0.02,
+  "description": "一间又一间几乎完全相同的白色房间：一张床、一盏灯、一扇门。没有灰尘，没有声音，没有任何多余的东西。有人在这里住过——床单上有长期躺过的褶皱，但褶皱的形状不像人类。",
+  "palette": {
+    "primary": "#e0e0da",
+    "secondary": "#b0b0aa",
+    "accent": "#787872",
+    "light": "#ffffff"
+  },
+  "terrain": {
+    "width": 24,
+    "height": 24,
+    "roomCount": 7,
+    "roomSizeMin": 5,
+    "roomSizeMax": 9,
+    "corridorWidth": 2,
+    "wallStyle": "drywall",
+    "floorStyle": "tile",
+    "extraFeatures": [
+      "doors",
+      "furniture"
+    ],
+    "infinite": false
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "note"
+  ],
+  "itemDensity": 0.014,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "center",
+      "text": "房间正中的床上放着一本翻开的日记，最后一行写着：『它每天睡八小时。它从不起床。』",
+      "sanityEffect": -4,
+      "note": "日记最后一页：它每天睡八小时。它从不起床。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "绝对的安静",
+      "偶尔极轻的开关门声"
+    ],
+    "startles": [
+      "你身后的灯突然暗了一瞬",
+      "床单的褶皱在你眨眼的瞬间改变了形状"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-0.1",
+      "hidden": true,
+      "danger": false,
+      "description": "墙壁与天花板的接缝——你挤过去，掉进一片黄色墙纸的走廊。"
+    },
+    {
+      "kind": "door",
+      "target": "level-hub",
+      "hidden": false,
+      "danger": false,
+      "description": "一扇没有门牌的白色门，打开是亮着暖光的房间。"
+    }
+  ]
+}

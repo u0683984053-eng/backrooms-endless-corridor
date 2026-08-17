@@ -1,0 +1,95 @@
+{
+  "id": "level-231",
+  "name": "Level 231 — 永夜公园",
+  "number": 231,
+  "category": "normal",
+  "difficultyClass": 3,
+  "environment": "outdoors",
+  "aesthetic": "dreamcore",
+  "light": "pitch",
+  "sanDrain": 0.09,
+  "description": "一座永远停留在深夜的公园。游乐设施在黑暗中静静矗立，秋千在没有风的情况下轻轻晃动，路灯只照亮灯下的一小圈地面。远处的黑暗中，有什么东西在模仿孩子的笑声。",
+  "palette": {
+    "primary": "#2e3a4a",
+    "secondary": "#1c2430",
+    "accent": "#4a5a6a",
+    "light": "#8a9ab0"
+  },
+  "terrain": {
+    "width": 36,
+    "height": 36,
+    "roomCount": 6,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "brick",
+    "floorStyle": "grass",
+    "extraFeatures": [
+      "furniture",
+      "plants",
+      "puddles",
+      "fountain"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "smiler",
+      "density": 0.005,
+      "aggression": "hostile"
+    },
+    {
+      "type": "moth",
+      "density": 0.006,
+      "aggression": "passive"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.016,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "秋千还在自己荡。你走近时它慢慢停了下来——像是不想被你看见它刚才在动。",
+      "sanityEffect": -4,
+      "note": "秋千在自己荡，走近时停了。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "夜风穿过树梢",
+      "远处游乐设施金属的吱呀声"
+    ],
+    "startles": [
+      "秋千链子突然绷紧的声音",
+      "黑暗中传来一声不属于任何孩子的轻笑"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-9",
+      "hidden": true,
+      "danger": false,
+      "description": "公园铁门的缝隙——另一边是亮着路灯的街道。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-14",
+      "hidden": true,
+      "danger": false,
+      "description": "滑梯底部的阴影——你滑下去，落进一片被月光照亮的田野。"
+    }
+  ]
+}

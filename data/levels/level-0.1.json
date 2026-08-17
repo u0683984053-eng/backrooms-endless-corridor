@@ -105,6 +105,13 @@
       "hidden": true,
       "danger": true,
       "description": "一段更深的楼梯，扶手结了霜。楼下没有光，只有极低的气温。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-976",
+      "hidden": true,
+      "danger": false,
+      "description": "一面特别白的墙——穿过去，是一间极简的房间。"
     }
   ]
 }

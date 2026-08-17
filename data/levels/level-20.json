@@ -1,0 +1,102 @@
+{
+  "id": "level-20",
+  "name": "Level 20 — 仓库深处",
+  "number": 20,
+  "category": "normal",
+  "difficultyClass": 3,
+  "environment": "industrial",
+  "aesthetic": "liminal",
+  "light": "flickering",
+  "sanDrain": 0.08,
+  "description": "比 Level 19 更深的仓库：货柜如山堆积，通道狭窄而曲折，荧光灯忽明忽暗。这里的灰尘很厚，厚到踩上去没有声音——所以当你听见脚步声时，那一定不是你的。",
+  "palette": {
+    "primary": "#7a7f7a",
+    "secondary": "#4c514c",
+    "accent": "#2e332e",
+    "light": "#c8c8b8"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 10,
+    "roomSizeMin": 4,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "metal",
+    "floorStyle": "concrete",
+    "extraFeatures": [
+      "crates",
+      "shelves",
+      "columns",
+      "wires",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "clump",
+      "density": 0.005,
+      "aggression": "curious"
+    },
+    {
+      "type": "duller",
+      "density": 0.006,
+      "aggression": "passive"
+    },
+    {
+      "type": "skin-stealer",
+      "density": 0.002,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.022,
+  "setPieces": [
+    {
+      "type": "corpse",
+      "position": "random",
+      "text": "货柜缝隙里蜷着一具干枯的尸体，手里攥着一把生锈的钥匙。",
+      "sanityEffect": -6,
+      "note": "一具尸体，手里攥着钥匙。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "荧光灯嗡鸣",
+      "金属货柜热胀冷缩的咔哒声"
+    ],
+    "startles": [
+      "某处货柜轰然倒塌，扬起的灰尘让你咳嗽",
+      "身后很近的地方传来一声呼吸"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-19",
+      "hidden": true,
+      "danger": false,
+      "description": "货柜之间的缝隙——钻过去，是稍亮一些的仓库。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-1",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇锈蚀的防火门，门后隐约是开阔的大厅。"
+    }
+  ]
+}

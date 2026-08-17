@@ -120,6 +120,13 @@
       "hidden": true,
       "danger": false,
       "description": "厨房冷藏室的金属门内侧用油漆写着『RUN』。推开门，是红色走廊和警报声。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-96",
+      "hidden": true,
+      "danger": false,
+      "description": "一堵假墙——墙后是日光灯下的隔间海洋。"
     }
   ]
 }

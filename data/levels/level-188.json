@@ -1,0 +1,79 @@
+{
+  "id": "level-188",
+  "name": "Level 188 — 密室",
+  "number": 188,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "rooms",
+  "aesthetic": "weirdcore",
+  "light": "bright",
+  "sanDrain": 0.03,
+  "description": "一间又一间窄小的白色房间。房间与房间之间只隔着薄薄的墙和一扇扇白门。这里的空间比外面看起来小得多——你总觉得把门关上后，房间会再缩小一点。",
+  "palette": {
+    "primary": "#d8d8d0",
+    "secondary": "#a8a8a0",
+    "accent": "#70706a",
+    "light": "#ffffff"
+  },
+  "terrain": {
+    "width": 26,
+    "height": 26,
+    "roomCount": 10,
+    "roomSizeMin": 3,
+    "roomSizeMax": 6,
+    "corridorWidth": 2,
+    "wallStyle": "drywall",
+    "floorStyle": "tile",
+    "extraFeatures": [
+      "doors",
+      "stairwell"
+    ],
+    "infinite": false
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "note"
+  ],
+  "itemDensity": 0.016,
+  "setPieces": [
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "门背后有人用铅笔写着一行小字：『把门关好。它不喜欢开着的门。』",
+      "sanityEffect": -2,
+      "note": "门后小字：把门关好。它不喜欢开着的门。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "空调的冷风声",
+      "房间另一边传来的开关门声"
+    ],
+    "startles": [
+      "你刚关上的门，在你身后又轻轻打开了",
+      "天花板上传来玻璃珠滚动的声音"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-205",
+      "hidden": true,
+      "danger": false,
+      "description": "一面贴满胶带的墙——撕开胶带，后面是红砖房。"
+    },
+    {
+      "kind": "door",
+      "target": "level-976",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇特别干净的白门，门缝里是更白的光。"
+    }
+  ]
+}

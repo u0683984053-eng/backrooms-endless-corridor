@@ -142,6 +142,13 @@
       "hidden": true,
       "danger": false,
       "description": "一栋办公楼的地下车库入口，坡道通向昏暗的停车场。"
+    },
+    {
+      "kind": "door",
+      "target": "level-555",
+      "hidden": true,
+      "danger": false,
+      "description": "街角超市的自动门——里面永远亮着惨白的灯。"
     }
   ]
 }

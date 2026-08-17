@@ -43,6 +43,15 @@ export const LEVEL_IDS = [
   // 全面优化新增（Fandom 经典层）
   'level-19',
   'level-205',
+  // 第二轮新增（Fandom 经典层）
+  'level-15',
+  'level-20',
+  'level-22',
+  'level-96',
+  'level-188',
+  'level-231',
+  'level-555',
+  'level-976',
 ];
 
 /** 默认值（合并时逐字段覆盖，保证任何残缺 DNA 都能得到完整结构） */

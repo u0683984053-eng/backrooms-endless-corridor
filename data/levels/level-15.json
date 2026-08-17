@@ -1,0 +1,84 @@
+{
+  "id": "level-15",
+  "name": "Level 15 — 无尽楼梯间",
+  "number": 15,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "corridors",
+  "aesthetic": "weirdcore",
+  "light": "bright",
+  "sanDrain": 0.04,
+  "description": "无尽的白墙楼梯间。楼梯向上延伸、向下延伸，永远看不到尽头。灯光是明亮的白色，空气干燥而安静——这里没有实体，只有你爬楼梯的脚步声和越来越重的喘息。",
+  "palette": {
+    "primary": "#c8c8c0",
+    "secondary": "#9a9a92",
+    "accent": "#6a6a64",
+    "light": "#f0f0e8"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 10,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "drywall",
+    "floorStyle": "concrete",
+    "extraFeatures": [
+      "stairwell",
+      "elevator",
+      "doors",
+      "wires"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.018,
+  "setPieces": [
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "墙上的灭火器箱被撬开了，里面没有灭火器，只有一张字条：『我数到了第 1314 级台阶。它还在往下。』",
+      "sanityEffect": -3,
+      "note": "字条：我数到了第 1314 级台阶。它还在往下。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "楼梯间的回音",
+      "远处某扇门轻轻关上"
+    ],
+    "startles": [
+      "头顶传来一声闷响，像有人跺了一下脚",
+      "电梯门在你身后开了——里面没有人"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "stairwell",
+      "target": "level-14",
+      "hidden": true,
+      "danger": false,
+      "description": "一段向下延伸的楼梯，尽头透出草地的气味。"
+    },
+    {
+      "kind": "elevator",
+      "target": "level-hub",
+      "hidden": true,
+      "danger": false,
+      "description": "一部亮着灯的电梯，门缝里是温暖的房间光。"
+    }
+  ]
+}

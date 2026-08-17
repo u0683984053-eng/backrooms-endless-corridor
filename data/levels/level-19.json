@@ -84,6 +84,13 @@
       "hidden": true,
       "danger": false,
       "description": "一堵墙的接缝处，透过它能看见亮着灯的房间。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-20",
+      "hidden": true,
+      "danger": false,
+      "description": "货架深处的暗门——通往更暗、更深的仓库。"
     }
   ]
 }

@@ -73,6 +73,13 @@
       "hidden": false,
       "danger": false,
       "description": "一扇亮着暖光的门，正常得可疑。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-188",
+      "hidden": true,
+      "danger": false,
+      "description": "红砖墙的裂缝——挤进去，是一间白色小房。"
     }
   ]
 }

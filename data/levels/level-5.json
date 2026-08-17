@@ -130,6 +130,20 @@
       "hidden": true,
       "danger": false,
       "description": "消防通道的尽头有一道泳池入口，门缝里透出柔和的水光。"
+    },
+    {
+      "kind": "stairwell",
+      "target": "level-15",
+      "hidden": true,
+      "danger": false,
+      "description": "员工楼梯间——往上走，楼梯永远没有尽头。"
+    },
+    {
+      "kind": "door",
+      "target": "level-22",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇没锁的员工通道门——门后是同一条走廊，只是更长。"
     }
   ]
 }
