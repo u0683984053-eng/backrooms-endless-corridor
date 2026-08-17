@@ -645,6 +645,14 @@ body {
   background: #4a4230;
 }
 
+/* 奔跑模式等切换型按钮：开启时高亮 */
+.pad-btn.active {
+  background: #8a7a3a;
+  border-color: #c8b46a;
+  color: #fff8d8;
+  box-shadow: 0 0 8px rgba(200, 180, 106, 0.4);
+}
+
 #dpad .dpad-center {
   background: rgba(200, 180, 106, 0.22);
   border-color: #8a7a3a;

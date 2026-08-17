@@ -2426,6 +2426,14 @@ function wireButtons() {
   });
 
   // 触屏控制：十字方向键（按下即走 + 长按连续移动）+ 动作键（点击）
+  // 奔跑模式：点按方向键=奔跑（2 格），长按仍为安全行走
+  let runMode = false;
+  const runBtn = document.querySelectorAll('#action-pad [data-act="run"]')[0];
+  const setRunMode = (on) => {
+    runMode = on;
+    if (runBtn) runBtn.classList.toggle('active', on);
+    renderEvents([{ text: on ? '奔跑模式开启：点按方向键将奔跑 2 格（长按仍为行走）' : '奔跑模式关闭。', kind: 'system' }]);
+  };
   document.querySelectorAll('#touch-pad .pad-btn').forEach((btn) => {
     // 长按不弹系统菜单
     btn.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -2433,7 +2441,8 @@ function wireButtons() {
       const DIRS = { up: { dx: 0, dy: -1 }, down: { dx: 0, dy: 1 }, left: { dx: -1, dy: 0 }, right: { dx: 1, dy: 0 } };
       const d = DIRS[btn.dataset.dir];
       let holdTimer = null;
-      const move = () => safeRun(() => doAction({ type: 'move', dx: d.dx, dy: d.dy }));
+      const stepOnce = () => safeRun(() => doAction(runMode ? { type: 'run', dx: d.dx, dy: d.dy } : { type: 'move', dx: d.dx, dy: d.dy }));
+      const stepHold = () => safeRun(() => doAction({ type: 'move', dx: d.dx, dy: d.dy }));
       const stopHold = () => {
         if (holdTimer) {
           clearInterval(holdTimer);
@@ -2452,17 +2461,34 @@ function wireButtons() {
       btn.addEventListener(downEv, (e) => {
         if (e.preventDefault) e.preventDefault();
         closeOpenModals(); // 弹窗打开时先关掉，避免遮罩挡住按键
-        move();
-        holdTimer = setInterval(move, 170);
+        stepOnce();
+        holdTimer = setInterval(stepHold, 170);
       });
       for (const ev of upEvs) btn.addEventListener(ev, stopHold);
     } else if (btn.dataset.act) {
-      const acts = { rest: { type: 'rest' }, search: { type: 'interact' }, light: { type: 'light' }, log: { type: 'log' }, exit: { type: 'exit' }, fight: { type: 'fight' } };
+      const acts = {
+        rest: { type: 'rest' },
+        search: { type: 'interact' },
+        light: { type: 'light' },
+        log: { type: 'log' },
+        exit: { type: 'exit' },
+        fight: { type: 'fight' },
+        map: { type: 'map' },
+        help: { type: 'help' },
+        run: { type: 'run' },
+      };
       const a = acts[btn.dataset.act];
       btn.addEventListener('click', () => {
         if (a.type === 'log') {
           fillLogModal();
           showOverlay('log-modal');
+        } else if (a.type === 'map') {
+          drawMapModal();
+          showOverlay('map-modal');
+        } else if (a.type === 'help') {
+          showOverlay('help-modal');
+        } else if (a.type === 'run') {
+          setRunMode(!runMode);
         } else {
           closeOpenModals(); // 弹窗打开时先关掉，避免遮罩挡住按键
           safeRun(() => doAction(a));
