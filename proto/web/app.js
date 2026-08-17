@@ -1794,7 +1794,7 @@ function renderBestiary(c) {
       return `<div class="beast-line"><span class="beast-emoji">${b.emoji || '❓'}</span><b>${escapeHtml(b.name)}</b> — 目击 ${b.seen} 次<span class="beast-desc">${escapeHtml(b.desc || '')}</span></div>`;
     })
     .join('');
-  return `<div class="codex-summary"><div class="cs-title">实体图鉴（${keys.length}/13）</div>${lines}</div>`;
+  return `<div class="codex-summary"><div class="cs-title">实体图鉴（${keys.length}/${Object.keys(ENTITY_DEFS).length}）</div>${lines}</div>`;
 }
 
 /** 画布自适应：canvas 像素 = 父容器(#view)像素，显示 1:1 铺满可用区域（任何设备都不变形、不留黑边） */
@@ -1848,11 +1848,13 @@ function fillLogModal() {
   const levelNames = Object.keys(c.levels || {})
     .map((id) => c.levels[id].name || id)
     .join('、');
+  const st = (game && game.stats) || {};
   $('log-body').innerHTML =
     `<div class="codex-summary">` +
     `<div class="cs-title">行记 Codex</div>` +
     `<div class="cs-line">已发现 ${Object.keys(c.levels || {}).length} 个层级：${levelNames || '仅 Level 0'}</div>` +
     `<div class="cs-line">笔记 ${(c.notes || []).length} 条 · 死亡 ${(c.deaths || []).length} 次 · 成就 ${(game.achievements ? game.achievements.size : 0)}/${ACHIEVEMENTS.length} 个</div>` +
+    `<div class="cs-line">统计：回合 ${(game && game.turn) || 0} · 移动 ${st.movesTotal || 0} 格 · 击杀 ${st.kills || 0} · 场景 ${st.scenesSeen || 0} · 无人机 ${st.dronesUsed || 0} · 手枪击杀 ${st.pistolKills || 0} · 黑暗回合 ${st.darkTurns || 0}</div>` +
     (c.notes && c.notes.length
       ? `<div class="cs-notes">${c.notes.map((n) => `「${escapeHtml(String(n))}」`).join(' ')}</div>`
       : '') +

@@ -7,7 +7,7 @@ import path from 'node:path';
 import { loadLevels, LEVEL_IDS, mutateDna } from './engine/dna.js';
 import { generateLevel, verifyReachable, createInfiniteLevel, tileAt, CHUNK, WALKABLE_TILES, nearestExitInfo, COMPASS_ARROWS, angleToArrow, trimChunkCache } from './engine/generator.js';
 import { hashString } from './engine/rng.js';
-import { createGame, step, enterLevel, playerVisibleTiles, serializeState, deserializeState } from './engine/game.js';
+import { createGame, step, enterLevel, playerVisibleTiles, serializeState, deserializeState, ACHIEVEMENTS } from './engine/game.js';
 import { viewRadiusOf } from './engine/player.js';
 import { ENTITY_DEFS } from './engine/entities.js';
 
@@ -927,6 +927,53 @@ section('5.8 新实体：潜伏 / 缓慢追踪 / 雾中闪现');
     // 无限层生成包含新实体（level-2 激活集）
     const lv2 = createInfiniteLevel(levels['level-2'], 7);
     check('level-2 无限层生成含新实体', lv2.entities.some((e) => ['dweller', 'vapor'].includes(e.type)), lv2.entities.map((e) => e.type).join(','));
+  }
+}
+
+// ---------- 5.9 统计计数与新成就 ----------
+section('5.9 统计计数与新成就');
+{
+  const st = createGame({ levels, seed: 41, startLevel: 'level-5' });
+  st.entities = [
+    { x: st.player.x + 1, y: st.player.y, type: 'moth', hp: 3, aggression: 'passive', state: 'idle', visible: true, alert: false, wait: 0, revealed: false },
+  ];
+  step(st, { type: 'fight' }); // 击杀 1
+  step(st, { type: 'move', dx: 0, dy: 0 }); // 移动 1（原地，不计）
+  step(st, { type: 'move', dx: 1, dy: 0 }); // 移动 1
+  check('击杀计数', st.stats.kills === 1, `kills=${st.stats.kills}`);
+  check('移动计数', st.stats.movesTotal >= 1, `moves=${st.stats.movesTotal}`);
+  // 场景计数（触发一个场景）
+  const sp0 = st.level.setPieces[0];
+  if (sp0) {
+    st.player.x = sp0.x + 1;
+    st.player.y = sp0.y;
+    step(st, { type: 'search' });
+    check('场景触发计数', (st.stats.scenesSeen || 0) >= 1, `scenes=${st.stats.scenesSeen}`);
+  }
+  // 无人机计数
+  st.player.inventory.push('drone');
+  step(st, { type: 'use', item: 'drone' });
+  check('无人机使用计数', st.stats.dronesUsed === 1, `drones=${st.stats.dronesUsed}`);
+  // 手枪击杀
+  const st2 = createGame({ levels, seed: 43, startLevel: 'level-5' });
+  st2.player.weapon = 'pistol';
+  st2.player.inventory.push('ammo');
+  st2.entities = [
+    { x: st2.player.x + 1, y: st2.player.y, type: 'moth', hp: 30, aggression: 'passive', state: 'idle', visible: true, alert: false, wait: 0, revealed: false },
+  ];
+  step(st2, { type: 'fight' });
+  check('手枪击杀计数', (st2.stats.pistolKills || 0) >= 1, `pistolKills=${st2.stats.pistolKills}`);
+  // 黑暗回合计数
+  const st3 = createGame({ levels, seed: 45, startLevel: 'level-6' }); // level-6 pitch
+  step(st3, { type: 'search' });
+  check('黑暗回合计数', (st3.stats.darkTurns || 0) >= 1, `darkTurns=${st3.stats.darkTurns}`);
+  // 新成就存在且可解锁
+  const ids = ACHIEVEMENTS.map((a) => a.id);
+  check('8 个新成就已注册', ['gifted', 'scout', 'gunslinger', 'ghost', 'scene-collector', 'marathon', 'night-owl', 'survivor-500'].every((i) => ids.includes(i)));
+  const stG = createGame({ levels, seed: 47 });
+  if (stG.player.talent) {
+    step(stG, { type: 'search' });
+    check('天选之人成就解锁', stG.achievements.has('gifted'));
   }
 }
 

@@ -201,6 +201,14 @@ export const ACHIEVEMENTS = [
   { id: 'hub-visitor', name: '中转站', desc: '发现枢纽（The Hub）。', test: (s) => (s.stats.visited['level-hub'] || 0) > 0 },
   { id: 'codex-24', name: '行记圆满', desc: '发现 28 个层级。你见过的后室，比大多数人想象的都多。', test: (s) => Object.keys(s.codex.levels || {}).length >= 28 },
   { id: 'codex-40', name: '资深行客', desc: '发现 36 个层级。你几乎走遍了所有已知的后室。', test: (s) => Object.keys(s.codex.levels || {}).length >= 36 },
+  { id: 'gifted', name: '天选之人', desc: '坠入后室时带着天赋。', test: (s) => !!s.player.talent },
+  { id: 'scout', name: '无人机操作员', desc: '放飞 3 台无人机。', test: (s) => (s.stats.dronesUsed || 0) >= 3 },
+  { id: 'gunslinger', name: '神枪手', desc: '用手枪击杀 3 个实体。', test: (s) => (s.stats.pistolKills || 0) >= 3 },
+  { id: 'ghost', name: '屠夫', desc: '击杀 5 个实体。', test: (s) => (s.stats.kills || 0) >= 5 },
+  { id: 'scene-collector', name: '场景收藏家', desc: '触发 10 个场景。', test: (s) => (s.stats.scenesSeen || 0) >= 10 },
+  { id: 'marathon', name: '长途跋涉', desc: '累计移动 500 格。', test: (s) => (s.stats.movesTotal || 0) >= 500 },
+  { id: 'night-owl', name: '夜行者', desc: '在黑暗层级累计度过 100 回合。', test: (s) => (s.stats.darkTurns || 0) >= 100 },
+  { id: 'survivor-500', name: '久居者', desc: '存活 500 回合。', test: (s) => s.turn >= 500 },
   { id: 'naturalist', name: '博物学家', desc: '目击全部 16 种实体。你是活的图鉴。', test: (s) => Object.keys((s.codex && s.codex.bestiary) || {}).length >= 16 },
 ];
 
@@ -447,6 +455,11 @@ function endTurn(state, events) {
 
   // 体力自然回复
   player.stamina = Math.min(player.staminaMax || 100, player.stamina + 2);
+
+  // 夜行者成就计数：黑暗层级累计回合
+  if (level.light === 'dark' || level.light === 'pitch') {
+    state.stats.darkTurns = (state.stats.darkTurns || 0) + 1;
+  }
 
   // 自愈体质天赋：每回合 +1 生命
   if (talent === 'healer') {

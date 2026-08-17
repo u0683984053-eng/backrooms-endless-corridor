@@ -496,6 +496,7 @@ function tryMove(state, world, dx, dy, events, opts) {
     triggerSetPieces(state, events, 0);
   }
 
+  if (moved > 0) state.stats.movesTotal = (state.stats.movesTotal || 0) + moved;
   return moved > 0;
 }
 
@@ -509,8 +510,10 @@ function triggerSetPieces(state, events, radius) {
     const d = Math.abs(sp.x - player.x) + Math.abs(sp.y - player.y);
     if (d <= radius) {
       seen.add(i);
+      state.stats.scenesSeen = (state.stats.scenesSeen || 0) + 1;
+      if ((sp.sanityEffect || 0) <= -50) state.stats.fatalScenes = (state.stats.fatalScenes || 0) + 1;
       if (sp.sanityEffect) {
-        player.sanity = Math.max(0, Math.min(100, player.sanity + sp.sanityEffect));
+        player.sanity = Math.max(0, Math.min(player.sanityMax || 100, player.sanity + sp.sanityEffect));
         events.push({
           text: `【场景】${sp.text}（理智 ${sp.sanityEffect > 0 ? '+' : ''}${sp.sanityEffect}）`,
           kind: 'sanity',
@@ -600,6 +603,8 @@ function doFight(state, world, events) {
   state.lastNoise = { level: 3, x: player.x, y: player.y };
 
   if (target.hp <= 0) {
+    state.stats.kills = (state.stats.kills || 0) + 1;
+    if (player.weapon === 'pistol') state.stats.pistolKills = (state.stats.pistolKills || 0) + 1;
     events.push({ text: `你杀死了${def.name || target.type}！`, kind: 'combat' });
     target.hp = 0;
     // 冷酷天赋：击杀恢复理智
@@ -695,6 +700,7 @@ function useItem(state, world, events, itemName, invIdx) {
       // 无人机：自动游走探索——从玩家位置出发贪心游走最多 24 步（未探索格优先），
       // 沿途记录每步 3×3 视野（补全地图）、标记发现的实体，随后返回并报告。一次性。
       player.inventory.splice(invIdx, 1);
+      state.stats.dronesUsed = (state.stats.dronesUsed || 0) + 1;
       const set = state.explored[state.levelId] || (state.explored[state.levelId] = new Set());
       const before = set.size;
       const foundNames = new Set();
