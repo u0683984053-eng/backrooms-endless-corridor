@@ -1,0 +1,118 @@
+{
+  "id": "level-118",
+  "name": "Level 118 — 废弃学校",
+  "number": 118,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "rooms",
+  "aesthetic": "kidcore",
+  "light": "flickering",
+  "sanDrain": 0.05,
+  "description": "一座废弃的学校：走廊里贴着手工海报，黑板上还留着半截板书，课桌整整齐齐。铃声每隔一会儿响一次——但学校里只有你。你路过教室时，最后一排的座位上，有一个书包。刚才还没有的。",
+  "palette": {
+    "primary": "#c8b878",
+    "secondary": "#8a7a4e",
+    "accent": "#e8786a",
+    "light": "#f0e8c8"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 12,
+    "roomSizeMin": 4,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "wallpaper",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "furniture",
+      "counters",
+      "papers",
+      "posters",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "faceling",
+      "density": 0.006,
+      "aggression": "curious"
+    },
+    {
+      "type": "scratcher",
+      "density": 0.004,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note",
+    "key"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "最后一排的座位上有一个书包，拉链开着。里面是一张作业本，每一页都写着同一个名字——你的名字。字迹很用力，力透纸背。",
+      "sanityEffect": -5,
+      "note": "书包里的作业本写着我的名字。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "黑板上留着半截板书：『今天我们要学习：为什么走廊的尽头永远是教室。』下面的日期是三十年前。",
+      "sanityEffect": -4,
+      "note": "板书：为什么走廊的尽头永远是教室。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "美术教室的墙上贴满了学生的自画像。每一张都画得歪歪扭扭，但有一张特别端正——画的是一个成年人，穿着老师的衣服，站在教室门口。你走近，画里的人微微侧了一下头。",
+      "sanityEffect": -5,
+      "note": "自画像里有一个穿老师衣服的成年人。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "洗手间的水龙头自己开着，水流得很细。你关上它，转身——身后传来水流声。你回头看，水龙头又开了，这次流的是红色的水。",
+      "sanityEffect": -4,
+      "note": "水龙头关不掉，水是红色的。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "上课铃的回响",
+      "远处教室里的读书声（没有人在读）"
+    ],
+    "startles": [
+      "你路过的一间教室，门从里面被轻轻带上",
+      "走廊尽头传来皮球弹跳的声音"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "door",
+      "target": "level-0.1",
+      "hidden": true,
+      "danger": false,
+      "description": "学校大门的侧门——门后是一段黄色墙纸的走廊。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-31",
+      "hidden": true,
+      "danger": false,
+      "description": "教室后墙的储物柜——你挤进去，落在一间巨大的儿童卧室里。"
+    }
+  ]
+}

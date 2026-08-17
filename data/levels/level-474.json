@@ -1,0 +1,111 @@
+{
+  "id": "level-474",
+  "name": "Level 474 — 无尽图书馆",
+  "number": 474,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "mixed",
+  "aesthetic": "weirdcore",
+  "light": "dim",
+  "sanDrain": 0.04,
+  "description": "一座看不到尽头的图书馆：书架高耸入云，光线从高处的天窗漏下来，灰尘在光柱里慢慢旋转。这里的书全部没有书名，但每一本翻开，都写着同一句话。你合上书，那句话是：『你在找什么？』",
+  "palette": {
+    "primary": "#7a6a4a",
+    "secondary": "#4e4230",
+    "accent": "#b8a878",
+    "light": "#e8d8a8"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 10,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "drywall",
+    "floorStyle": "wood",
+    "extraFeatures": [
+      "shelves",
+      "columns",
+      "papers",
+      "furniture",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "watcher",
+      "density": 0.005,
+      "aggression": "hostile"
+    },
+    {
+      "type": "moth",
+      "density": 0.008,
+      "aggression": "passive"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note",
+    "key"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "书架上一本书的侧面写着你的名字，烫金字体。你抽出来——是一本空白的书，只写着一行字：『第 1 页：你还没有开始读。』",
+      "sanityEffect": -4,
+      "note": "一本写着我的名字的书。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "阅览桌上摊着一本书，翻到某一页：『如果你正在读这句话，请把书放回原位。你已经在这里读过一次了。』",
+      "sanityEffect": -5,
+      "note": "书里写着：你已经在这里读过一次了。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "走廊尽头的阅览室，灯光昏暗。每一张桌子都坐着一个读者，背对着你，安静地翻书。你走近，他们同时停止了翻页——然后同时翻到了下一页。",
+      "sanityEffect": -6,
+      "note": "阅览室里的人同步翻页。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "翻页声的此起彼伏（没有人）",
+      "灰尘落在书脊上的细响"
+    ],
+    "startles": [
+      "某本书从高处书架掉下来，砸在你脚边，翻开的那页是空白的",
+      "身后传来一声极轻的『嘘』"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-4",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇标着『档案室』的门——门后是办公楼的走廊。"
+    },
+    {
+      "kind": "door",
+      "target": "level-98",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇隔音门——门后循环着一首陌生的旋律。"
+    }
+  ]
+}

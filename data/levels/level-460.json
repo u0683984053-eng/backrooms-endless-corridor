@@ -1,0 +1,114 @@
+{
+  "id": "level-460",
+  "name": "Level 460 — 大教堂",
+  "number": 460,
+  "category": "normal",
+  "difficultyClass": 3,
+  "environment": "mixed",
+  "aesthetic": "darkcore",
+  "light": "dark",
+  "sanDrain": 0.08,
+  "description": "一座没有穹顶的大教堂：长椅排列整齐，彩色玻璃窗透不进光，圣坛上点着永远不会燃尽的蜡烛。唱诗班的歌声从管风琴方向传来——那里没有人。你数了数长椅，一共 42 排，最后一排坐着一个人，背对着你，一动不动。",
+  "palette": {
+    "primary": "#4a3a4a",
+    "secondary": "#2e242e",
+    "accent": "#c8a858",
+    "light": "#d8b878"
+  },
+  "terrain": {
+    "width": 34,
+    "height": 34,
+    "roomCount": 8,
+    "roomSizeMin": 5,
+    "roomSizeMax": 9,
+    "corridorWidth": 2,
+    "wallStyle": "brick",
+    "floorStyle": "tile",
+    "extraFeatures": [
+      "columns",
+      "furniture",
+      "fountain",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "watcher",
+      "density": 0.006,
+      "aggression": "hostile"
+    },
+    {
+      "type": "clump",
+      "density": 0.005,
+      "aggression": "curious"
+    },
+    {
+      "type": "vapor",
+      "density": 0.005,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.016,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "圣坛上放着一本翻开的圣经，蜡烛的火苗静止不动。你凑近看，书上没有字——整页只画着一只眼睛。你抬头，穹顶的位置也有一只眼睛，正看着你。",
+      "sanityEffect": -6,
+      "note": "圣经里画着眼睛，穹顶上也有一只。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "长椅背面刻着一行小字，像是忏悔：『我数过蜡烛。一根都没有少。但是烛泪在增加。』",
+      "sanityEffect": -5,
+      "note": "长椅背面：烛泪在增加。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "唱诗班的歌声突然停下。管风琴的琴键自己按了下去——低沉的和弦，然后是一个不存在的音。歌声重新响起，这次混进了一个不属于任何人的声音，在唱你的名字。",
+      "sanityEffect": -6,
+      "note": "唱诗班里有人在唱我的名字。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "唱诗班的歌声（没有人）",
+      "蜡烛燃烧的细微噼啪声"
+    ],
+    "startles": [
+      "一排长椅突然齐刷刷地响了一声，像有人同时坐下",
+      "彩绘玻璃窗的图案在你注视时变成了另一幅"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-36",
+      "hidden": true,
+      "danger": false,
+      "description": "侧门的门缝——外面是雾中的墓园。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-150",
+      "hidden": true,
+      "danger": false,
+      "description": "圣坛后的暗梯——你走下去，落在冰原上。"
+    }
+  ]
+}

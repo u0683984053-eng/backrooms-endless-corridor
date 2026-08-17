@@ -126,6 +126,13 @@
       "hidden": true,
       "danger": false,
       "description": "一面特别白的墙——穿过去，是一间极简的房间。"
+    },
+    {
+      "kind": "door",
+      "target": "level-118",
+      "hidden": true,
+      "danger": false,
+      "description": "走廊尽头一扇写着『教学楼』的门。"
     }
   ]
 }

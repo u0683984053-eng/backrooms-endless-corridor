@@ -173,6 +173,13 @@
       "hidden": true,
       "danger": false,
       "description": "地铁通风口——你滑下去，落在瓷砖隧道里。"
+    },
+    {
+      "kind": "door",
+      "target": "level-975",
+      "hidden": true,
+      "danger": false,
+      "description": "街角一栋庄重的大楼，门牌写着『博物馆』。"
     }
   ]
 }

@@ -1,0 +1,110 @@
+{
+  "id": "level-975",
+  "name": "Level 975 — 博物馆",
+  "number": 975,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "mixed",
+  "aesthetic": "weirdcore",
+  "light": "dim",
+  "sanDrain": 0.04,
+  "description": "一座空旷的博物馆：大理石地面擦得发亮，展柜里的展品在聚光灯下静静陈列。你逛了一圈才发现——所有展品的标签上都写着同一个名字：你。有的展品是你的照片，有的是你的鞋，有的是一截你还没经历过的人生。",
+  "palette": {
+    "primary": "#8a8a9a",
+    "secondary": "#5c5c6a",
+    "accent": "#c8c0a8",
+    "light": "#e8e4d8"
+  },
+  "terrain": {
+    "width": 30,
+    "height": 30,
+    "roomCount": 10,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "drywall",
+    "floorStyle": "tile",
+    "extraFeatures": [
+      "columns",
+      "furniture",
+      "posters",
+      "doors",
+      "fountain"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "watcher",
+      "density": 0.005,
+      "aggression": "hostile"
+    },
+    {
+      "type": "faceling",
+      "density": 0.004,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "展柜里陈列着一张照片，标签写着你的名字。照片里是一个白发老人，坐在同一间博物馆的长椅上，正看着镜头微笑。你低头看了看自己的手——你的手已经和照片里的手一样，布满皱纹。",
+      "sanityEffect": -6,
+      "note": "展柜里的照片是我老了以后。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "展厅入口的导览牌：『开放时间：永续。展品数量：1。参观者：1。』",
+      "sanityEffect": -4,
+      "note": "导览牌：展品 1，参观者 1。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一个空展柜，标签上写着你的名字，下面一行小字：『即将展出。』展柜的玻璃上有手指印，从里面按的。",
+      "sanityEffect": -5,
+      "note": "空展柜：即将展出。玻璃上的指印从里面按的。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "聚光灯的电流声",
+      "远处保安的脚步声（没有保安）"
+    ],
+    "startles": [
+      "你刚走过的展柜，玻璃上多了一个手印",
+      "广播突然响起：『请参观者移步 2 号厅。』——没有 2 号厅"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "door",
+      "target": "level-11",
+      "hidden": true,
+      "danger": false,
+      "description": "博物馆的正门——门外是城市的街道。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-69",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇标着『藏品库』的门——门后是旋转木马的音乐。"
+    }
+  ]
+}

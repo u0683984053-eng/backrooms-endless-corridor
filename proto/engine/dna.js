@@ -74,6 +74,13 @@ export const LEVEL_IDS = [
   'level-330',
   'level-709',
   'level-98',
+  // 核类美学扩充（kidcore / liminal / darkcore）
+  'level-118',
+  'level-41',
+  'level-474',
+  'level-170',
+  'level-460',
+  'level-975',
 ];
 
 /** 默认值（合并时逐字段覆盖，保证任何残缺 DNA 都能得到完整结构） */

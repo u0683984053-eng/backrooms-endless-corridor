@@ -1,0 +1,112 @@
+{
+  "id": "level-170",
+  "name": "Level 170 — 废弃医院",
+  "number": 170,
+  "category": "normal",
+  "difficultyClass": 3,
+  "environment": "mixed",
+  "aesthetic": "traumacore",
+  "light": "flickering",
+  "sanDrain": 0.07,
+  "description": "一座废弃的医院：病床空置但床单有人睡过的痕迹，输液架上的药瓶还是满的，消毒水的味道浓得刺鼻。你路过病房时，床头的呼叫按钮自己亮了一下——是 303 号床。你回头，303 号床是空的。",
+  "palette": {
+    "primary": "#7a8a8a",
+    "secondary": "#4e5c5c",
+    "accent": "#a8b8b8",
+    "light": "#d8e8e8"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 10,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "tile",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "doors",
+      "counters",
+      "furniture",
+      "puddles",
+      "wires"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "mangled",
+      "density": 0.007,
+      "aggression": "hostile"
+    },
+    {
+      "type": "dweller",
+      "density": 0.005,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note",
+    "key"
+  ],
+  "itemDensity": 0.022,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "护士站的呼叫面板上，303 号床的灯一直亮着。你按下它——整层楼的灯闪了一下，然后 303 的灯灭了，你面前的这盏灯亮了。",
+      "sanityEffect": -5,
+      "note": "呼叫面板的灯，最终落在了我面前。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "药房的门上贴着医嘱，字迹潦草：『病人姓名：未知。症状：正在忘记自己来过。用药：无。疗效：正在起效。』",
+      "sanityEffect": -5,
+      "note": "医嘱：正在忘记自己来过。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "手术室的灯自己亮了。无影灯下的手术台上躺着一个被白布盖住的人形。你掀开一角——里面是另一层白布。再掀，还有。一共七层，最后一层下面什么都没有。",
+      "sanityEffect": -6,
+      "note": "手术台上七层白布，最下面什么都没有。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "心电监护仪的滴答声（没有接电源）",
+      "远处轮椅的轱辘声"
+    ],
+    "startles": [
+      "某间病房的门自己关上了，门锁咔哒一声",
+      "输液架倒地，玻璃瓶碎了一地"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-100",
+      "hidden": true,
+      "danger": false,
+      "description": "太平间的门——门后是停尸间。"
+    },
+    {
+      "kind": "elevator",
+      "target": "level-33",
+      "hidden": true,
+      "danger": false,
+      "description": "一部电梯，灯坏了，按钮摸上去是凉的——它停在黑暗里。"
+    }
+  ]
+}

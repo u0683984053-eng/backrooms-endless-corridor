@@ -105,6 +105,13 @@
       "hidden": true,
       "danger": false,
       "description": "一扇标着『太平间出口』的门，门后是破败的庇护所。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-170",
+      "hidden": true,
+      "danger": false,
+      "description": "停尸间深处的走廊——门后是消毒水的味道。"
     }
   ]
 }

@@ -1,0 +1,112 @@
+{
+  "id": "level-41",
+  "name": "Level 41 — 破败酒店",
+  "number": 41,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "rooms",
+  "aesthetic": "liminal",
+  "light": "dim",
+  "sanDrain": 0.06,
+  "description": "一座年久失修的酒店：地毯褪色发霉，墙纸起泡剥落，电梯门开开合合——里面永远是空的。前台放着一本登记簿，你翻开，最后一页写着：『房客：1 名。房间：全部。退房日期：未定。』",
+  "palette": {
+    "primary": "#6a5a4a",
+    "secondary": "#463a30",
+    "accent": "#8a6a4a",
+    "light": "#c8b090"
+  },
+  "terrain": {
+    "width": 30,
+    "height": 30,
+    "roomCount": 10,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "wallpaper",
+    "floorStyle": "carpet",
+    "extraFeatures": [
+      "doors",
+      "furniture",
+      "puddles",
+      "wires",
+      "elevator"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "dweller",
+      "density": 0.004,
+      "aggression": "curious"
+    },
+    {
+      "type": "partygoer",
+      "density": 0.004,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note",
+    "key"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "走廊尽头的地毯上有一道深色的水渍，形状像一个人趴着。你绕过它，再回头——水渍的位置移动了一点，像它也在绕着你走。",
+      "sanityEffect": -4,
+      "note": "地毯上的水渍在移动。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "某间客房的房门虚掩，门上的请勿打扰牌挂在里面。你推开一条缝——房间中央的椅子上坐着一个人形，被床单盖着。床单的轮廓轻轻起伏。",
+      "sanityEffect": -6,
+      "note": "椅子上被床单盖住的人形在起伏。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "前台的登记簿翻到最后一页：『房客：1 名。房间：全部。退房日期：未定。』字迹是新的，墨水还没干。",
+      "sanityEffect": -4,
+      "note": "登记簿墨水未干：房客 1 名，退房未定。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "电梯门反复开合的声音",
+      "水管里的咕噜声"
+    ],
+    "startles": [
+      "你经过的客房，门缝里透出电视的蓝光，随即熄灭",
+      "走廊深处传来酒店推车的轱辘声"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "elevator",
+      "target": "level-5",
+      "hidden": true,
+      "danger": false,
+      "description": "一部还能用的电梯，按钮上只有一个『5』。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-22",
+      "hidden": true,
+      "danger": false,
+      "description": "地毯翘起的一角——你掀开，下面是另一条红地毯走廊。"
+    }
+  ]
+}

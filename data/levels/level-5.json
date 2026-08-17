@@ -172,6 +172,13 @@
       "hidden": true,
       "danger": false,
       "description": "酒店员工厨房的门——门后是永不熄火的灶台。"
+    },
+    {
+      "kind": "door",
+      "target": "level-41",
+      "hidden": true,
+      "danger": false,
+      "description": "酒店后门的防火通道——门后是褪色地毯的走廊。"
     }
   ]
 }

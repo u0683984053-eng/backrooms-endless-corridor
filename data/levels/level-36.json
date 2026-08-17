@@ -102,6 +102,13 @@
       "hidden": true,
       "danger": false,
       "description": "一口没有井盖的枯井，你滑下去，落在麦田里。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-460",
+      "hidden": true,
+      "danger": false,
+      "description": "墓园尽头矗立着一座教堂的剪影。"
     }
   ]
 }

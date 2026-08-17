@@ -134,6 +134,13 @@
       "hidden": false,
       "danger": false,
       "description": "员工食堂的大门，门缝里飘出食物的香气——但里面从没有人用餐。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-474",
+      "hidden": true,
+      "danger": false,
+      "description": "档案室的书架——你挤进去，书架变成了一排排没有书名的书。"
     }
   ]
 }
