@@ -1,0 +1,95 @@
+{
+  "id": "level-28",
+  "name": "Level 28 — 破损庇护所",
+  "number": 28,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "corridors",
+  "aesthetic": "weirdcore",
+  "light": "flickering",
+  "sanDrain": 0.03,
+  "description": "从血染森林逃出来后，你会到达这里：一间破败的庇护所。墙壁开裂，水从天花板漏下来，但至少这里安静，没有低语。门上的漆写着两行字，一行温柔一行发抖：『你逃出来了=)』『快走，别回头=(』。",
+  "palette": {
+    "primary": "#8a8a7a",
+    "secondary": "#5c5c50",
+    "accent": "#32322a",
+    "light": "#e0e0c8"
+  },
+  "terrain": {
+    "width": 26,
+    "height": 26,
+    "roomCount": 8,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "drywall",
+    "floorStyle": "concrete",
+    "extraFeatures": [
+      "doors",
+      "furniture",
+      "puddles"
+    ],
+    "infinite": false
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "moth",
+      "density": 0.006,
+      "aggression": "passive"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "门上的漆字：『你逃出来了=)』。下面有一行被水泡得模糊的字：『快走，别回头=(』。",
+      "sanityEffect": -2,
+      "note": "庇护所的门上：快走，别回头。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "墙角堆着几双跑烂的鞋。鞋带系得很紧，像主人逃得很急。",
+      "sanityEffect": -2,
+      "note": "墙角堆着几双跑烂的鞋。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "滴水声",
+      "远处隐约的森林风声"
+    ],
+    "startles": [
+      "墙外传来一声极轻的：『留下来吧=）』——像是风，又不像"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "door",
+      "target": "level-hub",
+      "hidden": false,
+      "danger": false,
+      "description": "一扇歪斜的铁门，门缝里是亮着暖光的房间。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-36",
+      "hidden": true,
+      "danger": false,
+      "description": "墙角的裂缝——钻进去，是另一片被雾笼罩的夜色。"
+    }
+  ]
+}

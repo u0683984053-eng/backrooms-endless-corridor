@@ -125,6 +125,13 @@
       "hidden": false,
       "danger": false,
       "description": "通道尽头的门，门缝里透出泳池的水光和回声。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-14",
+      "hidden": true,
+      "danger": true,
+      "description": "地板某处裂开了——你切进去，落进一片猩红色的夜晚森林。"
     }
   ]
 }

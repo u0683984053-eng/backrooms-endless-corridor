@@ -1001,6 +1001,43 @@ section('5.10 新特殊机制：幻影噪音 / 黑暗脉冲');
   check('dark-pulse：理智被侵蚀', st2.player.sanity < 99, `san=${st2.player.sanity}`);
 }
 
+// ---------- 5.11 血染森林（Level 14 重做）：低语机制 / =) 双重视角 / 假出口 ----------
+section('5.11 血染森林：低语侵蚀 / 双重视角场景 / 真假出口');
+{
+  const d14 = levels['level-14'];
+  check('Level 14 已重做为血染森林', d14.name.includes('血染森林'), d14.name);
+  check('难度等级 5（实体横行）', d14.difficultyClass === 5, `dc=${d14.difficultyClass}`);
+  check('含 whisper-drain 机制', (d14.specialMechanisms || []).includes('whisper-drain'));
+  // 双重视角场景：=) 与 =( 并存（全角/半角都可能）
+  const spTexts = (d14.setPieces || []).map((s) => s.text).join('');
+  check('场景含 =) 低语', spTexts.includes('=）') || spTexts.includes('=)'));
+  check('场景含 =( 警告', spTexts.includes('=(') || spTexts.includes('=（'));
+  check('含致命场景（树根）', (d14.setPieces || []).some((s) => (s.sanityEffect || 0) <= -50));
+  // 真假出口
+  const fakeExit = (d14.exits || []).find((e) => e.danger);
+  const realExit = (d14.exits || []).find((e) => !e.danger && e.target === 'level-28');
+  check('假出口存在且标记危险', !!fakeExit && fakeExit.target === 'level-21');
+  check('真出口通往 Level 28（hidden）', !!realExit && realExit.hidden);
+  // whisper-drain：8 回合触发低语 + 理智下降；40 回合后侵蚀加深
+  const st = createGame({ levels, seed: 61, startLevel: 'level-14' });
+  st.player.sanityMax = 100;
+  st.player.sanity = 100;
+  let whisper = 0;
+  for (let i = 0; i < 20; i++) {
+    const res = step(st, { type: 'search' });
+    if (res.events.some((e) => e.text.includes('留下来吧'))) whisper++;
+  }
+  check('whisper-drain：8 回合触发低语（20 回合内 ≥1 次）', whisper >= 1, `低语 ${whisper} 次`);
+  check('whisper-drain：理智被低语侵蚀（<99）', st.player.sanity < 99, `san=${st.player.sanity}`);
+  // Level 28 可玩
+  const l28 = generateLevel(levels['level-28'], 3);
+  check('Level 28 生成且可达', verifyReachable(l28));
+  check('Level 28 有出口', l28.exits.length >= 2, `${l28.exits.length}`);
+  // 入口图：Level 13 地板切入 → 14
+  const l13 = levels['level-13'];
+  check('Level 13 提供入口到 14', (l13.exits || []).some((e) => e.target === 'level-14'));
+}
+
 // ---------- 6. 野性变体（wild 无尽生成） ----------
 section('6. wild 变异：确定性 + 10 个随机种子全部生成可达');
 {

@@ -1,128 +1,146 @@
 {
   "id": "level-14",
-  "name": "Level 14 — 天堂",
+  "name": "Level 14 — 血染森林",
   "number": 14,
   "category": "normal",
-  "difficultyClass": 0,
+  "difficultyClass": 5,
   "environment": "outdoors",
   "aesthetic": "dreamcore",
-  "light": "bright",
-  "sanDrain": 0,
-  "description": "绿色的草地、明亮的阳光、清澈的河流。这里是后室少数没有危险的地方——但正是这种完美让人不安。野餐毯摆好了，秋千在晃，却没有人。你第一次希望这里不是真的。",
+  "light": "dark",
+  "sanDrain": 0.1,
+  "description": "一片夜晚的森林。猩红的草叶沾着潮湿的露水，瀑布在轰鸣，星光无垠——美得不像真的。森林在你耳边低语，让你想留下来。别听她的。土里的客人们曾和你一样，以为这里是天堂。=)",
   "palette": {
-    "primary": "#3a7a4a",
-    "secondary": "#2a5a38",
-    "accent": "#8ac89a",
-    "light": "#e8f0d0"
+    "primary": "#6a2e3a",
+    "secondary": "#3e1c26",
+    "accent": "#24101a",
+    "light": "#e8b8c0"
   },
   "terrain": {
-    "width": 32,
-    "height": 32,
-    "roomCount": 10,
-    "roomSizeMin": 6,
-    "roomSizeMax": 14,
-    "corridorWidth": 3,
-    "wallStyle": "drywall",
+    "width": 40,
+    "height": 40,
+    "roomCount": 6,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "brick",
     "floorStyle": "grass",
-    "extraFeatures": [
-      "fountain",
-      "furniture",
-      "columns"
-    ],
     "topology": "fields",
+    "extraFeatures": [
+      "plants",
+      "furniture",
+      "puddles",
+      "fountain"
+    ],
     "infinite": true
   },
   "spaceRules": [
     "euclidean"
   ],
-  "entities": [],
+  "specialMechanisms": [
+    "whisper-drain"
+  ],
+  "entities": [
+    {
+      "type": "clump",
+      "density": 0.008,
+      "aggression": "curious"
+    },
+    {
+      "type": "smiler",
+      "density": 0.008,
+      "aggression": "hostile"
+    },
+    {
+      "type": "deathmoth",
+      "density": 0.006,
+      "aggression": "hostile"
+    },
+    {
+      "type": "mangled",
+      "density": 0.005,
+      "aggression": "hostile"
+    }
+  ],
   "items": [
     "almond-water",
     "royal-ration",
-    "medkit",
     "battery",
     "flashlight",
+    "crowbar",
+    "medkit",
     "note"
   ],
-  "itemDensity": 0.3,
+  "itemDensity": 0.018,
   "setPieces": [
     {
+      "type": "writing",
+      "position": "random",
+      "text": "树干上刻着一行字，字迹温柔得像在哄人：『这里多好呢，为什么要离开？=）』。刻痕很深，像刻了很多遍。",
+      "sanityEffect": -3,
+      "note": "树干上：这里多好呢，为什么要离开？=）"
+    },
+    {
       "type": "object",
       "position": "random",
-      "text": "河边的草地上铺着一张红白格野餐毯，毯上摆着三明治和果汁，杯壁还挂着水珠。没有人。毯子边缘整整齐齐，连一个脚印都没有。",
+      "text": "一片月光下的空地，土里整齐地埋着几具白骨。它们穿着不同的衣服，表情安详——像睡着了一样。",
       "sanityEffect": -5,
-      "note": "野餐毯摆得整整齐齐，像在等永远不会来的人。"
+      "note": "土里的客人，表情安详。"
     },
     {
-      "type": "object",
-      "position": "center",
-      "text": "一棵大树的枝桠上挂着一架秋千，绳结打得漂亮。你坐上去，它荡得很高，风很暖——你几乎忘了自己在哪里。直到你发现树影的方向和太阳相反。",
-      "sanityEffect": -3,
-      "note": "秋千荡得很高。树影的方向不对。"
-    },
-    {
-      "type": "object",
-      "position": "far-corner",
-      "text": "远处小丘上站着一个黑色的轮廓，一动不动。你转身走开，再回头，它还在那里——和你离开时一样的距离、一样的姿势。你每一次转身，它都在。",
-      "sanityEffect": -8,
-      "note": "远处的人影。每次转身，它都在。"
+      "type": "weird-room",
+      "position": "random",
+      "text": "孩子们排成一列，对着月亮发出嚎叫。你数了数——一共七个。第八个位置空着。",
+      "sanityEffect": -5,
+      "note": "七个孩子对着月亮嚎叫，第八个位置空着。"
     },
     {
       "type": "object",
       "position": "random",
-      "text": "花丛里有一块墓碑，没有名字，只有一行字：『它终于安静了』。",
-      "sanityEffect": -3,
-      "note": "无名墓碑：它终于安静了。"
-    },
-    {
-      "type": "object",
-      "position": "random",
-      "text": "喷泉里的硬币全是同一年份的。你捞起一枚，年份是明年。",
+      "text": "瀑布轰鸣着，水是红色的。你低头看——草叶上的露水也是红的，像血，又像眼泪。",
       "sanityEffect": -4,
-      "note": "喷泉硬币的年份是明年。"
+      "note": "瀑布和露水都是红色的。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "一块石头上用血写着：『快跑！远离那些树！深入森林，逃出去！=(』。字迹在发抖。",
+      "sanityEffect": -3,
+      "note": "石头上：快跑，远离那些树！=("
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "你低头，看见自己的手已经变成半透明的树根，正慢慢地、温柔地扎进土里。她还在低语：「不疼的，我保证=）」",
+      "sanityEffect": -100,
+      "note": "我的手变成了树根，正在扎进土里。"
     }
   ],
   "soundscape": {
     "ambient": [
-      "鸟鸣",
-      "溪水潺潺",
-      "风吹树叶的沙沙声"
+      "森林的低语（像很多人在同时说话）",
+      "瀑布的轰鸣",
+      "孩子们的嚎叫"
     ],
     "startles": [
-      "树枝在身后折断",
-      "远处传来一声模糊的呼唤——像是你的名字",
-      "鸟鸣突然全部停止"
+      "低语突然变得清晰：『留下来吧=）』",
+      "身后的树根破土而出的声音"
     ],
     "silenceEvents": true
   },
   "exits": [
     {
-      "target": "level-0",
       "kind": "noclip",
+      "target": "level-21",
       "hidden": true,
-      "danger": false,
-      "description": "河对岸的草地有一片颜色不对的阴影，像一块贴上去的补丁。你踩进去，脚下变成了发黄的墙纸和潮湿的地毯——你回到了这一切开始的地方。"
-    },
-    {
-      "target": "level-10",
-      "kind": "door",
-      "hidden": false,
       "danger": true,
-      "description": "一扇立在草地上的木门，门框上缠着野花。推开门，是金黄的麦田。你回头，身后只剩草地。"
-    },
-    {
-      "target": "level-922",
-      "kind": "door",
-      "hidden": true,
-      "danger": false,
-      "description": "树林尽头一座玻璃温室，阳光透过穹顶——绿色的香气从门缝里溢出来。"
+      "description": "森林深处一片亮着光的地方——「那里更好，去吧=）」她这样说着。"
     },
     {
       "kind": "hole",
-      "target": "level-231",
+      "target": "level-28",
       "hidden": true,
       "danger": false,
-      "description": "田野里一口枯井——你滑下去，落在深夜的游乐场。"
+      "description": "树根盘错的洞穴，越往里越暗。「别去！往里跑！那里是出口！=(」石头上写着。"
     }
   ]
 }

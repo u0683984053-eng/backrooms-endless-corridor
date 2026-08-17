@@ -126,6 +126,13 @@
       "hidden": true,
       "danger": false,
       "description": "楼梯间的门写着『办公楼』，门后是办公楼的空调风。"
+    },
+    {
+      "kind": "stairwell",
+      "target": "level-922",
+      "hidden": true,
+      "danger": false,
+      "description": "地下三层往下的楼梯——门后是另一座更旧的车库。"
     }
   ]
 }

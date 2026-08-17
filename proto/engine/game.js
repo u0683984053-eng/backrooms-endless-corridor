@@ -467,6 +467,19 @@ function endTurn(state, events) {
     player.sanity = Math.max(0, player.sanity - 1);
     events.push({ text: '黑暗像呼吸一样起伏了一瞬。有什么东西在黑暗里睁开了眼睛（-1 理智）。', kind: 'sanity' });
   }
+  // 特殊机制：whisper-drain（森林低语，Level 14 血染森林）——每 8 回合低语侵蚀
+  // （停留越久侵蚀越强：每 40 回合 +1）；每 24 回合一次"飘走"的加深侵蚀
+  if (mechs.includes('whisper-drain')) {
+    if ((state.turn + 1) % 8 === 0) {
+      const wd = 1 + Math.floor(state.turn / 40);
+      player.sanity = Math.max(0, player.sanity - wd);
+      events.push({ text: `森林在你耳边低语：「留下来吧，多好=）」（-${wd} 理智）`, kind: 'sanity' });
+    }
+    if ((state.turn + 1) % 24 === 0) {
+      player.sanity = Math.max(0, player.sanity - 2);
+      events.push({ text: '你几乎要飘走了。土里的客人们安静地躺着，骨头在月光下闪烁……（-2 理智）', kind: 'sanity' });
+    }
+  }
 
   // 理智：基础侵蚀（心如止水减半 / 无畏 -20%）；安全层（sanDrain<=0.03 且 bright）每回合 +1
   const talent = player.talent;

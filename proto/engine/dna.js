@@ -61,6 +61,8 @@ export const LEVEL_IDS = [
   'level-169',
   'level-400',
   'level-799',
+  // 血染森林（Level 14 重做）新增
+  'level-28',
 ];
 
 /** 默认值（合并时逐字段覆盖，保证任何残缺 DNA 都能得到完整结构） */
