@@ -21,6 +21,7 @@ export const ITEM_META = {
 
 /** 天赋池：坠入后室时随机获得的能力（"一定概率刷出"） */
 export const TALENTS = {
+  // 生存类
   strong: { name: '强健体魄', desc: '生命上限 +15。' },
   calm: { name: '心如止水', desc: '理智侵蚀减半。' },
   'night-eye': { name: '夜视', desc: '视野半径 +1。' },
@@ -31,6 +32,22 @@ export const TALENTS = {
   hardy: { name: '铁胃', desc: '食物与药品恢复效果 +50%。' },
   fearless: { name: '无畏', desc: '理智侵蚀 -20%，幻觉更少。' },
   guide: { name: '引路者', desc: '出口罗盘始终显示精确距离。' },
+  // 攻击性
+  fighter: { name: '斗士', desc: '战斗伤害 +50%。' },
+  hunter: { name: '猎手', desc: '15% 概率造成致命一击（伤害翻倍）。' },
+  grim: { name: '冷酷', desc: '击杀实体恢复 10 理智。' },
+  // 防御性
+  armored: { name: '铁壁', desc: '受到的伤害 -25%。' },
+  endure: { name: '硬皮', desc: '单次受击最多损失 8 生命。' },
+  laststand: { name: '背水一战', desc: '生命低于 30% 时受到的伤害减半。' },
+  // 空间性（后室风味：空间异常天赋）
+  phase: { name: '相位穿梭', desc: '移动时可以穿过实体占据的格子。' },
+  anchor: { name: '空间锚点', desc: '死亡时有 30% 概率被空间拽回（本局一次，恢复 30 生命/理智）。' },
+  shortcut: { name: '捷径', desc: '穿越传送门不再消耗理智。' },
+  // 探测性
+  hawkeye: { name: '鹰眼', desc: '搜索发现隐藏出口的距离 +1，潜伏者现形范围 +1。' },
+  hearing: { name: '顺风耳', desc: '每回合自动感知周围的潜伏者。' },
+  instinct: { name: '第六感', desc: '警觉实体接近 8 格内时自动预警。' },
 };
 
 /** 创建玩家（attrs: { hpMax, sanityMax, staminaMax, talent }） */
@@ -138,11 +155,13 @@ export function applyPlayerAction(state, action, world) {
         break;
       }
       player.stamina -= 2;
+      // 鹰眼天赋：发现隐藏出口的距离 +1
+      const searchRange = player.talent === 'hawkeye' ? 2 : 1;
       const found = [];
       for (const ex of level.exits) {
         if (ex.hidden && !state.discoveredExits[state.levelId].has(level.exits.indexOf(ex))) {
           const d = Math.abs(ex.x - player.x) + Math.abs(ex.y - player.y);
-          if (d <= 1) {
+          if (d <= searchRange) {
             state.discoveredExits[state.levelId].add(level.exits.indexOf(ex));
             found.push(ex);
           }
@@ -155,8 +174,8 @@ export function applyPlayerAction(state, action, world) {
       } else {
         events.push({ text: '你仔细搜索了周围，没有发现隐藏的出口。', kind: 'system' });
       }
-      // 搜索也会让潜伏者现形
-      revealNearby(state, world, events, 2);
+      // 搜索也会让潜伏者现形（鹰眼 +1 范围）
+      revealNearby(state, world, events, player.talent === 'hawkeye' ? 3 : 2);
       // 触发相邻 setPieces
       triggerSetPieces(state, events, 1);
       // 拾荒本能天赋：25% 概率在相邻可行走格发现一件物品（附近无物品时才触发）
@@ -350,18 +369,23 @@ function tryMove(state, world, dx, dy, events, opts) {
       break;
     }
 
-    // 实体挡路
+    // 实体挡路（相位穿梭天赋：直接穿过去，轻微理智代价）
     const blocker = state.entities.find((e) => e.x === nx && e.y === ny && e.hp > 0);
     if (blocker) {
-      const def = ENTITY_DEFS[blocker.type] || {};
-      if ((def.dmg || 0) === 0) {
-        // 无害生物（飞蛾）：触碰掉理智
+      if (player.talent === 'phase') {
         player.sanity = Math.max(0, player.sanity - 1);
-        events.push({ text: `你撞上了${def.name || blocker.type}，理智微微一颤。`, kind: 'sanity' });
+        events.push({ text: '你的身体与空间错开了半拍——你从它身边穿了过去（-1 理智）。', kind: 'sanity' });
       } else {
-        events.push({ text: `${def.name || blocker.type}挡住了去路，你无法前进。`, kind: 'combat' });
+        const def = ENTITY_DEFS[blocker.type] || {};
+        if ((def.dmg || 0) === 0) {
+          // 无害生物（飞蛾）：触碰掉理智
+          player.sanity = Math.max(0, player.sanity - 1);
+          events.push({ text: `你撞上了${def.name || blocker.type}，理智微微一颤。`, kind: 'sanity' });
+        } else {
+          events.push({ text: `${def.name || blocker.type}挡住了去路，你无法前进。`, kind: 'combat' });
+        }
+        break;
       }
-      break;
     }
 
     // 体力消耗：水格 2，普通 1；奔跑加倍（疾步天赋奔跑不额外消耗）
@@ -401,7 +425,7 @@ function tryMove(state, world, dx, dy, events, opts) {
             player.x = destIsFirst ? link.x2 : link.x1;
             player.y = destIsFirst ? link.y2 : link.y1;
             teleported = true;
-            player.sanity = Math.max(0, player.sanity - 2);
+            if (player.talent !== 'shortcut') player.sanity = Math.max(0, player.sanity - 2);
             events.push({ text: '你推开一扇门……门后竟是另一个房间。', kind: 'level' });
           }
         } else {
@@ -413,7 +437,7 @@ function tryMove(state, world, dx, dy, events, opts) {
             player.x = tx;
             player.y = ty;
             teleported = true;
-            player.sanity = Math.max(0, player.sanity - 2);
+            if (player.talent !== 'shortcut') player.sanity = Math.max(0, player.sanity - 2);
             events.push({ text: '你推开一扇门……门后竟是另一个房间。', kind: 'level' });
           } else {
             events.push({ text: '门吱呀作响，但另一侧被堵住了。', kind: 'system' });
@@ -500,8 +524,8 @@ function triggerSetPieces(state, events, radius) {
   }
 }
 
-/** 让视野/搜索范围内的潜伏者现形（皮行者、抓挠者） */
-function revealNearby(state, world, events, radius) {
+/** 让视野/搜索范围内的潜伏者现形（皮行者、抓挠者）；导出供顺风耳天赋使用 */
+export function revealNearby(state, world, events, radius) {
   const { level, player } = state;
   for (const e of state.entities) {
     if (e.hp <= 0) continue;
@@ -537,10 +561,19 @@ function doFight(state, world, events) {
   }
   player.stamina -= 20;
   const def = ENTITY_DEFS[target.type] || {};
-  const dmg = player.weapon === 'crowbar' ? randInt(world.rng, 20, 30) : randInt(world.rng, 5, 10);
+  let dmg = player.weapon === 'crowbar' ? randInt(world.rng, 20, 30) : randInt(world.rng, 5, 10);
+  let crit = false;
+  if (player.talent === 'fighter') dmg = Math.floor(dmg * 1.5);
+  if (player.talent === 'hunter' && chance(world.rng, 0.15)) {
+    dmg *= 2;
+    crit = true;
+  }
   target.hp -= dmg;
   const weaponName = player.weapon === 'crowbar' ? '撬棍' : '徒手';
-  events.push({ text: `你用${weaponName}攻击${def.name || target.type}（-${dmg} HP）。`, kind: 'combat' });
+  events.push({
+    text: `你用${weaponName}攻击${def.name || target.type}（-${dmg} HP）${crit ? '——致命一击！' : ''}。`,
+    kind: 'combat',
+  });
 
   // 战斗噪音（3 格内可被听见）
   state.lastNoise = { level: 3, x: player.x, y: player.y };
@@ -548,6 +581,11 @@ function doFight(state, world, events) {
   if (target.hp <= 0) {
     events.push({ text: `你杀死了${def.name || target.type}！`, kind: 'combat' });
     target.hp = 0;
+    // 冷酷天赋：击杀恢复理智
+    if (player.talent === 'grim') {
+      player.sanity = Math.min(player.sanityMax || 100, player.sanity + 10);
+      events.push({ text: '你面无表情地补上最后一击。恐惧没有追上你（+10 理智）。', kind: 'sanity' });
+    }
     return;
   }
 

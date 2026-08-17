@@ -5,7 +5,7 @@
 import { mulberry32, hashString, chance, pick, DIRS, randInt } from './rng.js';
 import { generateLevel, createInfiniteLevel, updateActiveChunks, trimChunkCache, tileAt } from './generator.js';
 import { updateEntity, ENTITY_DEFS } from './entities.js';
-import { createPlayer, applyPlayerAction, normalizePlayer, viewRadiusOf, isLitTile, pushLog, TALENTS } from './player.js';
+import { createPlayer, applyPlayerAction, normalizePlayer, revealNearby, viewRadiusOf, isLitTile, pushLog, TALENTS } from './player.js';
 
 /** 免费动作：不消耗回合、不进入实体阶段 */
 const FREE_ACTIONS = new Set(['look', 'note']);
@@ -151,6 +151,11 @@ export function step(state, action) {
   state.stats.levelsTurns[state.levelId] = (state.stats.levelsTurns[state.levelId] || 0) + 1;
   updateExplored(state);
   recordBestiary(state);
+  // 顺风耳天赋：每回合自动感知周围潜伏者
+  if (state.player.talent === 'hearing') {
+    world = buildWorld(state);
+    revealNearby(state, world, events, 2);
+  }
   checkDeath(state, events);
   checkAchievements(state, events);
 
@@ -448,6 +453,17 @@ function endTurn(state, events) {
     player.hp = Math.min(player.hpMax || 100, player.hp + 1);
   }
 
+  // 第六感天赋：警觉实体接近 8 格内自动预警（每 8 回合最多一次）
+  if (talent === 'instinct') {
+    const dangerNear = state.entities.some(
+      (e) => e.hp > 0 && e.alert && Math.abs(e.x - player.x) + Math.abs(e.y - player.y) <= 8
+    );
+    if (dangerNear && (!state.stats.instinctAt || state.turn - state.stats.instinctAt >= 8)) {
+      state.stats.instinctAt = state.turn;
+      events.push({ text: '你的第六感在尖叫——有什么危险的东西在靠近。', kind: 'sanity' });
+    }
+  }
+
   // 手电电池：每 20 回合耗 1 电池
   if (player.flashlight) {
     player.batteryFrac += 1 / 20;
@@ -532,6 +548,16 @@ function updateSanityPhase(state, events) {
 function checkDeath(state, events) {
   const { player } = state;
   if (player.hp <= 0) {
+    // 空间锚点天赋：30% 概率被空间拽回（本局一次）
+    if (player.talent === 'anchor' && !state.stats.anchorUsed && chance(state.rng, 0.3)) {
+      state.stats.anchorUsed = true;
+      player.hp = 30;
+      player.sanity = Math.max(30, player.sanity);
+      player.x = state.level.spawn.x;
+      player.y = state.level.spawn.y;
+      events.push({ text: '空间在最后一刻把你拽了回来——你回到了坠落的地方，剧烈喘息（30 生命 / 30 理智）。', kind: 'sanity' });
+      return;
+    }
     state.over = 'dead';
     state.deathCause = state.lastAttackerName ? `被${state.lastAttackerName}杀死` : '因伤死亡';
     pushLog(state, `你死了。${state.deathCause}`, 'death');

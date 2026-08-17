@@ -564,16 +564,21 @@ function wanderStep(e, world, speed) {
 
 // ---------- 攻击结算 ----------
 
-/** 实体攻击玩家：-dmg 生命；部分实体额外 -理智（幸运儿天赋 25% 落空，用引擎 rng 保确定性） */
+/** 实体攻击玩家：-dmg 生命；部分实体额外 -理智（幸运儿 25% 落空；铁壁/硬皮/背水一战减伤，均用引擎 rng 保确定性） */
 function attackPlayer(world, events, dmg, name, def) {
   const { player } = world;
   if (player && player.talent === 'lucky' && world.rng && world.rng() < 0.25) {
     events.push({ text: `${name}扑向你，但你在最后一刻躲开了！`, kind: 'combat' });
     return;
   }
-  player.hp = Math.max(0, player.hp - dmg);
+  let d = dmg;
+  const t = player.talent;
+  if (t === 'armored') d = Math.ceil(d * 0.75);
+  if (t === 'endure') d = Math.min(8, d);
+  if (t === 'laststand' && player.hp <= (player.hpMax || 100) * 0.3) d = Math.ceil(d * 0.5);
+  player.hp = Math.max(0, player.hp - d);
   if (world.recordAttack) world.recordAttack(name);
-  events.push({ text: `${name}攻击了你（-${dmg} HP）！`, kind: 'combat' });
+  events.push({ text: `${name}攻击了你（-${d} HP）！`, kind: 'combat' });
   if (def && def.touchSanity && def.touchSanity < 0) {
     player.sanity += def.touchSanity;
     events.push({ text: `与${name}的接触侵蚀了你的理智。`, kind: 'sanity' });

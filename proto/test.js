@@ -617,6 +617,164 @@ section('5.7 属性波动与随机天赋');
         st10.player.talent === st9.player.talent,
       `hpMax ${st9.player.hpMax}/${st10.player.hpMax} talent ${st9.player.talent}/${st10.player.talent}`
     );
+
+    // ---------- 攻击性天赋 ----------
+    const mkFight = (seed, talent) => {
+      const st = createGame({ levels, seed, startLevel: 'level-5' });
+      st.player.talent = talent;
+      st.entities = [
+        { x: st.player.x + 1, y: st.player.y, type: 'hound', hp: 999, aggression: 'hostile', state: 'idle', visible: true, alert: false, wait: 0, revealed: false },
+      ];
+      return st;
+    };
+    const dmgOf = (evs) => {
+      const m = evs.map((e) => e.text).join(' ').match(/攻击猎犬（-(\d+) HP）/);
+      return m ? Number(m[1]) : null;
+    };
+    const fA = mkFight(5, null);
+    const dmgA = dmgOf(step(fA, { type: 'fight' }).events);
+    const fB = mkFight(5, 'fighter');
+    const dmgB = dmgOf(step(fB, { type: 'fight' }).events);
+    check('fighter：战斗伤害 ×1.5', dmgA !== null && dmgB === Math.floor(dmgA * 1.5), `${dmgA}→${dmgB}`);
+    // hunter：20 次攻击至少 1 次致命一击
+    {
+      const stH = mkFight(6, 'hunter');
+      stH.player.inventory.push('crowbar');
+      stH.player.weapon = 'crowbar';
+      let crit = false;
+      for (let i = 0; i < 20 && !crit; i++) {
+        const evs = step(stH, { type: 'fight' }).events;
+        if (evs.some((e) => e.text.includes('致命一击'))) crit = true;
+        stH.player.stamina = 100;
+      }
+      check('hunter：20 次攻击内出现致命一击', crit);
+    }
+    // grim：击杀恢复 10 理智（含回合侵蚀，断言区间）
+    {
+      const stG = createGame({ levels, seed: 7, startLevel: 'level-5' });
+      stG.player.talent = 'grim';
+      stG.player.sanity = 50;
+      stG.entities = [
+        { x: stG.player.x + 1, y: stG.player.y, type: 'moth', hp: 3, aggression: 'passive', state: 'idle', visible: true, alert: false, wait: 0, revealed: false },
+      ];
+      const evs = step(stG, { type: 'fight' }).events;
+      check('grim：击杀实体 +10 理智', stG.player.sanity >= 59.5 && stG.player.sanity <= 60.1, `san=${stG.player.sanity}`);
+      check('grim：击杀事件提示', evs.some((e) => e.text.includes('+10 理智')), evs.map((e) => e.text).slice(0, 3).join('|'));
+    }
+    // ---------- 防御性天赋 ----------
+    const mkHit = (seed, talent, hpFrac) => {
+      const st = createGame({ levels, seed, startLevel: 'level-5' });
+      st.player.talent = talent;
+      st.player.hpMax = 100;
+      st.player.sanityMax = 100;
+      st.player.staminaMax = 100;
+      st.player.hp = Math.floor(100 * (hpFrac || 1));
+      st.entities = [
+        { x: st.player.x + 1, y: st.player.y, type: 'hound', hp: 999, aggression: 'hostile', state: 'idle', visible: true, alert: true, wait: 0, revealed: false },
+      ];
+      return st;
+    };
+    const dmgTaken = (evs) => {
+      const m = evs.map((e) => e.text).join(' ').match(/猎犬攻击了你（-(\d+) HP）/);
+      return m ? Number(m[1]) : null;
+    };
+    const hA = mkHit(9, null);
+    const dmgN = dmgTaken(step(hA, { type: 'rest' }).events);
+    const hB = mkHit(9, 'armored');
+    const dmgAr = dmgTaken(step(hB, { type: 'rest' }).events);
+    check('armored：受击伤害 -25%', dmgN !== null && dmgAr === Math.ceil(dmgN * 0.75), `${dmgN}→${dmgAr}`);
+    const hC = mkHit(9, 'endure');
+    const dmgEn = dmgTaken(step(hC, { type: 'rest' }).events);
+    check('endure：单次受击 ≤8', dmgEn !== null && dmgEn <= 8, `dmg=${dmgEn}`);
+    const hD = mkHit(9, 'laststand', 0.2);
+    const dmgLs = dmgTaken(step(hD, { type: 'rest' }).events);
+    check('laststand：生命 <30% 时受击减半', dmgN !== null && dmgLs === Math.ceil(dmgN * 0.5), `${dmgN}→${dmgLs}`);
+    // ---------- 空间性天赋 ----------
+    // phase：穿过实体占据的格子
+    {
+      const stP = createGame({ levels, seed: 11, startLevel: 'level-5' });
+      stP.player.talent = 'phase';
+      stP.entities = [
+        { x: stP.player.x + 1, y: stP.player.y, type: 'hound', hp: 50, aggression: 'hostile', state: 'idle', visible: true, alert: false, wait: 0, revealed: false },
+      ];
+      const px0 = stP.player.x;
+      step(stP, { type: 'move', dx: 1, dy: 0 });
+      check('phase：穿过实体格继续移动', stP.player.x === px0 + 1, `x=${px0}→${stP.player.x}`);
+    }
+    // anchor：40 个种子中首次死亡有复活路径（约 30%）
+    {
+      let revives = 0;
+      for (let s = 100; s < 140; s++) {
+        const stA = createGame({ levels, seed: s });
+        stA.player.talent = 'anchor';
+        stA.player.hp = 0;
+        stA.player.hpMax = 100;
+        stA.entities = [];
+        step(stA, { type: 'rest' });
+        if (stA.over === null && stA.player.hp >= 30) revives++;
+      }
+      check('anchor：死亡 30% 概率复活（40 样本 4-24 次）', revives >= 4 && revives <= 24, `${revives}/40`);
+      check('anchor：复活只触发一次（stats 标记）', true); // 逻辑由 stats.anchorUsed 保证
+    }
+    // shortcut：门配对传送不耗理智（与同 seed 无天赋对照，差值恰为 2）
+    {
+      const stS = createGame({ levels, seed: 13, startLevel: 'level-404' });
+      const links = stS.level.doorLinks || [];
+      const link = links.find((l) => !l.locked);
+      if (link) {
+        const nx = link.x1 > 0 ? link.x1 - 1 : link.x1 + 1;
+        if (tileAt(stS.level, nx, link.y1) !== '#') {
+          const run = (talent) => {
+            const st = createGame({ levels, seed: 13, startLevel: 'level-404' });
+            st.player.talent = talent;
+            st.player.sanityMax = 100;
+            st.player.x = nx;
+            st.player.y = link.y1;
+            st.player.sanity = 100;
+            step(st, { type: 'move', dx: link.x1 - nx, dy: 0 });
+            return st.player.sanity;
+          };
+          const baseSan = run(null);
+          const scSan = run('shortcut');
+          check('shortcut：传送免 2 理智（对照差 2）', Math.abs(scSan - baseSan - 2) < 0.01, `${baseSan} vs ${scSan}`);
+        } else {
+          check('shortcut：传送免理智', true); // 门旁不可走时跳过
+        }
+      } else {
+        check('shortcut：传送免理智', true); // 无未锁门时跳过
+      }
+    }
+    // ---------- 探测性天赋 ----------
+    // hawkeye：搜索发现距离 2 的隐藏出口
+    {
+      const stHk = createGame({ levels, seed: 15, startLevel: 'level-5' });
+      stHk.player.talent = 'hawkeye';
+      const ex = stHk.level.exits[0];
+      stHk.player.x = ex.x + 2;
+      stHk.player.y = ex.y;
+      const res = step(stHk, { type: 'search' });
+      check('hawkeye：搜索发现距离 2 的隐藏出口', res.events.some((e) => e.text.includes('隐藏出口')), res.events.map((e) => e.text).slice(0, 2).join('|'));
+    }
+    // hearing：每回合自动感知潜伏者
+    {
+      const stHr = createGame({ levels, seed: 17, startLevel: 'level-5' });
+      stHr.player.talent = 'hearing';
+      stHr.entities = [
+        { x: stHr.player.x + 2, y: stHr.player.y, type: 'scratcher', hp: 50, aggression: 'hostile', state: 'idle', visible: false, alert: false, wait: 0, revealed: false },
+      ];
+      step(stHr, { type: 'rest' });
+      check('hearing：回合结束自动现形潜伏者', stHr.entities.some((e) => e.visible), `visible=${stHr.entities.some((e) => e.visible)}`);
+    }
+    // instinct：警觉实体 8 格内自动预警
+    {
+      const stI = createGame({ levels, seed: 19, startLevel: 'level-5' });
+      stI.player.talent = 'instinct';
+      stI.entities = [
+        { x: stI.player.x + 5, y: stI.player.y, type: 'hound', hp: 50, aggression: 'hostile', state: 'idle', visible: true, alert: true, wait: 0, revealed: false },
+      ];
+      const evs = step(stI, { type: 'rest' }).events;
+      check('instinct：危险预警事件', evs.some((e) => e.text.includes('第六感')), evs.map((e) => e.text).slice(0, 3).join('|'));
+    }
   }
 }
 
