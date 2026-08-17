@@ -977,6 +977,30 @@ section('5.9 统计计数与新成就');
   }
 }
 
+// ---------- 5.10 新特殊机制：幻影噪音 / 黑暗脉冲 ----------
+section('5.10 新特殊机制：幻影噪音 / 黑暗脉冲');
+{
+  const st = createGame({ levels, seed: 51, startLevel: 'level-16' });
+  st.player.sanityMax = 100;
+  st.player.sanity = 100;
+  let heard = false;
+  for (let i = 0; i < 20; i++) {
+    const res = step(st, { type: 'search' });
+    if (res.events.some((e) => e.text.includes('巨响'))) heard = true;
+  }
+  check('phantom-noise：18 回合触发无源巨响', heard);
+  const st2 = createGame({ levels, seed: 53, startLevel: 'level-21' });
+  st2.player.sanityMax = 100;
+  st2.player.sanity = 100;
+  let pulsed = false;
+  for (let i = 0; i < 22; i++) {
+    const res = step(st2, { type: 'search' });
+    if (res.events.some((e) => e.text.includes('黑暗像呼吸'))) pulsed = true;
+  }
+  check('dark-pulse：20 回合触发黑暗脉冲', pulsed);
+  check('dark-pulse：理智被侵蚀', st2.player.sanity < 99, `san=${st2.player.sanity}`);
+}
+
 // ---------- 6. 野性变体（wild 无尽生成） ----------
 section('6. wild 变异：确定性 + 10 个随机种子全部生成可达');
 {

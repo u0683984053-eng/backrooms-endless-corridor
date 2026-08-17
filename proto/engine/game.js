@@ -416,8 +416,7 @@ function endTurn(state, events) {
     events.push({ text: '时间打了个盹。你的疲劳与恐惧似乎被偷走了片刻。（+2 理智 / +5 体力）', kind: 'sanity' });
   }
   // 空间规则机制：gravity-anomaly（重力异常）——每 30 回合一次重力翻转
-  if (rules.includes('gravity-anomaly') && (state.turn + 1) % 30 === 0) {
-    events.push({ text: '重力突然翻转了一瞬——你被抛向一侧，撞上了墙。', kind: 'sanity' });
+  if (rules.includes('gravity-anomaly') && (state.turn + 1) % 30 === 0) {    events.push({ text: '重力突然翻转了一瞬——你被抛向一侧，撞上了墙。', kind: 'sanity' });
     const dirs = [
       { dx: 0, dy: -1 },
       { dx: -1, dy: 0 },
@@ -440,6 +439,33 @@ function endTurn(state, events) {
         events.push({ text: '你被甩向墙壁，擦伤了（-1 HP）。', kind: 'combat' });
       }
     }
+  }
+
+  // 特殊机制：phantom-noise（幻影噪音）——每 18 回合一声没有来源的巨响，惊散附近实体
+  if (mechs.includes('phantom-noise') && (state.turn + 1) % 18 === 0) {
+    events.push({ text: '远处传来一声巨响，像什么东西在走廊尽头倒塌。那里什么都没有。', kind: 'sanity' });
+    const dirsP = [
+      { dx: 0, dy: -1 },
+      { dx: -1, dy: 0 },
+      { dx: 0, dy: 1 },
+      { dx: 1, dy: 0 },
+    ];
+    for (const e of state.entities) {
+      if (e.hp <= 0) continue;
+      if (Math.abs(e.x - player.x) + Math.abs(e.y - player.y) > 6) continue;
+      const dP = dirsP[Math.floor(state.rng() * 4)];
+      const nx = e.x + dP.dx;
+      const ny = e.y + dP.dy;
+      if ((level.infinite || (nx >= 0 && ny >= 0 && nx < level.width && ny < level.height)) && tileAt(level, nx, ny) !== '#') {
+        e.x = nx;
+        e.y = ny;
+      }
+    }
+  }
+  // 特殊机制：dark-pulse（黑暗脉冲）——每 20 回合黑暗起伏，轻微侵蚀理智
+  if (mechs.includes('dark-pulse') && (state.turn + 1) % 20 === 0) {
+    player.sanity = Math.max(0, player.sanity - 1);
+    events.push({ text: '黑暗像呼吸一样起伏了一瞬。有什么东西在黑暗里睁开了眼睛（-1 理智）。', kind: 'sanity' });
   }
 
   // 理智：基础侵蚀（心如止水减半 / 无畏 -20%）；安全层（sanDrain<=0.03 且 bright）每回合 +1

@@ -23,6 +23,9 @@ import {
   onDoor,
   onExit,
   onHit,
+  onShot,
+  onDrone,
+  onScene,
   onSanityStage,
   onHeartbeat,
   setMuted,
@@ -336,13 +339,14 @@ function showDeath() {
     '这不是结束——后室没有结束。',
   ];
   const epilogue = EPILOGUES[Math.floor(Math.random() * EPILOGUES.length)];
+  const st = g.stats || {};
   $('death-body').innerHTML = `
     <div class="death-stats">
       <div class="ds">死因：<b>${g.deathCause || '未知'}</b></div>
-      <div class="ds">存活回合：<b>${g.turn}</b></div>
+      <div class="ds">存活回合：<b>${g.turn}</b> · 移动 ${st.movesTotal || 0} 格 · 击杀 ${st.kills || 0}</div>
+      <div class="ds">触发的场景：<b>${st.scenesSeen || 0}</b> · 无人机 ${st.dronesUsed || 0} · 手枪击杀 ${st.pistolKills || 0}</div>
       <div class="ds">发现层级：<b>${discovered.length}</b>（${discovered.map((id) => g.codex.levels[id].name).join('、') || '仅 Level 0'}）</div>
-      <div class="ds">日志笔记：<b>${notes}</b> 条</div>
-      <div class="ds">死亡记录：<b>${deaths}</b> 次</div>
+      <div class="ds">日志笔记：<b>${notes}</b> 条 · 死亡记录：<b>${deaths}</b> 次</div>
       <div class="ds">最终位置：<b>${g.codex.levels[g.levelId] ? g.codex.levels[g.levelId].name : g.levelId}</b></div>
     </div>
     <p class="death-epilogue">${epilogue}</p>
@@ -2170,6 +2174,9 @@ function audioAfterStep(events, moved, ran) {
   let teleported = false; // 门/传送门（播放 onDoor，抑制脚步）
   let exited = false; // 卡出
   let hit = false; // 受击
+  let shot = false; // 手枪射击
+  let drone = false; // 无人机
+  let scene = false; // 场景触发
   const startles = [];
   for (const e of events || []) {
     const t = e.text || '';
@@ -2185,13 +2192,28 @@ function audioAfterStep(events, moved, ran) {
       hit = true;
       continue;
     }
+    if (e.kind === 'combat' && /用手枪攻击/.test(t)) {
+      shot = true;
+      continue;
+    }
+    if (e.kind === 'item' && /无人机/.test(t)) {
+      drone = true;
+      continue;
+    }
+    if (e.kind === 'sanity' && /【场景】/.test(t)) {
+      scene = true;
+      continue;
+    }
     if (STARTLE_KEYWORDS.test(t)) startles.push(t);
   }
   try {
     if (exited) onExit();
+    if (shot) onShot();
     if (hit) onHit();
     if (teleported) onDoor();
     else if (!exited && moved) onPlayerMove(ran, playerOnWater()); // 卡出时不再叠加脚步
+    if (drone) onDrone();
+    if (scene) onScene();
     for (const t of startles) startle(t);
   } catch (err) {
     /* 音频失败不影响游戏 */

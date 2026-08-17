@@ -662,6 +662,85 @@ export function onHit() {
   src.connect(bp).connect(g).connect(master);
 }
 
+/** 枪声：短促噪声爆发 + 高频瞬态 + 低音炮冲击（手枪射击） */
+export function onShot() {
+  if (!ctx || !master) return;
+  const t = ctx.currentTime;
+
+  // 爆破噪声（极短）
+  const src = noiseSource(0.05, t);
+  const bp = filterNode('bandpass', 1800, 0.7);
+  const g = gainAt(0.0001);
+  g.gain.exponentialRampToValueAtTime(0.5, t + 0.005);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+  src.connect(bp).connect(g).connect(master);
+
+  // 低频冲击
+  const osc = ctx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(150, t);
+  osc.frequency.exponentialRampToValueAtTime(40, t + 0.08);
+  const og = gainAt(0.0001);
+  og.gain.exponentialRampToValueAtTime(0.45, t + 0.005);
+  og.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+  osc.connect(og).connect(master);
+
+  // 高频金属尾音
+  const osc2 = ctx.createOscillator();
+  osc2.type = 'square';
+  osc2.frequency.setValueAtTime(3200, t);
+  osc2.frequency.exponentialRampToValueAtTime(1400, t + 0.1);
+  const og2 = gainAt(0.0001);
+  og2.gain.exponentialRampToValueAtTime(0.06, t + 0.002);
+  og2.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+  osc2.connect(og2).connect(master);
+}
+
+/** 无人机：升空嗡鸣（滑音 + 螺旋桨噪声，约 1.2 秒） */
+export function onDrone() {
+  if (!ctx || !master) return;
+  const t = ctx.currentTime;
+
+  const osc = ctx.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(120, t);
+  osc.frequency.exponentialRampToValueAtTime(260, t + 0.5);
+  osc.frequency.exponentialRampToValueAtTime(180, t + 1.2);
+  const og = gainAt(0.0001);
+  og.gain.exponentialRampToValueAtTime(0.1, t + 0.15);
+  og.gain.exponentialRampToValueAtTime(0.0001, t + 1.3);
+  osc.connect(og).connect(master);
+
+  const src = noiseSource(1.3, t);
+  const bp = filterNode('bandpass', 900, 1.5);
+  const g = gainAt(0.0001);
+  g.gain.exponentialRampToValueAtTime(0.05, t + 0.2);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 1.3);
+  src.connect(bp).connect(g).connect(master);
+}
+
+/** 场景触发：低八度钟声 + 噪声沙粒（细思极恐的提示音） */
+export function onScene() {
+  if (!ctx || !master) return;
+  const t = ctx.currentTime;
+
+  const osc = ctx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(220, t);
+  osc.frequency.exponentialRampToValueAtTime(110, t + 0.6);
+  const og = gainAt(0.0001);
+  og.gain.exponentialRampToValueAtTime(0.18, t + 0.02);
+  og.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+  osc.connect(og).connect(master);
+
+  const src = noiseSource(0.4, t + 0.05);
+  const bp = filterNode('highpass', 2400, 1);
+  const g = gainAt(0.0001);
+  g.gain.exponentialRampToValueAtTime(0.03, t + 0.1);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+  src.connect(bp).connect(g).connect(master);
+}
+
 // ============================================================
 // 2.4 突发音效（startles）：按文本关键词选合成器
 // ============================================================

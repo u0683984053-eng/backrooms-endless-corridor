@@ -108,5 +108,8 @@
       "danger": false,
       "description": "一扇写满错误代码的玻璃门。"
     }
+  ],
+  "specialMechanisms": [
+    "phantom-noise"
   ]
 }

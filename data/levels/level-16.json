@@ -100,5 +100,8 @@
       "danger": false,
       "description": "墙上的一个洞——钻过去，是变压器嗡鸣的房间。"
     }
+  ],
+  "specialMechanisms": [
+    "phantom-noise"
   ]
 }

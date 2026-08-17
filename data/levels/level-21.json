@@ -98,5 +98,8 @@
       "danger": false,
       "description": "一扇厚重的防火门，推开是更深的黑暗仓库。"
     }
+  ],
+  "specialMechanisms": [
+    "dark-pulse"
   ]
 }

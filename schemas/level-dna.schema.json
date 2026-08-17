@@ -48,6 +48,11 @@
       "items": { "enum": ["euclidean", "looping", "non-euclidean", "gravity-anomaly", "time-anomaly"] },
       "description": "空间规则：looping=边缘环绕；non-euclidean=传送式错位"
     },
+    "specialMechanisms": {
+      "type": "array",
+      "items": { "enum": ["endless-chase", "heat-drain", "phantom-noise", "dark-pulse"] },
+      "description": "特殊机制：endless-chase=实体永不冷静（!层）；heat-drain=高温灼烧（666层）；phantom-noise=幻影噪音惊散实体（16/169层）；dark-pulse=黑暗脉冲侵蚀理智（21层）"
+    },
     "entities": {
       "type": "array",
       "items": {
