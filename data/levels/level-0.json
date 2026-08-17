@@ -139,6 +139,13 @@
       "hidden": true,
       "danger": false,
       "description": "一处墙纸裂缝透出蓝光——穿过去，是蓝色灯管的通道。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-999",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇特别旧的木门嵌在黄色墙纸里——推开，是一模一样的房间。"
     }
   ]
 }

@@ -1,0 +1,114 @@
+{
+  "id": "level-40",
+  "name": "Level 40 — 水晶洞",
+  "number": 40,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "caves",
+  "aesthetic": "dreamcore",
+  "light": "dim",
+  "sanDrain": 0.05,
+  "description": "一座被发光水晶照亮的洞穴。晶体从岩壁、地面、头顶生长出来，发出温暖的蓝绿色光，洞穴里永远像黄昏。你听见翅膀扑打的声音——这里的主人不太欢迎访客，但它们会给你留一点时间，让你好好看看这些漂亮的水晶。",
+  "palette": {
+    "primary": "#3a8a7a",
+    "secondary": "#2a5c50",
+    "accent": "#8ac8b0",
+    "light": "#b8f0e0"
+  },
+  "terrain": {
+    "width": 34,
+    "height": 34,
+    "roomCount": 6,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "brick",
+    "floorStyle": "gravel",
+    "topology": "caves",
+    "extraFeatures": [
+      "columns",
+      "puddles",
+      "fountain"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "deathmoth",
+      "density": 0.008,
+      "aggression": "hostile"
+    },
+    {
+      "type": "moth",
+      "density": 0.01,
+      "aggression": "passive"
+    },
+    {
+      "type": "mangled",
+      "density": 0.003,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一块水晶的表面光滑如镜，映出你的脸。你眨了眨眼——水晶里的人比你慢了一拍，然后对你笑了一下。",
+      "sanityEffect": -4,
+      "note": "水晶里的人对我笑了。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "一颗巨大的水晶，里面封着一个人形的轮廓。它保持着呼救的姿势。水晶很温暖。",
+      "sanityEffect": -6,
+      "note": "水晶里封着一个人。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "岩壁上用炭笔写着：『不要碰最大的那颗水晶。它会回应你。』旁边有人加了一行：『我碰了。』",
+      "sanityEffect": -4,
+      "note": "岩壁：不要碰最大的那颗水晶。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "水晶的低鸣",
+      "翅膀扑打的回声"
+    ],
+    "startles": [
+      "某颗水晶突然裂开一道缝，缝隙里是更亮的蓝光",
+      "黑暗深处传来一声很轻的回应——像你的声音"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-8",
+      "hidden": true,
+      "danger": false,
+      "description": "水晶最密集处的岩缝——钻过去，是普通的洞穴。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-799",
+      "hidden": true,
+      "danger": false,
+      "description": "洞底的水潭，潜下去，浮上来时是没过脚踝的积水。"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "id": "level-999",
+  "name": "Level 999 — 循环房间",
+  "number": 999,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "rooms",
+  "aesthetic": "weirdcore",
+  "light": "flickering",
+  "sanDrain": 0.05,
+  "description": "一间又一间完全相同的房间：白墙、木地板、一扇门、一扇窗。你推开门走进下一间——一模一样。你在墙上做了记号，走了十三间房之后，你回到了自己做的记号前。记号还在，但位置不对。",
+  "palette": {
+    "primary": "#c8c8b8",
+    "secondary": "#8a8a7a",
+    "accent": "#4a4a3e",
+    "light": "#f0f0e0"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 14,
+    "roomSizeMin": 3,
+    "roomSizeMax": 5,
+    "corridorWidth": 2,
+    "wallStyle": "drywall",
+    "floorStyle": "wood",
+    "extraFeatures": [
+      "doors",
+      "furniture",
+      "papers"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "faceling",
+      "density": 0.004,
+      "aggression": "curious"
+    },
+    {
+      "type": "watcher",
+      "density": 0.005,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.018,
+  "setPieces": [
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "墙角的记号——你自己的记号，但你还没走到这一间。记号下面多了一行字：『第 13 遍。』",
+      "sanityEffect": -5,
+      "note": "我的记号出现在我没去过的房间：第 13 遍。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "窗外的景色：同样的房间，一扇接一扇，一直延伸到看不见的地方。每一扇窗里都站着一个人，背对着你。",
+      "sanityEffect": -6,
+      "note": "窗外是一排排房间，每扇窗里都有人背对着我。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "这间房的桌上有两张椅子，面对面。你坐下一张，另一张上有一层薄薄的灰——像刚有人站起来，还来不及坐下。",
+      "sanityEffect": -4,
+      "note": "两张椅子面对面，另一张刚有人坐过。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "门在身后轻轻关上的声音",
+      "隔壁房间传来的脚步声（和你同步）"
+    ],
+    "startles": [
+      "你刚进过的房间，门从里面被敲响",
+      "窗外某个背对的人，转过了头"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-0",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇特别旧的木门——推开，是黄色的墙纸和荧光灯。"
+    },
+    {
+      "kind": "door",
+      "target": "level-976",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇没有门牌的白色门——门后是更安静的极简房间。"
+    }
+  ]
+}

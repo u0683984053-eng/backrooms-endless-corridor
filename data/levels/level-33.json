@@ -98,6 +98,20 @@
       "text": "地上有一串脚印，只有进来的，没有出去的。你站在原地，脚印多了一双。",
       "sanityEffect": -6,
       "note": "脚印在增加。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "黑暗里传来哭声。你循着声音摸过去——哭声来自一个墙角，那里什么都没有。但哭声还在继续，像在等你蹲下来听。",
+      "sanityEffect": -5,
+      "note": "空墙角的哭声。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "你摸到一只湿漉漉的小鞋子。你拿起来——哭声停了。你把鞋子放下——哭声又响起来，这次近了很多。",
+      "sanityEffect": -6,
+      "note": "一只小鞋子，拿起时哭声会停。"
     }
   ],
   "soundscape": {

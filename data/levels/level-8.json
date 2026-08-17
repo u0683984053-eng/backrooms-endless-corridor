@@ -124,6 +124,13 @@
       "hidden": true,
       "danger": false,
       "description": "一段被落石封住大半的岩缝，缝隙里漏出楼梯间的灯光和回声。你侧身挤进去，脚下的碎石变成了水泥台阶。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-40",
+      "hidden": true,
+      "danger": false,
+      "description": "一处岩壁渗出蓝绿色的光——挖开，是发光的洞穴。"
     }
   ]
 }

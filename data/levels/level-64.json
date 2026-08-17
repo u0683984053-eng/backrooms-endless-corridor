@@ -1,0 +1,111 @@
+{
+  "id": "level-64",
+  "name": "Level 64 — 废弃厨房",
+  "number": 64,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "mixed",
+  "aesthetic": "liminal",
+  "light": "flickering",
+  "sanDrain": 0.06,
+  "description": "一间无尽延伸的厨房：不锈钢灶台、吊柜、双开门冰箱，一尘不染却充满霉味。灶台上的火还开着，锅里的东西早已烧成黑炭。你路过一台冰箱时，听见里面传来很轻的敲击声——一下，两下，等你走远才停。",
+  "palette": {
+    "primary": "#8a9a92",
+    "secondary": "#5c6a64",
+    "accent": "#363e3a",
+    "light": "#d8e8e0"
+  },
+  "terrain": {
+    "width": 30,
+    "height": 30,
+    "roomCount": 10,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "tile",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "counters",
+      "shelves",
+      "crates",
+      "puddles",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "faceling",
+      "density": 0.004,
+      "aggression": "curious"
+    },
+    {
+      "type": "mangled",
+      "density": 0.004,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.022,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "灶台上的火还开着，锅里的东西早已烧成黑炭。火苗在你注视时矮了一寸——它认识你。",
+      "sanityEffect": -4,
+      "note": "灶台的火在我注视时矮了一寸。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一台冰箱的门虚掩着，冷气泄漏。你轻轻拉开——里面码着整整齐齐的餐盒，每一个都贴着你的名字，日期是明天。",
+      "sanityEffect": -6,
+      "note": "冰箱里的餐盒贴着我的名字，日期是明天。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "橱柜内侧用刀刻着：『今天的菜是昨天的我。』",
+      "sanityEffect": -5,
+      "note": "橱柜里：今天的菜是昨天的我。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "灶台的火焰声",
+      "冰箱压缩机的低鸣"
+    ],
+    "startles": [
+      "某台冰箱的门自己打开又关上",
+      "餐具柜里传来刀叉碰撞的声音"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "door",
+      "target": "level-5",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇员工通道门——门后是酒店的后厨走廊。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-555",
+      "hidden": true,
+      "danger": false,
+      "description": "冷库的卷帘门——另一边是永远亮着灯的超市。"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "id": "level-31",
+  "name": "Level 31 — 童年卧室",
+  "number": 31,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "rooms",
+  "aesthetic": "traumacore",
+  "light": "dim",
+  "sanDrain": 0.05,
+  "description": "一间巨大化的童年卧室：书桌高得像悬崖，床单垂下来像瀑布，玩具散落在地上，每一件都比你高。你小时候丢的那只玩具熊站在墙角——它朝你这边转过了头。",
+  "palette": {
+    "primary": "#b08a5a",
+    "secondary": "#7a5c38",
+    "accent": "#4a3620",
+    "light": "#e8d0a8"
+  },
+  "terrain": {
+    "width": 24,
+    "height": 24,
+    "roomCount": 7,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "wallpaper",
+    "floorStyle": "wood",
+    "extraFeatures": [
+      "furniture",
+      "posters",
+      "puddles",
+      "doors"
+    ],
+    "infinite": false
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "moth",
+      "density": 0.006,
+      "aggression": "passive"
+    },
+    {
+      "type": "faceling",
+      "density": 0.003,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note",
+    "key"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "相框里是一张全家福，你的位置站着一个小女孩。你仔细看了看——她穿着你小时候的衣服，笑得比你开心。",
+      "sanityEffect": -5,
+      "note": "全家福里，我的位置站着别人。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "床底下伸出一只玩具手，指着你。你蹲下看——床底下是空的，但那只手还指着你。",
+      "sanityEffect": -4,
+      "note": "床底下的玩具手一直指着我。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "墙上用蜡笔写着一行歪歪扭扭的字：『这里是我的房间。你睡我的床。我不开心。』",
+      "sanityEffect": -4,
+      "note": "蜡笔字：你睡我的床，我不开心。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "八音盒的旋律（不知道从哪里传来）",
+      "遥远的风铃"
+    ],
+    "startles": [
+      "玩具熊的眼睛在暗处亮了一下",
+      "书桌上有什么东西掉下来，碎了"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "door",
+      "target": "level-5",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇儿童房的门——门后是酒店走廊。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-976",
+      "hidden": true,
+      "danger": false,
+      "description": "衣柜的背板裂开了——挤过去，是一间极简的白色房间。"
+    }
+  ]
+}

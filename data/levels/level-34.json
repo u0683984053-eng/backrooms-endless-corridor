@@ -1,19 +1,19 @@
 {
   "id": "level-34",
-  "name": "Level 34 — 食堂",
+  "name": "Level 34 — 双色房间",
   "number": 34,
   "category": "normal",
   "difficultyClass": 2,
   "environment": "mixed",
   "aesthetic": "traumacore",
-  "light": "bright",
+  "light": "flickering",
   "sanDrain": 0.1,
-  "description": "一座没有尽头的宴会厅：长桌、吊灯、烛台。餐盘上的食物永远不会腐坏，也永远不会有人来吃。菜单上的字会自己变化。",
+  "description": "红色的房间连着蓝色的房间，走廊两侧的灯光一半红一半蓝。你从红色的门进去，从蓝色的门出来——回头一看，你出来的门也变成了蓝色。这里没有第三种颜色，就像这里没有第三种选择。",
   "palette": {
-    "primary": "#b8a888",
-    "secondary": "#8a7a5e",
-    "accent": "#c8a050",
-    "light": "#e8d8a8"
+    "primary": "#8a3a4a",
+    "secondary": "#3a4a8a",
+    "accent": "#5a2a3a",
+    "light": "#e8a8b8"
   },
   "terrain": {
     "width": 32,
@@ -93,6 +93,27 @@
       "text": "一张没写完的信，落款是你的笔迹——但你从没写过信。",
       "sanityEffect": -5,
       "note": "一封落款是我的信。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "你从红色的门进去，蓝色的门出来。回头一看——你出来的门也变成了蓝色。你试了三次，每次回头时，它都已经变成了蓝色。",
+      "sanityEffect": -5,
+      "note": "门在我回头时会变色。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "蓝色走廊的墙上用红漆写着：『蓝色这边是出口。』红色走廊的墙上用蓝漆写着：『红色这边才是出口。』",
+      "sanityEffect": -4,
+      "note": "两种颜色的墙互相指路。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "走廊尽头的镜子照出两种颜色：你的一半是红的，一半是蓝的。你眨了眨眼，分界线往中间移了一点。",
+      "sanityEffect": -6,
+      "note": "镜子里我的分界线在移动。"
     }
   ],
   "soundscape": {

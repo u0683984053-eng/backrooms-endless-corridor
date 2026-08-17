@@ -158,6 +158,20 @@
       "hidden": true,
       "danger": false,
       "description": "一扇没锁的员工通道门——门后是同一条走廊，只是更长。"
+    },
+    {
+      "kind": "door",
+      "target": "level-31",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇贴着卡通贴纸的房门——门后是一间巨大的儿童卧室。"
+    },
+    {
+      "kind": "door",
+      "target": "level-64",
+      "hidden": true,
+      "danger": false,
+      "description": "酒店员工厨房的门——门后是永不熄火的灶台。"
     }
   ]
 }

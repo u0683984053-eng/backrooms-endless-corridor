@@ -1,0 +1,114 @@
+{
+  "id": "level-150",
+  "name": "Level 150 — 冰原",
+  "number": 150,
+  "category": "normal",
+  "difficultyClass": 3,
+  "environment": "outdoors",
+  "aesthetic": "dreamcore",
+  "light": "dim",
+  "sanDrain": 0.07,
+  "description": "一片冻结的荒野：白色延伸到地平线，冰晶在暗淡的光线里闪烁。空气冷得让呼吸变成白雾，但你的身体并不觉得冷——这是最糟糕的部分。远处的冰层下有东西在跟着你走，你能看见它模糊的轮廓，被冻在冰面下，和你保持同一个速度。",
+  "palette": {
+    "primary": "#a8c0d0",
+    "secondary": "#6a8aa0",
+    "accent": "#3a5268",
+    "light": "#e8f4f8"
+  },
+  "terrain": {
+    "width": 36,
+    "height": 36,
+    "roomCount": 5,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "glass",
+    "floorStyle": "gravel",
+    "topology": "fields",
+    "extraFeatures": [
+      "furniture",
+      "columns",
+      "fountain"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "clump",
+      "density": 0.005,
+      "aggression": "curious"
+    },
+    {
+      "type": "smiler",
+      "density": 0.005,
+      "aggression": "hostile"
+    },
+    {
+      "type": "vapor",
+      "density": 0.006,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.016,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "冰层下有一个人形轮廓，保持着奔跑的姿势。你走过它上方时，它跟着你转了个方向。",
+      "sanityEffect": -5,
+      "note": "冰层下的身影在跟着我转。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "雪地上有一行字，像用脚踩出来的：『别停下来。它数到十就会动。』",
+      "sanityEffect": -4,
+      "note": "雪地里的字：别停下来。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一顶冻在冰里的帽子，款式和你记忆里小时候丢的那顶一模一样。冰没有化过。",
+      "sanityEffect": -4,
+      "note": "冰里冻着一顶我小时候的帽子。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "冰层裂开又合拢的声音",
+      "极远处的风声（没有风）"
+    ],
+    "startles": [
+      "冰面下传来一下敲击，就在你脚下",
+      "你呼出的白雾里，出现了一瞬不属于你的轮廓"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-36",
+      "hidden": true,
+      "danger": false,
+      "description": "冰原尽头的铁门——门后是雾中的墓园。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-10",
+      "hidden": true,
+      "danger": false,
+      "description": "一道冰缝，你滑下去，落在温热的麦田里。"
+    }
+  ]
+}

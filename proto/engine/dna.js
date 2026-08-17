@@ -63,6 +63,13 @@ export const LEVEL_IDS = [
   'level-799',
   // 血染森林（Level 14 重做）新增
   'level-28',
+  // 第四轮新增（Fandom 经典层）
+  'level-31',
+  'level-40',
+  'level-64',
+  'level-100',
+  'level-150',
+  'level-999',
 ];
 
 /** 默认值（合并时逐字段覆盖，保证任何残缺 DNA 都能得到完整结构） */

@@ -1,0 +1,110 @@
+{
+  "id": "level-100",
+  "name": "Level 100 — 停尸间",
+  "number": 100,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "mixed",
+  "aesthetic": "traumacore",
+  "light": "flickering",
+  "sanDrain": 0.06,
+  "description": "一座废弃的停尸间：瓷砖墙面发黄，不锈钢柜门半开，冷气管道发出细微的呜咽。你经过一排停尸柜时，其中一个里面传来均匀的呼吸声——你数了数，一共七个柜子在呼吸。",
+  "palette": {
+    "primary": "#6a7a72",
+    "secondary": "#46524c",
+    "accent": "#2a322e",
+    "light": "#c8d8d0"
+  },
+  "terrain": {
+    "width": 26,
+    "height": 26,
+    "roomCount": 8,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "tile",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "counters",
+      "columns",
+      "wires",
+      "doors"
+    ],
+    "infinite": false
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "mangled",
+      "density": 0.008,
+      "aggression": "hostile"
+    },
+    {
+      "type": "clump",
+      "density": 0.005,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note",
+    "key"
+  ],
+  "itemDensity": 0.018,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一个停尸柜半开着。里面是空的，但柜壁上写满了名字——你认出了其中一个，是你小学时听说过的失踪者。",
+      "sanityEffect": -5,
+      "note": "停尸柜里写满了名字，有一个我听说过。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "七个柜子在均匀地呼吸。你屏住呼吸听了很久——它们的呼吸频率，和你的心跳一样。",
+      "sanityEffect": -6,
+      "note": "七个柜子的呼吸和我的心跳同步。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "墙上贴着值班表，纸张泛黄：『晚班：无。周末：无。节假日：无。』最底下用小字写着：『它不需要休息。』",
+      "sanityEffect": -4,
+      "note": "值班表：它不需要休息。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "冷气管道的呜咽",
+      "远处均匀的呼吸声"
+    ],
+    "startles": [
+      "你经过时，某个柜子从里面被轻轻敲了一下",
+      "呼吸声突然全部停止了"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-188",
+      "hidden": true,
+      "danger": false,
+      "description": "冷库门的缝隙——后面是一间又一间的白色密室。"
+    },
+    {
+      "kind": "door",
+      "target": "level-28",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇标着『太平间出口』的门，门后是破败的庇护所。"
+    }
+  ]
+}

@@ -120,6 +120,13 @@
       "hidden": false,
       "danger": true,
       "description": "一栋被麦田半埋的旧房子，门开着。门里是永恒的黄昏——和一条空无一人的街道。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-150",
+      "hidden": true,
+      "danger": false,
+      "description": "麦田尽头一道白线——跨过去，是冻结的荒野。"
     }
   ]
 }

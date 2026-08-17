@@ -101,6 +101,13 @@
       "hidden": true,
       "danger": false,
       "description": "一扇特别干净的白门，门缝里是更白的光。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-100",
+      "hidden": true,
+      "danger": false,
+      "description": "白墙里嵌着一扇不锈钢门——门后是停尸间。"
     }
   ]
 }
