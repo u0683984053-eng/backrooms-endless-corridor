@@ -51,6 +51,16 @@
       "type": "skin-stealer",
       "density": 0.002,
       "aggression": "hostile"
+    },
+    {
+      "type": "dweller",
+      "density": 0.006,
+      "aggression": "curious"
+    },
+    {
+      "type": "vapor",
+      "density": 0.005,
+      "aggression": "curious"
     }
   ],
   "items": [

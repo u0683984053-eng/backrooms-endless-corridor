@@ -53,6 +53,11 @@
       "type": "glowfolk",
       "density": 0.005,
       "aggression": "passive"
+    },
+    {
+      "type": "vapor",
+      "density": 0.005,
+      "aggression": "curious"
     }
   ],
   "items": [

@@ -33,7 +33,13 @@
   "spaceRules": [
     "euclidean"
   ],
-  "entities": [],
+  "entities": [
+    {
+      "type": "mangled",
+      "density": 0.008,
+      "aggression": "hostile"
+    }
+  ],
   "items": [
     "almond-water",
     "royal-ration",

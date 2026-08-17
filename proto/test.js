@@ -9,6 +9,7 @@ import { generateLevel, verifyReachable, createInfiniteLevel, tileAt, CHUNK, WAL
 import { hashString } from './engine/rng.js';
 import { createGame, step, enterLevel, playerVisibleTiles, serializeState, deserializeState } from './engine/game.js';
 import { viewRadiusOf } from './engine/player.js';
+import { ENTITY_DEFS } from './engine/entities.js';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 
@@ -878,6 +879,54 @@ section('5.7 属性波动与随机天赋');
       step(stD2, { type: 'use', item: 'drone' });
       check('drone：游走路径确定性（同 seed 结果一致）', stD.explored['level-5'].size === stD2.explored['level-5'].size, `${stD.explored['level-5'].size} vs ${stD2.explored['level-5'].size}`);
     }
+  }
+}
+
+// ---------- 5.8 新实体：管道潜伏者 / 残缺者 / 蒸汽幻影 ----------
+section('5.8 新实体：潜伏 / 缓慢追踪 / 雾中闪现');
+{
+  const defs = Object.keys(ENTITY_DEFS);
+  check('实体种类 16 种', defs.length === 16, `${defs.length} 种`);
+  check('包含 3 种新实体', ['dweller', 'mangled', 'vapor'].every((t) => defs.includes(t)));
+  // dweller：初始不可见，噪音使其现形
+  {
+    const st = createGame({ levels, seed: 31, startLevel: 'level-5' });
+    st.entities = [
+      { x: st.player.x + 2, y: st.player.y, type: 'dweller', hp: 45, aggression: 'curious', state: 'idle', visible: false, alert: false, wait: 0, revealed: false },
+    ];
+    step(st, { type: 'move', dx: 0, dy: 0 }); // 原地移动制造噪音
+    check('dweller：噪音使其现形', st.entities.some((e) => e.visible), '仍不可见');
+  }
+  // mangled：噪音引导的缓慢追踪（速度 0.5，两回合后距离缩短）
+  {
+    const st = createGame({ levels, seed: 33, startLevel: 'level-5' });
+    const d0 = 2;
+    st.entities = [
+      { x: st.player.x + d0, y: st.player.y, type: 'mangled', hp: 60, aggression: 'hostile', state: 'idle', visible: true, alert: false, wait: 0, revealed: false },
+    ];
+    step(st, { type: 'move', dx: 0, dy: 0 });
+    step(st, { type: 'move', dx: 0, dy: 0 });
+    const d1 = Math.abs(st.entities[0].x - st.player.x) + Math.abs(st.entities[0].y - st.player.y);
+    check('mangled：噪音后缓慢靠近（两回合距离缩短）', d1 < d0, `${d0}→${d1}`);
+  }
+  // vapor：近距离可见并实体化
+  {
+    const st = createGame({ levels, seed: 35, startLevel: 'level-5' });
+    st.entities = [
+      { x: st.player.x + 2, y: st.player.y, type: 'vapor', hp: 30, aggression: 'curious', state: 'idle', visible: true, alert: false, wait: 0, revealed: false },
+    ];
+    const evs = step(st, { type: 'rest' }).events;
+    check('vapor：近距离保持可见', st.entities.some((e) => e.visible));
+  }
+  // 新实体放置到匹配层
+  {
+    const ok = ['level-2', 'level-19', 'level-20', 'level-1', 'level-188', 'level-976'].every((id) =>
+      (levels[id].entities || []).some((e) => ['dweller', 'mangled', 'vapor'].includes(e.type))
+    );
+    check('6 个层配置了新实体', ok);
+    // 无限层生成包含新实体（level-2 激活集）
+    const lv2 = createInfiniteLevel(levels['level-2'], 7);
+    check('level-2 无限层生成含新实体', lv2.entities.some((e) => ['dweller', 'vapor'].includes(e.type)), lv2.entities.map((e) => e.type).join(','));
   }
 }
 

@@ -46,6 +46,16 @@
       "type": "clump",
       "density": 0.003,
       "aggression": "curious"
+    },
+    {
+      "type": "dweller",
+      "density": 0.004,
+      "aggression": "curious"
+    },
+    {
+      "type": "vapor",
+      "density": 0.004,
+      "aggression": "curious"
     }
   ],
   "items": [

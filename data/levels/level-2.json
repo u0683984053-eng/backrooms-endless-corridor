@@ -56,6 +56,11 @@
       "type": "deathmoth",
       "density": 0.008,
       "aggression": "hostile"
+    },
+    {
+      "type": "dweller",
+      "density": 0.006,
+      "aggression": "curious"
     }
   ],
   "items": [

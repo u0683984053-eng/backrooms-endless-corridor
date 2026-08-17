@@ -72,6 +72,21 @@ export const ENTITY_DEFS = {
     behavior: 'guider',
     desc: '温和的发光人形。它会试着为你引路——三次之后，它会指出一条隐藏的路。',
   },
+  dweller: {
+    name: '管道潜伏者', char: 'd', emoji: '🕳️', hp: 45, dmg: 10, sight: 3, hears: 3, speed: 1,
+    behavior: 'pipe-ambush', touchSanity: -1,
+    desc: '藏在管道里的东西。它几乎看不见——你弄出动静，它才会钻出来。',
+  },
+  mangled: {
+    name: '残缺者', char: 'r', emoji: '🚶', hp: 60, dmg: 8, sight: 2, hears: 4, speed: 0.5,
+    behavior: 'slow-hunt', touchSanity: -3,
+    desc: '白房间里的残缺人形。它走得很慢，但它从不放弃——被它碰到，理智会先于身体流失。',
+  },
+  vapor: {
+    name: '蒸汽幻影', char: 'v', emoji: '🌫️', hp: 30, dmg: 4, sight: 6, hears: 0, speed: 0,
+    behavior: 'mist-haunt', touchSanity: -4,
+    desc: '雾气深处的人形。远看它在，近看它散——它闪现靠近时，你该跑了。',
+  },
 };
 
 function mod(n, m) {
@@ -386,6 +401,81 @@ export function updateEntity(e, world) {
       } else {
         wanderStep(e, world, 1);
         e.wait = randInt(rng, 1, 4);
+      }
+      break;
+    }
+
+    case 'pipe-ambush': {
+      // 管道潜伏者：初始不可见；玩家弄出动静或贴近 2 格内时钻出，随后追击
+      if (!e.visible) {
+        if (noiseHere || d <= 2) {
+          e.visible = true;
+          events.push({ text: '管道里传来金属刮擦声——有什么东西钻了出来！', kind: 'entity' });
+          if (adjacent) wantsAttack = true;
+        } else if (e.wait > 0) {
+          e.wait--;
+        } else {
+          wanderStep(e, world, 0.5);
+          e.wait = randInt(rng, 2, 4);
+        }
+        break;
+      }
+      // 已现形：听觉/视线引导的追击
+      if (noiseHere || (d <= def.sight && los)) {
+        moveToward(e, world, def.speed);
+        if (adjacent) wantsAttack = true;
+      } else if (adjacent) {
+        wantsAttack = true;
+      } else if (e.wait > 0) {
+        e.wait--;
+      } else {
+        wanderStep(e, world, 1);
+        e.wait = randInt(rng, 1, 3);
+      }
+      break;
+    }
+
+    case 'slow-hunt': {
+      // 残缺者：缓慢但执着；声音/视线引导，贴脸攻击并侵蚀理智
+      if (noiseHere || (d <= def.sight && los) || adjacent) {
+        e.alert = true;
+        moveToward(e, world, def.speed);
+        if (adjacent) wantsAttack = true;
+      } else {
+        e.alert = false;
+        if (e.wait > 0) e.wait--;
+        else {
+          wanderStep(e, world, 0.5);
+          e.wait = randInt(rng, 2, 4);
+        }
+      }
+      break;
+    }
+
+    case 'mist-haunt': {
+      // 蒸汽幻影：远距离消散不可见；中距离若隐若现并随机闪现逼近；近距离实体化攻击
+      if (d <= 4 && los) {
+        e.visible = true;
+        moveToward(e, world, 1);
+        if (adjacent) wantsAttack = true;
+      } else if (d <= def.sight && los) {
+        e.visible = true;
+        if (rng() < 0.3) {
+          const nx = player.x + Math.sign(e.x - player.x) * Math.min(2, Math.abs(e.x - player.x));
+          const ny = player.y + Math.sign(e.y - player.y) * Math.min(2, Math.abs(e.y - player.y));
+          if (world.isWalkable(nx, ny, e)) {
+            e.x = nx;
+            e.y = ny;
+            events.push({ text: '雾气深处的人形闪了一下——它更近了。', kind: 'entity' });
+          }
+        }
+      } else {
+        e.visible = false;
+        if (e.wait > 0) e.wait--;
+        else {
+          wanderStep(e, world, 1);
+          e.wait = randInt(rng, 1, 3);
+        }
       }
       break;
     }

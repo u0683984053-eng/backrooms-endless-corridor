@@ -54,7 +54,7 @@
         "type": "object",
         "required": ["type", "density"],
         "properties": {
-          "type": { "enum": ["moth", "smiler", "hound", "partygoer", "skin-stealer", "clump", "faceling", "watcher", "duller", "insanity", "scratcher", "deathmoth", "glowfolk"] },
+          "type": { "enum": ["moth", "smiler", "hound", "partygoer", "skin-stealer", "clump", "faceling", "watcher", "duller", "insanity", "scratcher", "deathmoth", "glowfolk", "dweller", "mangled", "vapor"] },
           "density": { "type": "number", "minimum": 0, "maximum": 1, "description": "0-1，生成器按此比例放置" },
           "aggression": { "enum": ["passive", "curious", "hostile"] }
         }

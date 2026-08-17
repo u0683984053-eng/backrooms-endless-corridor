@@ -201,7 +201,7 @@ export const ACHIEVEMENTS = [
   { id: 'hub-visitor', name: '中转站', desc: '发现枢纽（The Hub）。', test: (s) => (s.stats.visited['level-hub'] || 0) > 0 },
   { id: 'codex-24', name: '行记圆满', desc: '发现 28 个层级。你见过的后室，比大多数人想象的都多。', test: (s) => Object.keys(s.codex.levels || {}).length >= 28 },
   { id: 'codex-40', name: '资深行客', desc: '发现 36 个层级。你几乎走遍了所有已知的后室。', test: (s) => Object.keys(s.codex.levels || {}).length >= 36 },
-  { id: 'naturalist', name: '博物学家', desc: '目击全部 13 种实体。你是活的图鉴。', test: (s) => Object.keys((s.codex && s.codex.bestiary) || {}).length >= 13 },
+  { id: 'naturalist', name: '博物学家', desc: '目击全部 16 种实体。你是活的图鉴。', test: (s) => Object.keys((s.codex && s.codex.bestiary) || {}).length >= 16 },
 ];
 
 function checkAchievements(state, events) {

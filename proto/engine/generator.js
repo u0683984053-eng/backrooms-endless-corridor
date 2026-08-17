@@ -904,7 +904,7 @@ function buildLevel(dna, rng) {
       const c = placeAway(rng, tiles, occupied, spawn, spawnDist);
       if (!c) break;
       occupied.add(key(c.x, c.y));
-      const stealthy = spec.type === 'skin-stealer' || spec.type === 'scratcher';
+      const stealthy = spec.type === 'skin-stealer' || spec.type === 'scratcher' || spec.type === 'dweller';
       entities.push({
         x: c.x,
         y: c.y,
@@ -1621,7 +1621,7 @@ function buildChunk(dna, runSeed, cx, cy) {
           }
         }
         if (px < 0) continue;
-        const stealthy = spec.type === 'skin-stealer' || spec.type === 'scratcher';
+        const stealthy = spec.type === 'skin-stealer' || spec.type === 'scratcher' || spec.type === 'dweller';
         ents.push({
           id: (gx0 + px) + ',' + (gy0 + py),
           chunkKey: cx + ',' + cy,
