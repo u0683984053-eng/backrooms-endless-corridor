@@ -1347,6 +1347,16 @@ function buildRoomsChunk(tiles, rng, dna) {
       if (tiles[cy][cx] === '.') tiles[cy][cx] = '~';
     }
   }
+  // 楼梯/电梯（'S' 可走标记）：房间内确定性散布——Level 15 无尽楼梯间的核心氛围
+  if (extra.includes('stairwell') || extra.includes('elevator')) {
+    const n = randInt(rng, 1, 2);
+    for (let i = 0; i < n && rooms.length > 0; i++) {
+      const r = rooms[randInt(rng, 0, rooms.length - 1)];
+      const cx = r.x + randInt(rng, 1, r.w - 2);
+      const cy = r.y + randInt(rng, 1, r.h - 2);
+      if (tiles[cy][cx] === '.') tiles[cy][cx] = 'S';
+    }
+  }
   return rooms.length;
 }
 
@@ -1771,6 +1781,33 @@ export function createInfiniteLevel(dna, runSeed) {
   c0.items = c0.items.filter((it) => !nearSpawn(it.x, it.y));
   level.entities = c0.entities.slice();
   level.items = c0.items.slice();
+
+  // 场景锚点（setPieces）：确定性放置在出生点附近 8-30 格（恐怖来自手作场景，无限层同样生效）
+  const spRng = mulberry32(hashString(`${runSeed}|${dna.id}|setpieces`));
+  for (const sp of dna.setPieces || []) {
+    if (!sp || !sp.type) continue;
+    const d2 = randInt(spRng, 8, 30);
+    const ang2 = (randInt(spRng, 0, 7) * Math.PI) / 4;
+    let x = Math.round(level.spawn.x + Math.cos(ang2) * d2);
+    let y = Math.round(level.spawn.y + Math.sin(ang2) * d2);
+    for (let t = 0; t < 60 && !WALKABLE_TILES.has(level.getTile(x, y)); t++) {
+      x += randInt(spRng, -1, 1);
+      y += randInt(spRng, -1, 1);
+    }
+    if (!WALKABLE_TILES.has(level.getTile(x, y))) {
+      const p = nearestWalkableInfinite(level, x, y);
+      x = p.x;
+      y = p.y;
+    }
+    level.setPieces.push({
+      x,
+      y,
+      type: sp.type,
+      text: sp.text || '',
+      sanityEffect: sp.sanityEffect || 0,
+      note: sp.note || '',
+    });
+  }
   return level;
 }
 

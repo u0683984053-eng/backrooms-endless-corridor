@@ -451,6 +451,39 @@ section('5.6 无限层优化：出口指引 / 缓存上限 / 追击保持');
     check('存档体积受控（<1MB）', saved.length < 1000000, `${(saved.length / 1024).toFixed(0)}KB`);
   }
 
+  // 无限层场景锚点（setPieces）与楼梯（stairwell 特性）——"恐怖来自手作场景"铁律在无限层生效
+  {
+    const lv15 = createInfiniteLevel(levels['level-15'], 7);
+    check('无限层 setPieces 确定性生成', lv15.setPieces.length >= 1, `${lv15.setPieces.length} 个`);
+    check(
+      'setPieces 坐标可行走',
+      lv15.setPieces.every((sp) => WALKABLE_TILES.has(lv15.getTile(sp.x, sp.y)))
+    );
+    let sCount = 0;
+    for (let cy = -1; cy <= 1; cy++) {
+      for (let cx = -1; cx <= 1; cx++) {
+        const c = lv15.getChunk(cx, cy);
+        for (let y = 0; y < 16; y++) {
+          for (let x = 0; x < 16; x++) {
+            if (c.tiles[y][x] === 'S') sCount++;
+          }
+        }
+      }
+    }
+    check('Level 15 楼梯瓦片存在（3×3 chunk ≥1）', sCount >= 1, `${sCount} 个`);
+    // 触发验证：把玩家放到 setPieces 旁 → 事件 + 笔记
+    const st15 = createGame({ levels, seed: 7 });
+    enterLevel(st15, 'level-15', {});
+    const sp0 = st15.level.setPieces[0];
+    if (sp0) {
+      st15.player.x = sp0.x + 1;
+      st15.player.y = sp0.y;
+      const res = step(st15, { type: 'search' });
+      check('触碰 setPieces 触发场景事件', res.events.some((e) => e.text.includes('【场景】')), res.events.map((e) => e.text).slice(0, 2).join(' | '));
+      check('setPieces 笔记写入 Codex 层级条目', (st15.codex.levels['level-15'] && st15.codex.levels['level-15'].notes.length) >= 1, `notes=${st15.codex.levels['level-15'] ? st15.codex.levels['level-15'].notes.length : 0}`);
+    }
+  }
+
   // 出生层级：createGame 支持 startLevel（F 版：90% Level 0，10% 随机层由前端决定）
   {
     const g11 = createGame({ levels, seed: 5, startLevel: 'level-11' });
