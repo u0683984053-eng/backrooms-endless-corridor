@@ -8,6 +8,7 @@ import { loadLevels, LEVEL_IDS, mutateDna } from './engine/dna.js';
 import { generateLevel, verifyReachable, createInfiniteLevel, tileAt, CHUNK, WALKABLE_TILES, nearestExitInfo, COMPASS_ARROWS, angleToArrow, trimChunkCache } from './engine/generator.js';
 import { hashString } from './engine/rng.js';
 import { createGame, step, enterLevel, playerVisibleTiles, serializeState, deserializeState } from './engine/game.js';
+import { viewRadiusOf } from './engine/player.js';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 
@@ -496,6 +497,126 @@ section('5.6 无限层优化：出口指引 / 缓存上限 / 追击保持');
     const gRand = createGame({ levels, seed: 42, startLevel: 'level-19' });
     const okSpawn = WALKABLE_TILES.has(gRand.level.getTile(gRand.player.x, gRand.player.y));
     check('随机出生层可玩（出生点可行走）', okSpawn);
+  }
+}
+
+// ---------- 5.7 属性波动与随机天赋 ----------
+section('5.7 属性波动与随机天赋');
+{
+  // 确定性：同 seed 同属性/天赋
+  const a1 = createGame({ levels, seed: 99 });
+  const a2 = createGame({ levels, seed: 99 });
+  check(
+    '同 seed 属性/天赋一致',
+    a1.player.hpMax === a2.player.hpMax &&
+      a1.player.sanityMax === a2.player.sanityMax &&
+      a1.player.staminaMax === a2.player.staminaMax &&
+      a1.player.talent === a2.player.talent,
+    `${a1.player.hpMax}/${a2.player.hpMax} talent=${a1.player.talent}/${a2.player.talent}`
+  );
+  // 波动范围 + 天赋出现率（40 个种子）
+  let allInRange = true;
+  let talents = 0;
+  const n = 40;
+  for (let s = 1; s <= n; s++) {
+    const g = createGame({ levels, seed: s });
+    if (
+      g.player.hpMax < 90 || g.player.hpMax > 110 ||
+      g.player.sanityMax < 90 || g.player.sanityMax > 110 ||
+      g.player.staminaMax < 90 || g.player.staminaMax > 110
+    ) allInRange = false;
+    if (g.player.talent) talents++;
+  }
+  check('属性波动范围 90-110（40 个种子全部）', allInRange);
+  check('天赋出现率约 40%（4-24/40 内）', talents >= 4 && talents <= 24, `${talents}/${n}`);
+  // 各天赋效果
+  {
+    // strong：hpMax 115 且不被 clamp 回 100
+    const st = createGame({ levels, seed: 1 });
+    st.player.talent = 'strong';
+    st.player.hpMax = 115;
+    st.player.hp = 115;
+    step(st, { type: 'search' });
+    check('strong：HP 上限 115 且回合结算不回落', st.player.hp === 115, `hp=${st.player.hp}`);
+    // healer：回合结束 +1 HP
+    const st2 = createGame({ levels, seed: 1 });
+    st2.player.talent = 'healer';
+    st2.player.hp = 50;
+    step(st2, { type: 'search' });
+    check('healer：回合结束 +1 HP', st2.player.hp === 51, `hp=${st2.player.hp}`);
+    // calm：理智侵蚀减半（Level 15 无实体，sanDrain 0.04 → 0.02/回合，无干扰）
+    const st3 = createGame({ levels, seed: 1, startLevel: 'level-15' });
+    st3.player.talent = 'calm';
+    st3.player.sanityMax = 100;
+    st3.player.sanity = 100;
+    step(st3, { type: 'search' });
+    check('calm：理智侵蚀减半', Math.abs(st3.player.sanity - (100 - 0.04 * 0.5)) < 0.001, `san=${st3.player.sanity}`);
+    // fearless：理智侵蚀 ×0.8
+    const st4 = createGame({ levels, seed: 1, startLevel: 'level-15' });
+    st4.player.talent = 'fearless';
+    st4.player.sanityMax = 100;
+    st4.player.sanity = 100;
+    step(st4, { type: 'search' });
+    check('fearless：理智侵蚀 ×0.8', Math.abs(st4.player.sanity - (100 - 0.04 * 0.8)) < 0.001, `san=${st4.player.sanity}`);
+    // night-eye：视野半径 +1
+    const st5 = createGame({ levels, seed: 1 });
+    st5.player.talent = 'night-eye';
+    const r1 = viewRadiusOf(st5.level, st5.player);
+    st5.player.talent = null;
+    const r2 = viewRadiusOf(st5.level, st5.player);
+    check('night-eye：视野半径 +1', r1 === r2 + 1, `${r1} vs ${r2}`);
+    // runner：奔跑 2 格只耗 2 体力（普通 4；回合回复 +2 抵消）
+    const st6 = createGame({ levels, seed: 1 });
+    st6.player.talent = 'runner';
+    const p6 = st6.player;
+    const dirs6 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    let moved6 = false;
+    for (const d of dirs6) {
+      if (tileAt(st6.level, p6.x + d[0], p6.y + d[1]) !== '#') {
+        step(st6, { type: 'run', dx: d[0], dy: d[1] });
+        moved6 = true;
+        break;
+      }
+    }
+    check('runner：奔跑消耗减半（2 格 2 体力）', !moved6 || p6.stamina >= (p6.staminaMax || 100) - 3, `sta=${p6.stamina}/${p6.staminaMax}`);
+    // hardy：杏仁水恢复 ×1.5（+37 理智 +22 生命）
+    const st7 = createGame({ levels, seed: 1 });
+    st7.player.talent = 'hardy';
+    st7.player.inventory.push('almond-water');
+    st7.player.hp = 50;
+    st7.player.sanity = 50;
+    const beforeHp = st7.player.hp;
+    const beforeSan = st7.player.sanity;
+    step(st7, { type: 'use', item: 'almond-water' });
+    check(
+      'hardy：杏仁水恢复 ×1.5',
+      st7.player.hp - beforeHp === 22 && st7.player.sanity - beforeSan > 36 && st7.player.sanity - beforeSan < 37.5,
+      `hpΔ=${st7.player.hp - beforeHp} sanΔ=${(st7.player.sanity - beforeSan).toFixed(2)}`
+    );
+    // scavenger：反复搜索可发现物品
+    const st8 = createGame({ levels, seed: 1 });
+    st8.player.talent = 'scavenger';
+    st8.items = [];
+    st8.level.items = [];
+    let found8 = false;
+    for (let i = 0; i < 10 && !found8; i++) {
+      step(st8, { type: 'search' });
+      if (st8.items.length > 0) found8 = true;
+    }
+    check('scavenger：搜索可发现物品', found8);
+    // 序列化往返：属性/天赋保留
+    const st9 = createGame({ levels, seed: 123 });
+    const data = JSON.parse(JSON.stringify(serializeState(st9)));
+    const st10 = createGame({ levels, seed: 999 });
+    deserializeState(st10, data);
+    check(
+      '序列化往返保留属性/天赋',
+      st10.player.hpMax === st9.player.hpMax &&
+        st10.player.sanityMax === st9.player.sanityMax &&
+        st10.player.staminaMax === st9.player.staminaMax &&
+        st10.player.talent === st9.player.talent,
+      `hpMax ${st9.player.hpMax}/${st10.player.hpMax} talent ${st9.player.talent}/${st10.player.talent}`
+    );
   }
 }
 

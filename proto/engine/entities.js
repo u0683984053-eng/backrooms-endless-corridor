@@ -564,9 +564,13 @@ function wanderStep(e, world, speed) {
 
 // ---------- 攻击结算 ----------
 
-/** 实体攻击玩家：-dmg 生命；部分实体额外 -理智 */
+/** 实体攻击玩家：-dmg 生命；部分实体额外 -理智（幸运儿天赋 25% 落空，用引擎 rng 保确定性） */
 function attackPlayer(world, events, dmg, name, def) {
   const { player } = world;
+  if (player && player.talent === 'lucky' && world.rng && world.rng() < 0.25) {
+    events.push({ text: `${name}扑向你，但你在最后一刻躲开了！`, kind: 'combat' });
+    return;
+  }
   player.hp = Math.max(0, player.hp - dmg);
   if (world.recordAttack) world.recordAttack(name);
   events.push({ text: `${name}攻击了你（-${dmg} HP）！`, kind: 'combat' });

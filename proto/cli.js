@@ -17,7 +17,7 @@ import {
   deserializeState,
   enterLevel,
 } from './engine/game.js';
-import { viewRadiusOf, ITEM_META } from './engine/player.js';
+import { viewRadiusOf, ITEM_META, TALENTS } from './engine/player.js';
 import { ENTITY_DEFS } from './engine/entities.js';
 import { nearestExitInfo, COMPASS_ARROWS, angleToArrow } from './engine/generator.js';
 
@@ -104,19 +104,26 @@ function renderView(state, radiusOverride) {
 /** 状态栏 */
 function renderStatus() {
   const { player, level } = state;
-  const pct = (v) => (v >= 100 ? 'MAX' : String(Math.round(v)).padStart(3));
+  const pct = (v, max) => (v >= max ? 'MAX' : String(Math.round(v)).padStart(3));
+  const talent = player.talent && TALENTS[player.talent] ? ` | 天赋:${TALENTS[player.talent].name}` : '';
   let compass = '';
   if (level.infinite) {
     const info = nearestExitInfo(level, player.x, player.y);
     if (info) {
-      compass = ` 出口${COMPASS_ARROWS[angleToArrow(info.angle)]}${Math.round(info.d)}m`;
+      const disc = state.discoveredExits[state.levelId] || new Set();
+      const known =
+        player.talent === 'guide' ||
+        !info.hidden ||
+        disc.has(state.level.exits.findIndex((e) => e.x === info.x && e.y === info.y));
+      compass = ` 出口${COMPASS_ARROWS[angleToArrow(info.angle)]}${known ? Math.round(info.d) + 'm' : '?'}`;
     }
   }
   return (
-    `HP ${pct(player.hp)}  SAN ${pct(player.sanity)}  STA ${pct(player.stamina)}  ` +
+    `HP ${pct(player.hp, player.hpMax || 100)}  SAN ${pct(player.sanity, player.sanityMax || 100)}  STA ${pct(player.stamina, player.staminaMax || 100)}  ` +
     `| ${level.name}（难度 ${level.difficultyClass}）| 第 ${state.turn} 回合 | ` +
     `手电:${player.flashlight ? '开' : '关'}(${Math.floor(player.battery)}%) ` +
     `潜行:${player.sneak ? '开' : '关'} 武器:${player.weapon ? '撬棍' : '徒手'}` +
+    talent +
     compass
   );
 }

@@ -11,7 +11,7 @@ import {
   enterLevel,
   ACHIEVEMENTS,
 } from '../engine/game.js';
-import { ITEM_META, viewRadiusOf } from '../engine/player.js';
+import { ITEM_META, viewRadiusOf, TALENTS } from '../engine/player.js';
 import { ENTITY_DEFS } from '../engine/entities.js';
 import { tileAt, nearestExitInfo, COMPASS_ARROWS, angleToArrow } from '../engine/generator.js';
 import { hashString } from '../engine/rng.js';
@@ -212,9 +212,11 @@ function newGame() {
   rebuildVisuals();
   renderAll();
   saveGame();
-  // 与野性入口一致的可见反馈：跌入层级过渡遮罩（含层级名与描述）
+  // 与野性入口一致的可见反馈：跌入层级过渡遮罩（含层级名与描述、天赋提示）
   const dna = game.levels[game.levelId];
-  showTransition(`你跌入了 ${dna.name}（难度 Class ${dna.difficultyClass}）\n${dna.description}`, 3400);
+  const t = game.player.talent && TALENTS[game.player.talent];
+  const talentLine = t ? `\n天赋：${t.name}——${t.desc}` : '';
+  showTransition(`你跌入了 ${dna.name}（难度 Class ${dna.difficultyClass}）\n${dna.description}${talentLine}`, 3800);
 }
 
 function continueGame() {
@@ -1610,14 +1612,15 @@ function renderHud() {
   const g = game;
   const p = g.player;
   const level = g.level;
-  setBar('hp', p.hp);
-  setBar('san', p.sanity);
-  setBar('sta', p.stamina);
-  $('hp-num').textContent = `${Math.round(p.hp)}/100`;
-  $('san-num').textContent = `${Math.round(p.sanity)}/100`;
-  $('sta-num').textContent = `${Math.round(p.stamina)}/100`;
+  setBar('hp', p.hp, p.hpMax || 100);
+  setBar('san', p.sanity, p.sanityMax || 100);
+  setBar('sta', p.stamina, p.staminaMax || 100);
+  $('hp-num').textContent = `${Math.round(p.hp)}/${p.hpMax || 100}`;
+  $('san-num').textContent = `${Math.round(p.sanity)}/${p.sanityMax || 100}`;
+  $('sta-num').textContent = `${Math.round(p.stamina)}/${p.staminaMax || 100}`;
   $('level-name').textContent = level.name;
-  $('level-meta').textContent = `难度 Class ${level.difficultyClass} · ${level.environment} · 光照:${level.light} · 空间:${level.spaceRules.join('/')} · 美学:${level.aesthetic || '默认'}`;
+  const talentText = p.talent && TALENTS[p.talent] ? ` · 天赋:${TALENTS[p.talent].name}` : '';
+  $('level-meta').textContent = `难度 Class ${level.difficultyClass} · ${level.environment} · 光照:${level.light} · 空间:${level.spaceRules.join('/')} · 美学:${level.aesthetic || '默认'}${talentText}`;
   $('turn-info').textContent = `第 ${g.turn} 回合`;
   $('light-info').textContent = `手电:${p.flashlight ? '开' : '关'} 电量 ${Math.floor(p.battery)}% · 潜行:${p.sneak ? '开' : '关'} · 武器:${p.weapon ? '撬棍' : '徒手'}`;
 
@@ -1652,6 +1655,7 @@ function renderHud() {
     if (info) {
       const arrow = COMPASS_ARROWS[angleToArrow(info.angle)];
       const known =
+        g.player.talent === 'guide' ||
         !info.hidden ||
         (disc && disc.has(level.exits.findIndex((e) => e.x === info.x && e.y === info.y)));
       compass.textContent = known ? `${arrow} 出口 ${Math.round(info.d)}m` : `${arrow} 出口 ?`;
@@ -1662,8 +1666,8 @@ function renderHud() {
   }
 }
 
-function setBar(id, v) {
-  $(id + '-fill').style.width = `${Math.max(0, Math.min(100, v))}%`;
+function setBar(id, v, max = 100) {
+  $(id + '-fill').style.width = `${Math.max(0, Math.min(100, (v / max) * 100))}%`;
 }
 
 /** 背包：角标数量 + 弹窗物品网格（B 键/🎒按钮打开） */

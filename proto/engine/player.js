@@ -19,14 +19,35 @@ export const ITEM_META = {
   'liquid-pain': { name: '痛苦之液', emoji: '🧪', desc: '来历不明的镇痛液：+15 生命，但 -20 理智。' },
 };
 
-/** 创建玩家 */
-export function createPlayer(x, y) {
+/** 天赋池：坠入后室时随机获得的能力（"一定概率刷出"） */
+export const TALENTS = {
+  strong: { name: '强健体魄', desc: '生命上限 +15。' },
+  calm: { name: '心如止水', desc: '理智侵蚀减半。' },
+  'night-eye': { name: '夜视', desc: '视野半径 +1。' },
+  runner: { name: '疾步', desc: '奔跑体力消耗减半。' },
+  healer: { name: '自愈体质', desc: '每回合恢复 1 生命。' },
+  lucky: { name: '幸运儿', desc: '受实体攻击时 25% 概率落空。' },
+  scavenger: { name: '拾荒本能', desc: '搜索时 25% 概率在附近发现物品。' },
+  hardy: { name: '铁胃', desc: '食物与药品恢复效果 +50%。' },
+  fearless: { name: '无畏', desc: '理智侵蚀 -20%，幻觉更少。' },
+  guide: { name: '引路者', desc: '出口罗盘始终显示精确距离。' },
+};
+
+/** 创建玩家（attrs: { hpMax, sanityMax, staminaMax, talent }） */
+export function createPlayer(x, y, attrs = {}) {
+  const hpMax = attrs.hpMax || 100;
+  const sanityMax = attrs.sanityMax || 100;
+  const staminaMax = attrs.staminaMax || 100;
   return {
     x,
     y,
-    hp: 100,
-    sanity: 100,
-    stamina: 100,
+    hp: hpMax,
+    sanity: sanityMax,
+    stamina: staminaMax,
+    hpMax,
+    sanityMax,
+    staminaMax,
+    talent: attrs.talent || null,
     inventory: ['flashlight'], // 初始自带一支手电（默认关闭）
     weapon: null,
     flashlight: false,
@@ -36,10 +57,24 @@ export function createPlayer(x, y) {
   };
 }
 
-/** 视野半径：随层级光照与手电变化 */
+/** 旧存档兼容：补齐属性上限与天赋字段 */
+export function normalizePlayer(p) {
+  if (!p) return p;
+  p.hpMax = p.hpMax || 100;
+  p.sanityMax = p.sanityMax || 100;
+  p.staminaMax = p.staminaMax || 100;
+  p.talent = p.talent || null;
+  p.hp = Math.min(p.hpMax, Math.max(0, p.hp));
+  p.sanity = Math.min(p.sanityMax, Math.max(0, p.sanity));
+  p.stamina = Math.min(p.staminaMax, Math.max(0, p.stamina));
+  return p;
+}
+
+/** 视野半径：随层级光照与手电变化（夜视天赋 +1） */
 export function viewRadiusOf(level, player) {
   const base = { bright: 9, dim: 7, flickering: 7, dark: 5, pitch: 3 }[level.light] ?? 6;
-  return player && player.flashlight ? base + 2 : base;
+  const extra = player && player.talent === 'night-eye' ? 1 : 0;
+  return base + (player && player.flashlight ? 2 : 0) + extra;
 }
 
 /** 瓦片是否"亮"：bright/flickering 层级常亮；否则手电半径 5 内亮 */
@@ -124,6 +159,25 @@ export function applyPlayerAction(state, action, world) {
       revealNearby(state, world, events, 2);
       // 触发相邻 setPieces
       triggerSetPieces(state, events, 1);
+      // 拾荒本能天赋：25% 概率在相邻可行走格发现一件物品（附近无物品时才触发）
+      if (player.talent === 'scavenger' && chance(state.rng, 0.25)) {
+        const pool = state.levels[state.levelId] && state.levels[state.levelId].items;
+        const hasNearby = state.items.some((it) => Math.abs(it.x - player.x) + Math.abs(it.y - player.y) <= 1);
+        if (!hasNearby && pool && pool.length > 0) {
+          const spots = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+          const free = spots.find(([dx, dy]) => tileAt(level, player.x + dx, player.y + dy) !== '#');
+          if (free) {
+            state.items.push({
+              id: 'scav:' + state.turn + ':' + (state.items.length % 97),
+              chunkKey: level.infinite ? Math.floor(player.x / 16) + ',' + Math.floor(player.y / 16) : null,
+              x: player.x + free[0],
+              y: player.y + free[1],
+              type: pick(state.rng, pool),
+            });
+            events.push({ text: '你的拾荒本能让你在角落里发现了一点东西。', kind: 'item' });
+          }
+        }
+      }
       break;
     }
 
@@ -160,10 +214,10 @@ export function applyPlayerAction(state, action, world) {
     }
 
     case 'rest': {
-      player.stamina = Math.min(100, player.stamina + 30);
+      player.stamina = Math.min(player.staminaMax || 100, player.stamina + 30);
       const lit = isLitTile(level, player, player.x, player.y);
       if (lit) {
-        player.sanity = Math.min(100, player.sanity + 8);
+        player.sanity = Math.min(player.sanityMax || 100, player.sanity + 8);
         events.push({ text: '你在光亮处休息了一会儿，恢复体力，理智也稳住了。（+30 体力，+8 理智）', kind: 'item' });
       } else {
         events.push({ text: '你在黑暗中休息了一会儿，恢复体力。（+30 体力）', kind: 'item' });
@@ -310,9 +364,10 @@ function tryMove(state, world, dx, dy, events, opts) {
       break;
     }
 
-    // 体力消耗：水格 2，普通 1；奔跑加倍
+    // 体力消耗：水格 2，普通 1；奔跑加倍（疾步天赋奔跑不额外消耗）
     const water = tile === '~';
-    const cost = (water ? 2 : 1) * (opts.run ? 2 : 1);
+    const runMult = opts.run ? (player.talent === 'runner' ? 1 : 2) : 1;
+    const cost = (water ? 2 : 1) * runMult;
     if (player.stamina < cost) {
       events.push({ text: '体力不足，无法继续前进。', kind: 'system' });
       break;
@@ -518,19 +573,26 @@ function doFight(state, world, events) {
 /** 使用物品 */
 function useItem(state, world, events, itemName, invIdx) {
   const { player } = state;
+  // 铁胃天赋：食物与药品恢复 +50%（整数向下取整）
+  const healMul = player.talent === 'hardy' ? 1.5 : 1;
+  const clampMax = (v, max) => Math.max(0, Math.min(max || 100, v));
   switch (itemName) {
     case 'almond-water': {
-      player.sanity = Math.min(100, player.sanity + 25);
-      player.hp = Math.min(100, player.hp + 15);
+      const s = Math.floor(25 * healMul);
+      const h = Math.floor(15 * healMul);
+      player.sanity = clampMax(player.sanity + s, player.sanityMax);
+      player.hp = clampMax(player.hp + h, player.hpMax);
       player.inventory.splice(invIdx, 1);
-      events.push({ text: '你喝下杏仁水。理智回归（+25 理智，+15 生命）。', kind: 'item' });
+      events.push({ text: `你喝下杏仁水。理智回归（+${s} 理智，+${h} 生命）。`, kind: 'item' });
       break;
     }
     case 'royal-ration': {
-      player.stamina = Math.min(100, player.stamina + 30);
-      player.hp = Math.min(100, player.hp + 5);
+      const s = Math.floor(30 * healMul);
+      const h = Math.floor(5 * healMul);
+      player.stamina = clampMax(player.stamina + s, player.staminaMax);
+      player.hp = clampMax(player.hp + h, player.hpMax);
       player.inventory.splice(invIdx, 1);
-      events.push({ text: '你吃下皇家口粮（+30 体力，+5 生命）。', kind: 'item' });
+      events.push({ text: `你吃下皇家口粮（+${s} 体力，+${h} 生命）。`, kind: 'item' });
       break;
     }
     case 'battery': {
@@ -540,9 +602,10 @@ function useItem(state, world, events, itemName, invIdx) {
       break;
     }
     case 'medkit': {
-      player.hp = Math.min(100, player.hp + 40);
+      const h = Math.floor(40 * healMul);
+      player.hp = clampMax(player.hp + h, player.hpMax);
       player.inventory.splice(invIdx, 1);
-      events.push({ text: '你用医疗包处理了伤口（+40 生命）。', kind: 'item' });
+      events.push({ text: `你用医疗包处理了伤口（+${h} 生命）。`, kind: 'item' });
       break;
     }
     case 'flashlight': {
@@ -576,7 +639,7 @@ function useItem(state, world, events, itemName, invIdx) {
     case 'liquid-pain': {
       // 痛苦之液（Fandom：镇痛但侵蚀理智）
       player.inventory.splice(invIdx, 1);
-      player.hp = Math.min(100, player.hp + 15);
+      player.hp = clampMax(player.hp + Math.floor(15 * healMul), player.hpMax);
       player.sanity = Math.max(0, player.sanity - 20);
       events.push({ text: '液体灼烧你的喉咙，疼痛消失了——但有什么东西也跟着消失了。（+15 生命 / -20 理智）', kind: 'sanity' });
       break;

@@ -2,10 +2,10 @@
 // 游戏主循环：回合制状态机、事件日志、胜负判定、层级切换、视野计算、存档序列化。
 // 回合经济学：玩家动作 → 出口切换 → 实体行动 → 状态结算 → 事件日志。
 
-import { mulberry32, hashString, chance, pick, DIRS } from './rng.js';
+import { mulberry32, hashString, chance, pick, DIRS, randInt } from './rng.js';
 import { generateLevel, createInfiniteLevel, updateActiveChunks, trimChunkCache, tileAt } from './generator.js';
 import { updateEntity, ENTITY_DEFS } from './entities.js';
-import { createPlayer, applyPlayerAction, viewRadiusOf, isLitTile, pushLog } from './player.js';
+import { createPlayer, applyPlayerAction, normalizePlayer, viewRadiusOf, isLitTile, pushLog, TALENTS } from './player.js';
 
 /** 免费动作：不消耗回合、不进入实体阶段 */
 const FREE_ACTIONS = new Set(['look', 'note']);
@@ -21,6 +21,18 @@ function clamp(v, min, max) {
 /** 创建一局游戏（默认从 Level 0 出生；startLevel 可指定出生层级） */
 export function createGame({ levels, seed, startLevel }) {
   const runSeed = seed === undefined ? 1 : seed;
+  // 属性波动与随机天赋：确定性派生（同一 runSeed 永远同一套属性/天赋）
+  const prng = mulberry32(hashString('attrs:' + String(runSeed)));
+  const playerAttrs = {
+    hpMax: 100 + randInt(prng, -10, 10),
+    sanityMax: 100 + randInt(prng, -10, 10),
+    staminaMax: 100 + randInt(prng, -10, 10),
+    talent: null,
+  };
+  if (prng() < 0.4) {
+    const ids = Object.keys(TALENTS);
+    playerAttrs.talent = ids[Math.floor(prng() * ids.length)];
+  }
   const state = {
     levels,
     runSeed,
@@ -53,6 +65,7 @@ export function createGame({ levels, seed, startLevel }) {
       visited: {}, // levelId -> 进入次数
     },
     rng: mulberry32(hashString('game:' + String(runSeed))),
+    playerAttrs,
   };
   const start = startLevel && levels[startLevel] ? startLevel : 'level-0';
   enterLevel(state, start, { initial: true });
@@ -240,7 +253,8 @@ export function enterLevel(state, levelId, opts = {}) {
     state.player.x = level.spawn.x;
     state.player.y = level.spawn.y;
   } else {
-    state.player = createPlayer(level.spawn.x, level.spawn.y);
+    const attrs = state.playerAttrs || { hpMax: 100, sanityMax: 100, staminaMax: 100, talent: null };
+    state.player = createPlayer(level.spawn.x, level.spawn.y, attrs);
   }
   if (level.infinite) {
     // 无限层：实体/物品直接引用激活集（updateActiveChunks 维护进出）
@@ -415,15 +429,24 @@ function endTurn(state, events) {
     }
   }
 
-  // 理智：基础侵蚀；安全层（sanDrain<=0.03 且 bright）每回合 +1
+  // 理智：基础侵蚀（心如止水减半 / 无畏 -20%）；安全层（sanDrain<=0.03 且 bright）每回合 +1
+  const talent = player.talent;
   if (level.sanDrain <= 0.03 && level.light === 'bright') {
-    player.sanity = Math.min(100, player.sanity + 1);
+    player.sanity = Math.min(player.sanityMax || 100, player.sanity + 1);
   } else {
-    player.sanity -= level.sanDrain || 0;
+    let drain = level.sanDrain || 0;
+    if (talent === 'calm') drain *= 0.5;
+    else if (talent === 'fearless') drain *= 0.8;
+    player.sanity -= drain;
   }
 
   // 体力自然回复
-  player.stamina = Math.min(100, player.stamina + 2);
+  player.stamina = Math.min(player.staminaMax || 100, player.stamina + 2);
+
+  // 自愈体质天赋：每回合 +1 生命
+  if (talent === 'healer') {
+    player.hp = Math.min(player.hpMax || 100, player.hp + 1);
+  }
 
   // 手电电池：每 20 回合耗 1 电池
   if (player.flashlight) {
@@ -441,9 +464,9 @@ function endTurn(state, events) {
 
   updateSanityPhase(state, events);
 
-  player.sanity = clamp(player.sanity, 0, 100);
-  player.hp = clamp(player.hp, 0, 100);
-  player.stamina = clamp(player.stamina, 0, 100);
+  player.sanity = clamp(player.sanity, 0, player.sanityMax || 100);
+  player.hp = clamp(player.hp, 0, player.hpMax || 100);
+  player.stamina = clamp(player.stamina, 0, player.staminaMax || 100);
 }
 
 const FAKE_UNEASY = [
@@ -496,11 +519,12 @@ function updateSanityPhase(state, events) {
     state.sanityPhase = phase;
   }
   state.fear = phase === 'fear' || phase === 'collapse';
-  if (phase === 'uneasy' && chance(state.rng, 0.12)) {
+  const halve = state.player.talent === 'fearless' ? 0.5 : 1;
+  if (phase === 'uneasy' && chance(state.rng, 0.12 * halve)) {
     events.push({ text: pick(state.rng, FAKE_UNEASY), kind: 'sanity', hallucination: true });
-  } else if (phase === 'fear' && chance(state.rng, 0.18)) {
+  } else if (phase === 'fear' && chance(state.rng, 0.18 * halve)) {
     events.push({ text: pick(state.rng, FAKE_FEAR), kind: 'sanity', hallucination: true });
-  } else if (phase === 'collapse' && chance(state.rng, 0.25)) {
+  } else if (phase === 'collapse' && chance(state.rng, 0.25 * halve)) {
     events.push({ text: pick(state.rng, FAKE_COLLAPSE), kind: 'sanity', hallucination: true });
   }
 }
@@ -594,6 +618,16 @@ export function deserializeState(state, data) {
   );
   enterLevel(state, data.levelId || 'level-0', { keepPlayer: true });
   if (data.player) Object.assign(state.player, data.player);
+  normalizePlayer(state.player);
+  // 恢复属性/天赋（旧存档无 playerAttrs 时从玩家状态回填）
+  if (!state.playerAttrs && data.player) {
+    state.playerAttrs = {
+      hpMax: state.player.hpMax || 100,
+      sanityMax: state.player.sanityMax || 100,
+      staminaMax: state.player.staminaMax || 100,
+      talent: state.player.talent || null,
+    };
+  }
   // 无限层：恢复取走/击杀集合并刷新激活集（chunk 瓦片确定性重放）
   if (data.inf && state.level && state.level.infinite) {
     state.level.takenItems = new Set(data.inf.ti || []);
