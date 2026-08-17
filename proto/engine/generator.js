@@ -1138,7 +1138,7 @@ function findFreeNear(tiles, occupied, x, y) {
 /** 可达性验证：出生点 BFS 可达所有出口（looping 层按环面处理；无限层限深验证） */
 export function verifyReachable(level) {
   if (level.infinite) {
-    // 无限层：出口都在出生点附近（8-24 格），80 步 BFS 足够验证
+    // 无限层：出口都在出生点附近（8-24 格），200 步 BFS 足够（洞穴类迷宫绕路多）
     if (!WALKABLE_TILES.has(tileAt(level, level.spawn.x, level.spawn.y))) return false;
     const exitKeys = new Set((level.exits || []).map((e) => key(e.x, e.y)));
     if (exitKeys.size === 0) return true;
@@ -1147,7 +1147,7 @@ export function verifyReachable(level) {
     let head = 0;
     while (head < queue.length) {
       const [x, y, d] = queue[head++];
-      if (d >= 80) continue;
+      if (d >= 200) continue;
       for (const dd of DIRS4) {
         const nx = x + dd.dx;
         const ny = y + dd.dy;
@@ -1251,6 +1251,59 @@ function carveL(tiles, a, b, cw = 2) {
   const yHi = Math.max(a.y, b.y);
   for (let yy = yLo; yy <= yHi; yy++) {
     for (let xx = x0; xx <= x1; xx++) tiles[yy][xx] = '.';
+  }
+}
+
+/** 地铁隧道 chunk：4 宽隧道网格（全局公式）+ 块哈希站台开放区 + 站台楼梯（Level 169） */
+function buildTunnelChunk(tiles, gx0, gy0, dna, runSeed) {
+  const stride = 12;
+  const tunnelW = 4;
+  for (let ly = 0; ly < CHUNK; ly++) {
+    for (let lx = 0; lx < CHUNK; lx++) {
+      const gx = gx0 + lx;
+      const gy = gy0 + ly;
+      tiles[ly][lx] = posmod(gx, stride) < tunnelW || posmod(gy, stride) < tunnelW ? '.' : '#';
+    }
+  }
+  // 站台：块哈希决定（与 chunk 无关，跨 chunk 一致），35% 的街区成为开放站台
+  const bx0 = Math.floor(gx0 / stride);
+  const bx1 = Math.floor((gx0 + CHUNK - 1) / stride);
+  const by0 = Math.floor(gy0 / stride);
+  const by1 = Math.floor((gy0 + CHUNK - 1) / stride);
+  for (let by = by0; by <= by1; by++) {
+    for (let bx = bx0; bx <= bx1; bx++) {
+      const br = mulberry32(hashString(`${runSeed}|${dna.id}|tblk:${bx},${by}`));
+      if (!chance(br, 0.35)) continue;
+      const x0 = bx * stride + tunnelW + 1;
+      const y0 = by * stride + tunnelW + 1;
+      for (let yy = y0; yy < y0 + 6; yy++) {
+        for (let xx = x0; xx < x0 + 6; xx++) {
+          const lx = xx - gx0;
+          const ly = yy - gy0;
+          if (lx >= 0 && lx < CHUNK && ly >= 0 && ly < CHUNK) tiles[ly][lx] = '.';
+        }
+      }
+      const n = randInt(br, 1, 2);
+      for (let i = 0; i < n; i++) {
+        const sx = x0 + randInt(br, 0, 5);
+        const sy = y0 + randInt(br, 0, 5);
+        const lx = sx - gx0;
+        const ly = sy - gy0;
+        if (lx >= 0 && lx < CHUNK && ly >= 0 && ly < CHUNK && tiles[ly][lx] === '.') tiles[ly][lx] = 'S';
+      }
+      // 站台与隧道之间的开口：四面各开 2 格（站台不能是封闭房间）
+      const opens = [
+        [x0 + 2, y0 - 1], [x0 + 3, y0 - 1],
+        [x0 + 2, y0 + 6], [x0 + 3, y0 + 6],
+        [x0 - 1, y0 + 2], [x0 - 1, y0 + 3],
+        [x0 + 6, y0 + 2], [x0 + 6, y0 + 3],
+      ];
+      for (const [gx, gy] of opens) {
+        const lx = gx - gx0;
+        const ly = gy - gy0;
+        if (lx >= 0 && lx < CHUNK && ly >= 0 && ly < CHUNK && tiles[ly][lx] === '#') tiles[ly][lx] = '.';
+      }
+    }
   }
 }
 
@@ -1360,7 +1413,7 @@ function buildRoomsChunk(tiles, rng, dna) {
   return rooms.length;
 }
 
-/** 洞穴 chunk：8 端口 + 从端口出发的随机游走 + 随机洞穴室 */
+/** 洞穴 chunk：8 端口 + 从端口出发的随机游走 + 随机洞穴室（端口兜底 L 通道保证全连通） */
 function buildCavesChunk(tiles, rng) {
   carvePorts(tiles);
   const starts = EDGE_PORTS.map(portInner);
@@ -1368,18 +1421,29 @@ function buildCavesChunk(tiles, rng) {
   let y = starts[0].y;
   tiles[y][x] = '.';
   for (let s = 1; s < starts.length; s++) {
+    let reached = false;
     for (let i = 0; i < 60; i++) {
       const dir = DIRS4[randInt(rng, 0, 3)];
       x = Math.max(1, Math.min(CHUNK - 2, x + dir.dx));
       y = Math.max(1, Math.min(CHUNK - 2, y + dir.dy));
       tiles[y][x] = '.';
-      if (Math.abs(x - starts[s].x) + Math.abs(y - starts[s].y) <= 2) break;
+      if (Math.abs(x - starts[s].x) + Math.abs(y - starts[s].y) <= 2) {
+        reached = true;
+        break;
+      }
+    }
+    // 兜底：游走未达端口时，挖一条 L 形通道直达（保证端口永不孤立）
+    if (!reached) {
+      carveL(tiles, { x, y }, starts[s], 2);
+      x = starts[s].x;
+      y = starts[s].y;
     }
   }
   const caves = randInt(rng, 1, 3);
   for (let i = 0; i < caves; i++) {
-    const cx = randInt(rng, 3, CHUNK - 4);
-    const cy = randInt(rng, 3, CHUNK - 4);
+    // 洞穴室从主游走路径上延伸（保证与网络连通，不会出现孤立洞穴）
+    const cx = Math.max(2, Math.min(CHUNK - 3, x + randInt(rng, -5, 5)));
+    const cy = Math.max(2, Math.min(CHUNK - 3, y + randInt(rng, -5, 5)));
     const r = randInt(rng, 2, 4);
     for (let yy = cy - r; yy <= cy + r; yy++) {
       for (let xx = cx - r; xx <= cx + r; xx++) {
@@ -1387,6 +1451,15 @@ function buildCavesChunk(tiles, rng) {
           tiles[yy][xx] = '.';
         }
       }
+    }
+    // 洞穴室与路径之间的通道（确定性）
+    tiles[cy][cx] = '.';
+    if (Math.abs(cx - x) >= Math.abs(cy - y)) {
+      for (let xx = Math.min(cx, x); xx <= Math.max(cx, x); xx++) tiles[cy][xx] = '.';
+      for (let yy = Math.min(cy, y); yy <= Math.max(cy, y); yy++) tiles[yy][x] = '.';
+    } else {
+      for (let yy = Math.min(cy, y); yy <= Math.max(cy, y); yy++) tiles[yy][cx] = '.';
+      for (let xx = Math.min(cx, x); xx <= Math.max(cx, x); xx++) tiles[y][xx] = '.';
     }
   }
 }
@@ -1594,6 +1667,7 @@ function buildChunk(dna, runSeed, cx, cy) {
   else if (topology === 'hotel') buildHotelChunk(tiles, gx0, gy0, dna, runSeed);
   else if (topology === 'fields') buildFieldsChunk(tiles, rng);
   else if (topology === 'caves') buildCavesChunk(tiles, rng);
+  else if (topology === 'tunnel') buildTunnelChunk(tiles, gx0, gy0, dna, runSeed);
   else roomCount = buildRoomsChunk(tiles, rng, dna);
 
   // 实体：密度 × 256 格期望值，泊松化

@@ -1,0 +1,98 @@
+{
+  "id": "level-97",
+  "name": "Level 97 — 存储间",
+  "number": 97,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "mixed",
+  "aesthetic": "weirdcore",
+  "light": "flickering",
+  "sanDrain": 0.04,
+  "description": "一间又一间的存储室：货架、纸箱、贴着标签的收纳盒。标签上写着『旧衣服』『工具』『回忆』——有一个盒子标签上写着你的名字，盒子是空的，但盒底有一道新划痕。",
+  "palette": {
+    "primary": "#9a968a",
+    "secondary": "#6a665e",
+    "accent": "#3e3a34",
+    "light": "#e0dcc8"
+  },
+  "terrain": {
+    "width": 30,
+    "height": 30,
+    "roomCount": 10,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "drywall",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "shelves",
+      "crates",
+      "papers",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "faceling",
+      "density": 0.004,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note",
+    "key"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一个贴着『备用钥匙』的盒子。你打开——里面是另一把锁的钥匙，锁在一扇你找不到的门上。",
+      "sanityEffect": -3,
+      "note": "一盒备用钥匙，锁着不存在的门。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "纸箱上贴着一张便签：『放不下的东西都存在这里。包括你。』",
+      "sanityEffect": -4,
+      "note": "便签：包括你。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "荧光灯轻微嗡鸣",
+      "纸箱里偶尔的窸窣声"
+    ],
+    "startles": [
+      "某个纸箱的封条自己裂开了",
+      "隔壁存储间传来翻找东西的声音"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-96",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇标着『档案室』的门，门后是日光灯下的办公楼。"
+    },
+    {
+      "kind": "elevator",
+      "target": "level-4",
+      "hidden": true,
+      "danger": false,
+      "description": "一部货运电梯，按钮上写着『4F』。"
+    }
+  ]
+}

@@ -128,6 +128,20 @@
       "hidden": true,
       "danger": true,
       "description": "地板上一处被锈穿的大洞，下方是漆黑的深井——跳下去会到 Level 4，如果你活着落地。"
+    },
+    {
+      "kind": "stairwell",
+      "target": "level-16",
+      "hidden": true,
+      "danger": false,
+      "description": "一段没建完的楼梯——通向钢筋与水泥袋之间。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-799",
+      "hidden": true,
+      "danger": false,
+      "description": "管道井盖——下面是没过脚踝的积水。"
     }
   ]
 }

@@ -1,0 +1,102 @@
+{
+  "id": "level-21",
+  "name": "Level 21 — 黑暗仓库",
+  "number": 21,
+  "category": "normal",
+  "difficultyClass": 3,
+  "environment": "industrial",
+  "aesthetic": "traumacore",
+  "light": "pitch",
+  "sanDrain": 0.08,
+  "description": "一座没有灯的仓库。手电的光在这里照不了多远——货架之间的黑暗浓稠得像水。你听见货架深处有东西在数数，数到某个数字就停一下，等你屏住呼吸。",
+  "palette": {
+    "primary": "#3a3f3a",
+    "secondary": "#262a26",
+    "accent": "#1a1e1a",
+    "light": "#8a908a"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 8,
+    "roomSizeMin": 5,
+    "roomSizeMax": 9,
+    "corridorWidth": 2,
+    "wallStyle": "metal",
+    "floorStyle": "concrete",
+    "extraFeatures": [
+      "crates",
+      "shelves",
+      "columns",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "smiler",
+      "density": 0.006,
+      "aggression": "hostile"
+    },
+    {
+      "type": "scratcher",
+      "density": 0.005,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.015,
+  "setPieces": [
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "货架侧面用荧光漆写着：『它怕光。但它知道你在哪。』",
+      "sanityEffect": -5,
+      "note": "荧光字：它怕光，但它知道你在哪。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一个空的货架层板上，放着一排熄灭的蜡烛，一共七根。其中一根还是热的。",
+      "sanityEffect": -4,
+      "note": "七根蜡烛，一根还是热的。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "黑暗里极轻的数数声",
+      "货架金属的收缩声"
+    ],
+    "startles": [
+      "数数声突然在你身后响起",
+      "货架深处传来拖动重物的声音"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-1",
+      "hidden": true,
+      "danger": false,
+      "description": "货架缝隙透出一点光——另一侧是亮着灯的仓库。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-20",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇厚重的防火门，推开是更深的黑暗仓库。"
+    }
+  ]
+}

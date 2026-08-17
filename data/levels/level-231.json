@@ -111,6 +111,13 @@
       "hidden": true,
       "danger": false,
       "description": "滑梯底部的阴影——你滑下去，落进一片被月光照亮的田野。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-36",
+      "hidden": true,
+      "danger": false,
+      "description": "游乐场围栏的破口——外面是一片墓碑。"
     }
   ]
 }

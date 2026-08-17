@@ -1,0 +1,109 @@
+{
+  "id": "level-799",
+  "name": "Level 799 — 下水道",
+  "number": 799,
+  "category": "normal",
+  "difficultyClass": 3,
+  "environment": "aquatic",
+  "aesthetic": "traumacore",
+  "light": "dark",
+  "sanDrain": 0.08,
+  "description": "无尽的下水道：浑浊的积水没过脚踝，砖壁上长着发光的苔藓，水声在管道里回荡成无数个方向。你分不清脚下踩的是淤泥还是别的什么——水里的东西总在你迈步时，跟着挪动一下。",
+  "palette": {
+    "primary": "#4a5248",
+    "secondary": "#2e342c",
+    "accent": "#1a1e18",
+    "light": "#9aa88a"
+  },
+  "terrain": {
+    "width": 34,
+    "height": 34,
+    "roomCount": 6,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "brick",
+    "floorStyle": "concrete",
+    "extraFeatures": [
+      "puddles",
+      "pipes",
+      "wires",
+      "columns"
+    ],
+    "infinite": true,
+    "topology": "caves"
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "dweller",
+      "density": 0.008,
+      "aggression": "curious"
+    },
+    {
+      "type": "clump",
+      "density": 0.005,
+      "aggression": "curious"
+    },
+    {
+      "type": "scratcher",
+      "density": 0.004,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.016,
+  "setPieces": [
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "砖墙上用指甲刻着一行字：『水位上涨的时候，别抬头看水面。』",
+      "sanityEffect": -5,
+      "note": "墙上刻字：水位上涨时别抬头看水面。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "积水里漂着一只儿童雨鞋，鞋口朝上，稳稳地浮着。你凑近看——里面有一双眼睛在看你。",
+      "sanityEffect": -7,
+      "note": "浮着的雨鞋里有一双眼睛。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "滴水的回声",
+      "水声被管道放大成脚步声"
+    ],
+    "startles": [
+      "水面突然鼓起一个包，又塌下去",
+      "管道深处传来拖拽声，越来越近"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-2",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇检修井盖——推上去，是满是管道的走廊。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-8",
+      "hidden": true,
+      "danger": false,
+      "description": "砖壁上的缺口，后面是天然洞穴的黑暗。"
+    }
+  ]
+}

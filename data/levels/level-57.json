@@ -1,0 +1,104 @@
+{
+  "id": "level-57",
+  "name": "Level 57 — 废弃港口",
+  "number": 57,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "aquatic",
+  "aesthetic": "liminal",
+  "light": "dim",
+  "sanDrain": 0.06,
+  "description": "一座废弃的港口：锈蚀的集装箱、腐烂的木栈道、凝固的黑色海面。海水不再流动，浪花定格在半空。你听见锚链的声音——但这里没有一艘船。",
+  "palette": {
+    "primary": "#4a5a5a",
+    "secondary": "#2e3a3a",
+    "accent": "#1a2222",
+    "light": "#a0b0b0"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 10,
+    "roomSizeMin": 4,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "metal",
+    "floorStyle": "concrete",
+    "extraFeatures": [
+      "crates",
+      "columns",
+      "puddles",
+      "wires",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "clump",
+      "density": 0.004,
+      "aggression": "curious"
+    },
+    {
+      "type": "dweller",
+      "density": 0.005,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.018,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "码头的系缆柱上绑着一根缆绳，另一端沉入黑色的海水。你拉了拉——绳子的另一头有东西在用力拉回来。",
+      "sanityEffect": -6,
+      "note": "缆绳的另一头有东西在拉。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "集装箱上用油漆写着船名，字迹被海水泡得模糊。你凑近看——那是你的名字。",
+      "sanityEffect": -5,
+      "note": "集装箱上写着我的名字。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "锚链缓慢的金属碰撞声",
+      "凝固的海浪声（其实没有风）"
+    ],
+    "startles": [
+      "海面突然泛起一圈涟漪，随即静止",
+      "集装箱里传来规律的敲击声"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-7",
+      "hidden": true,
+      "danger": false,
+      "description": "栈道尽头的一扇闸门，门后是潮湿的走廊。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-37",
+      "hidden": true,
+      "danger": false,
+      "description": "船舷的破洞——你钻进去，落进一片温热的水面。"
+    }
+  ]
+}

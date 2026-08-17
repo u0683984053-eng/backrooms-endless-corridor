@@ -1,0 +1,112 @@
+{
+  "id": "level-169",
+  "name": "Level 169 — 地铁",
+  "number": 169,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "mixed",
+  "aesthetic": "liminal",
+  "light": "flickering",
+  "sanDrain": 0.05,
+  "description": "一座无限延伸的地铁站：瓷砖隧道、生锈的轨道、忽明忽暗的日光灯。广播在循环播报：『下一站：未知。』——然后是一段很长的沉默，长到你想知道广播里是不是有人在等你回应。",
+  "palette": {
+    "primary": "#7a7a72",
+    "secondary": "#52524c",
+    "accent": "#2e2e2a",
+    "light": "#d8d8c8"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 8,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "tile",
+    "floorStyle": "concrete",
+    "extraFeatures": [
+      "stairwell",
+      "columns",
+      "puddles",
+      "wires",
+      "doors"
+    ],
+    "infinite": true,
+    "topology": "tunnel"
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "dweller",
+      "density": 0.006,
+      "aggression": "curious"
+    },
+    {
+      "type": "deathmoth",
+      "density": 0.004,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "站台的自动售货机还在运作，灯亮着。你投了一枚硬币——掉出来的是一张票，起点站是『这里』，终点站是『你』。",
+      "sanityEffect": -5,
+      "note": "车票：从这里到你。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "隧道壁上用白色喷漆写着：『不要上最后一班车。』下面有人加了一行：『没有最后一班车。』",
+      "sanityEffect": -4,
+      "note": "隧道涂鸦：不要上最后一班车。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "远处列车驶过的轰鸣（但没有列车）",
+      "广播循环的报站声"
+    ],
+    "startles": [
+      "隧道深处亮起一对车灯，又熄灭了",
+      "广播突然切到一段没有台词的呼吸声"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "stairwell",
+      "target": "level-11",
+      "hidden": true,
+      "danger": false,
+      "description": "一段向上的楼梯——出口是城市的一条街。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-15",
+      "hidden": true,
+      "danger": false,
+      "description": "隧道侧壁的检修门，门后是无尽的白墙楼梯间。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-404",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇写满错误代码的玻璃门。"
+    }
+  ]
+}

@@ -120,6 +120,13 @@
       "hidden": true,
       "danger": false,
       "description": "一堵墙面的瓷砖松动脱落，后面不是砖石，而是碧蓝的水光和空旷的回声。你挤过去，落在了干燥的池边。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-57",
+      "hidden": true,
+      "danger": false,
+      "description": "排水渠尽头——你爬出去，站在凝固的码头上。"
     }
   ]
 }

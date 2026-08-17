@@ -109,6 +109,13 @@
       "hidden": true,
       "danger": false,
       "description": "消防楼梯盘旋而下，尽头的门缝透出昏黄的光。"
+    },
+    {
+      "kind": "elevator",
+      "target": "level-97",
+      "hidden": true,
+      "danger": false,
+      "description": "货运电梯下到一层——全是贴着标签的收纳间。"
     }
   ]
 }

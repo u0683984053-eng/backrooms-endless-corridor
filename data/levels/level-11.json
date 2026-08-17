@@ -166,6 +166,13 @@
       "hidden": true,
       "danger": false,
       "description": "街角超市的自动门——里面永远亮着惨白的灯。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-169",
+      "hidden": true,
+      "danger": false,
+      "description": "地铁通风口——你滑下去，落在瓷砖隧道里。"
     }
   ]
 }

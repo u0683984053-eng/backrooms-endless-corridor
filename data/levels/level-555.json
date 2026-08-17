@@ -109,6 +109,13 @@
       "hidden": true,
       "danger": false,
       "description": "员工通道里的货梯，按钮上只有一个『H』。"
+    },
+    {
+      "kind": "door",
+      "target": "level-400",
+      "hidden": true,
+      "danger": false,
+      "description": "超市员工通道——尽头是一家小便利店。"
     }
   ]
 }

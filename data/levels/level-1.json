@@ -153,6 +153,13 @@
       "hidden": true,
       "danger": false,
       "description": "仓库深处的另一道门，门后是无穷无尽的储物架——储物间。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-21",
+      "hidden": true,
+      "danger": false,
+      "description": "仓库尽头的暗门——门后是熄了灯的仓库。"
     }
   ]
 }

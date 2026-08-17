@@ -1,0 +1,107 @@
+{
+  "id": "level-36",
+  "name": "Level 36 — 墓园",
+  "number": 36,
+  "category": "normal",
+  "difficultyClass": 3,
+  "environment": "outdoors",
+  "aesthetic": "dreamcore",
+  "light": "dim",
+  "sanDrain": 0.07,
+  "description": "一座被浓雾笼罩的墓园。墓碑排列整齐，却全部没有名字。雾很重，重到你看不清十步之外的路——但你能听见脚步声，从墓碑之间传来，走得不紧不慢，永远和你保持同一个距离。",
+  "palette": {
+    "primary": "#4a4e5a",
+    "secondary": "#2e323c",
+    "accent": "#1a1c24",
+    "light": "#9aa0b0"
+  },
+  "terrain": {
+    "width": 36,
+    "height": 36,
+    "roomCount": 6,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "brick",
+    "floorStyle": "grass",
+    "extraFeatures": [
+      "furniture",
+      "plants",
+      "fountain",
+      "columns"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "smiler",
+      "density": 0.004,
+      "aggression": "hostile"
+    },
+    {
+      "type": "clump",
+      "density": 0.003,
+      "aggression": "curious"
+    },
+    {
+      "type": "vapor",
+      "density": 0.005,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.016,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一座墓碑前放着一束新鲜的花，花瓣上还有露水。墓园里没有别人——花是谁放的？",
+      "sanityEffect": -4,
+      "note": "一座墓前放着新鲜的花。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "墓碑背面刻着一行小字：『这里埋的不是人。』",
+      "sanityEffect": -5,
+      "note": "墓碑背面：这里埋的不是人。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "雾中的风声",
+      "远处断断续续的脚步声"
+    ],
+    "startles": [
+      "身后的脚步声停了——就在你背后",
+      "某座墓碑后面传来一声叹息"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-231",
+      "hidden": true,
+      "danger": false,
+      "description": "墓园的铁门——门外是深夜里更暗的游乐场。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-10",
+      "hidden": true,
+      "danger": false,
+      "description": "一口没有井盖的枯井，你滑下去，落在麦田里。"
+    }
+  ]
+}

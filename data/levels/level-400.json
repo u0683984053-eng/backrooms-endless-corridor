@@ -1,0 +1,100 @@
+{
+  "id": "level-400",
+  "name": "Level 400 — 便利店",
+  "number": 400,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "mixed",
+  "aesthetic": "mallcore",
+  "light": "bright",
+  "sanDrain": 0.04,
+  "description": "一家没有窗户的便利店。灯管白得刺眼，货架上的商品全是没见过的牌子，收银机没有电源线，却在你经过时发出『叮咚』的开门声。店门口的风铃自己响了一下，但没有风，也没有门。",
+  "palette": {
+    "primary": "#d0d8d0",
+    "secondary": "#9aa69a",
+    "accent": "#5a665a",
+    "light": "#f8fff8"
+  },
+  "terrain": {
+    "width": 26,
+    "height": 26,
+    "roomCount": 8,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "tile",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "shelves",
+      "counters",
+      "crates",
+      "doors"
+    ],
+    "infinite": false
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "faceling",
+      "density": 0.006,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note",
+    "pistol",
+    "ammo"
+  ],
+  "itemDensity": 0.03,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "收银台的托盘里放着一卷小票，打印出来的时间戳是四十年前的今天。最后一行：『已售：顾客 1 名。』",
+      "sanityEffect": -4,
+      "note": "四十年前的小票：已售顾客 1 名。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "冷藏柜门上贴着店规：『1. 请购买。2. 请付款。3. 请不要看向窗外——店里没有窗户。』",
+      "sanityEffect": -5,
+      "note": "店规第三条：不要看向窗外——店里没有窗户。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "收银机的叮咚声（没有顾客）",
+      "风铃自鸣"
+    ],
+    "startles": [
+      "收银机突然打印出一张小票，上面是你的名字",
+      "货架深处传来拆包装的声音"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "door",
+      "target": "level-555",
+      "hidden": true,
+      "danger": false,
+      "description": "自动门——门外不是街道，是更大的超市。"
+    },
+    {
+      "kind": "window",
+      "target": "level-11",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇本不存在的窗户，窗外是城市的路灯。"
+    }
+  ]
+}

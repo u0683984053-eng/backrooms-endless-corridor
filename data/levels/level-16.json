@@ -1,0 +1,104 @@
+{
+  "id": "level-16",
+  "name": "Level 16 — 建筑工地",
+  "number": 16,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "industrial",
+  "aesthetic": "liminal",
+  "light": "dim",
+  "sanDrain": 0.06,
+  "description": "一座永远在施工的大楼：裸露的钢筋、未封顶的天花板、堆积的水泥袋。风从没有玻璃的窗洞灌进来，吹动挂在钢梁上的安全绳——绳子自己在轻轻摆动，像刚有人从上面跳下去。",
+  "palette": {
+    "primary": "#6a6a62",
+    "secondary": "#4a4a44",
+    "accent": "#2e2e2a",
+    "light": "#c8c8b8"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 10,
+    "roomSizeMin": 4,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "concrete",
+    "floorStyle": "concrete",
+    "extraFeatures": [
+      "columns",
+      "crates",
+      "wires",
+      "stairwell",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "dweller",
+      "density": 0.005,
+      "aggression": "curious"
+    },
+    {
+      "type": "moth",
+      "density": 0.006,
+      "aggression": "passive"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.018,
+  "setPieces": [
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "水泥柱上用粉笔写着：『这栋楼盖了 30 年。工人从来没有换过。』",
+      "sanityEffect": -4,
+      "note": "粉笔字：这栋楼盖了 30 年，工人没有换过。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一台没有缆绳的吊车吊钩悬在半空，微微晃动。你抬头——吊钩正对着你头顶。",
+      "sanityEffect": -5,
+      "note": "吊钩悬在我头顶。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "风穿过钢筋的哨声",
+      "远处传来打桩的闷响"
+    ],
+    "startles": [
+      "一根钢管从高处掉下来，砸在你身后",
+      "安全绳突然绷紧的声音"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "stairwell",
+      "target": "level-2",
+      "hidden": true,
+      "danger": false,
+      "description": "一段没建完的楼梯，通向满是管道的楼层。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-3",
+      "hidden": true,
+      "danger": false,
+      "description": "墙上的一个洞——钻过去，是变压器嗡鸣的房间。"
+    }
+  ]
+}
