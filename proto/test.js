@@ -450,6 +450,20 @@ section('5.6 无限层优化：出口指引 / 缓存上限 / 追击保持');
     const saved = JSON.stringify(serializeState(st2));
     check('存档体积受控（<1MB）', saved.length < 1000000, `${(saved.length / 1024).toFixed(0)}KB`);
   }
+
+  // 出生层级：createGame 支持 startLevel（F 版：90% Level 0，10% 随机层由前端决定）
+  {
+    const g11 = createGame({ levels, seed: 5, startLevel: 'level-11' });
+    check('createGame 指定出生层级生效', g11.levelId === 'level-11', g11.levelId);
+    const gBad = createGame({ levels, seed: 5, startLevel: 'level-9999' });
+    check('无效出生层级回退 Level 0', gBad.levelId === 'level-0', gBad.levelId);
+    const gDef = createGame({ levels, seed: 5 });
+    check('默认出生 Level 0', gDef.levelId === 'level-0', gDef.levelId);
+    // 随机出生层也要可玩（出生点可行走、有出口）
+    const gRand = createGame({ levels, seed: 42, startLevel: 'level-19' });
+    const okSpawn = WALKABLE_TILES.has(gRand.level.getTile(gRand.player.x, gRand.player.y));
+    check('随机出生层可玩（出生点可行走）', okSpawn);
+  }
 }
 
 // ---------- 6. 野性变体（wild 无尽生成） ----------

@@ -198,7 +198,13 @@ function saveGame() {
 
 function newGame() {
   const seed = Math.floor(Math.random() * 1e6);
-  game = createGame({ levels, seed });
+  // 出生层级（F 版设定：绝大多数人第一次卡出落在 Level 0，少数人直接出现在其它层级）
+  let startLevel = 'level-0';
+  if (Math.random() < 0.1) {
+    const others = Object.keys(levels).filter((id) => id !== 'level-0');
+    startLevel = others.length ? others[Math.floor(Math.random() * others.length)] : 'level-0';
+  }
+  game = createGame({ levels, seed, startLevel });
   mergeCodexIntoGame();
   lastLevelId = game.levelId;
   hideOverlay('start-screen');

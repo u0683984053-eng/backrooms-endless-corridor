@@ -18,8 +18,8 @@ function clamp(v, min, max) {
   return Math.min(max, Math.max(min, v));
 }
 
-/** 创建一局游戏（从 Level 0 出生） */
-export function createGame({ levels, seed }) {
+/** 创建一局游戏（默认从 Level 0 出生；startLevel 可指定出生层级） */
+export function createGame({ levels, seed, startLevel }) {
   const runSeed = seed === undefined ? 1 : seed;
   const state = {
     levels,
@@ -54,7 +54,8 @@ export function createGame({ levels, seed }) {
     },
     rng: mulberry32(hashString('game:' + String(runSeed))),
   };
-  enterLevel(state, 'level-0', { initial: true });
+  const start = startLevel && levels[startLevel] ? startLevel : 'level-0';
+  enterLevel(state, start, { initial: true });
   return state;
 }
 
