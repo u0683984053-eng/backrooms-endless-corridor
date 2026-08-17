@@ -84,6 +84,20 @@
       "text": "一个纸箱里放着一副眼镜和一枚婚戒，像被妥善保存的遗物。箱子上写着：『别打开。』",
       "sanityEffect": -7,
       "note": "纸箱里的眼镜与婚戒，写着别打开。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "灭火器箱的玻璃碎了，里面不是灭火器，是一张全家福。照片里所有人的眼睛都被抠掉了。",
+      "sanityEffect": -5,
+      "note": "灭火器箱里的全家福。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "天花板有一块渗水的痕迹，形状像一张脸。你换个角度，它跟着你转。",
+      "sanityEffect": -4,
+      "note": "水渍像一张会转动的脸。"
     }
   ],
   "soundscape": {

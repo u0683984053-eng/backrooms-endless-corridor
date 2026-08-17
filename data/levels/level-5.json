@@ -87,6 +87,20 @@
       "text": "浴缸里放着一件叠好的制服，叠得整整齐齐，像在等人穿。",
       "sanityEffect": -6,
       "note": "浴缸里叠着一件制服。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "前台登记簿翻开在最后一页：『客人：无。房间：全部。』",
+      "sanityEffect": -4,
+      "note": "登记簿：客人无，房间全部。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "电梯按钮上，『4』楼的位置被磨得发亮，其它楼层的按钮都积着灰。",
+      "sanityEffect": -3,
+      "note": "电梯 4 楼按钮被磨得发亮。"
     }
   ],
   "soundscape": {

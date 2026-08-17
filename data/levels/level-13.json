@@ -82,6 +82,20 @@
       "text": "墙上的水渍组成一张脸的轮廓，轮廓的嘴在慢慢扩大——水渍是湿的。",
       "sanityEffect": -6,
       "note": "水渍组成的脸，嘴在扩大。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "楼梯扶手上有一道新抓痕，木屑还是新鲜的。这里已经很久没有人了。",
+      "sanityEffect": -4,
+      "note": "一道新鲜抓痕。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "墙角的影子形状不对。你盯着它，它慢慢变成了你的形状。",
+      "sanityEffect": -5,
+      "note": "影子变成了我的形状。"
     }
   ],
   "soundscape": {

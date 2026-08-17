@@ -95,6 +95,20 @@
       "text": "一间'博物馆'，展柜里陈列着：一张现实世界的机票、一支铅笔、一片枯叶。标签写着：『前室的遗物。』",
       "sanityEffect": -5,
       "note": "博物馆里陈列着前室的遗物。枯叶来自哪里？"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "红绿灯永远停留在黄色。你等了十分钟，它闪了十次，每次都刚好闪三下。",
+      "sanityEffect": -3,
+      "note": "红灯永远停在黄色。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "某栋楼有一扇永远亮着灯的窗户。你绕了三条街，它都在你的正前方。",
+      "sanityEffect": -4,
+      "note": "那扇窗永远在我正前方。"
     }
   ],
   "soundscape": {

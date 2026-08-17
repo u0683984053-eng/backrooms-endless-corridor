@@ -79,6 +79,20 @@
       "text": "角落里一台服务铃，按下去会响，但没有人来。你按了三次。它响了三次。",
       "sanityEffect": -5,
       "note": "角落的服务铃。我按了三次。它响了三次。没有人来。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "墙上的排班表：『本周值班：无。下周值班：无。下下周：……』最后一行被水渍晕开了。",
+      "sanityEffect": -3,
+      "note": "永远无人的排班表。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一张没写完的信，落款是你的笔迹——但你从没写过信。",
+      "sanityEffect": -5,
+      "note": "一封落款是我的信。"
     }
   ],
   "soundscape": {

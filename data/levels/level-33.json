@@ -84,6 +84,20 @@
       "text": "角落的阴影里有一双鞋，整齐地并排放着，鞋尖朝墙。鞋的主人不在。",
       "sanityEffect": -7,
       "note": "一双朝墙的鞋。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "你摸到的每一面墙都是同一个温度，但有一块特别凉。凉的那一块，形状像一只手掌。",
+      "sanityEffect": -4,
+      "note": "墙上有一块手掌形的凉斑。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "地上有一串脚印，只有进来的，没有出去的。你站在原地，脚印多了一双。",
+      "sanityEffect": -6,
+      "note": "脚印在增加。"
     }
   ],
   "soundscape": {

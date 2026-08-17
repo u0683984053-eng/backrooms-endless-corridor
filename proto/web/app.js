@@ -1424,6 +1424,29 @@ function drawGame() {
     }
   }
 
+  // ---- 场景锚点（未触发的 setPieces：微光 ✦，走近触发后消失） ----
+  const seenSp = g.seenSetPieces[g.levelId] || new Set();
+  for (let i = 0; i < level.setPieces.length; i++) {
+    const sp = level.setPieces[i];
+    if (seenSp.has(i)) continue;
+    const dx = sp.x - (player.x - halfCols);
+    const dy = sp.y - (player.y - halfRows);
+    if (dx < 0 || dy < 0 || dx >= viewCols || dy >= viewRows) continue;
+    if (!visible.has(sp.x + ',' + sp.y)) continue;
+    const tx = ox + dx * tile;
+    const ty = oy + dy * tile;
+    const pulse = 0.5 + 0.5 * Math.sin(now * 0.002 + i * 2.7);
+    ctx.fillStyle = `rgba(180,140,90,${0.06 + pulse * 0.1})`;
+    ctx.fillRect(tx + tile * 0.12, ty + tile * 0.12, tile * 0.76, tile * 0.76);
+    ctx.fillStyle = `rgba(232,224,138,${0.3 + pulse * 0.35})`;
+    ctx.font = `${Math.floor(tile * 0.55)}px "Segoe UI Emoji", "Noto Sans SC", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('✦', tx + tile / 2, ty + tile / 2 + tile * 0.04);
+    ctx.textAlign = 'start';
+    ctx.textBaseline = 'alphabetic';
+  }
+
   // ---- 物品（emoji） ----
   for (const it of g.items) {
     const dx = it.x - (player.x - halfCols);

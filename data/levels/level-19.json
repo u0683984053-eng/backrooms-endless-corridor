@@ -58,7 +58,22 @@
     "note"
   ],
   "itemDensity": 0.02,
-  "setPieces": [],
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "货架最深处有一台没有插电的收音机，还在播放。声音很小，像有人在里面说话。",
+      "sanityEffect": -4,
+      "note": "没插电的收音机在响。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "地上有一行粉笔箭头，指向仓库深处。箭头画得很认真，但通向的是一堵墙。",
+      "sanityEffect": -3,
+      "note": "粉笔箭头通向一堵墙。"
+    }
+  ],
   "soundscape": {
     "ambient": [
       "荧光灯嗡鸣",

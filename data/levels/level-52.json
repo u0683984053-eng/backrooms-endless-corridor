@@ -86,6 +86,20 @@
       "text": "瞭望塔的窗户外面不是海，而是另一艘一模一样的航母，正对着你。它的瞭望塔里也有一个人影，也在看你。",
       "sanityEffect": -8,
       "note": "窗外是另一艘航母，有人在看我。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "船钟停在 4:44。你敲了一下，它响了五声。",
+      "sanityEffect": -3,
+      "note": "船钟停着，却响了五声。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "舷窗外的海面永远是同一片浪。你看了十分钟，它没有动过。",
+      "sanityEffect": -4,
+      "note": "海面凝固了。"
     }
   ],
   "soundscape": {

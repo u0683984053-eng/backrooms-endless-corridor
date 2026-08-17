@@ -83,6 +83,20 @@
       "text": "角落停着一辆婴儿车，车里的不是婴儿，而是一盒还在冒热气的薯条。",
       "sanityEffect": -8,
       "note": "婴儿车里的薯条还冒着热气。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "每辆车的后视镜都绑着红绳。你数了数，一共六十六辆。",
+      "sanityEffect": -3,
+      "note": "六十六面后视镜都绑着红绳。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "地下二层有一辆车，车窗贴着『不要启动』。钥匙还插在锁孔里。",
+      "sanityEffect": -4,
+      "note": "贴着不要启动的车。"
     }
   ],
   "soundscape": {

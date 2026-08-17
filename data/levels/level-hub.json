@@ -66,6 +66,20 @@
       "text": "墙上的壁画：无数人形手拉手穿过一扇扇门，最远处的门里是白色的光。",
       "sanityEffect": 1,
       "note": "壁画：人们穿过门，走向白光。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "一扇没有门牌的门，门缝里透出光。你推开——里面是另一个你，正在开门。",
+      "sanityEffect": -5,
+      "note": "门里是另一个我在开门。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "地板中央有一圈粉笔画的圈，圈内写满同一个日期。你数了数——和墙上的划痕数一样。",
+      "sanityEffect": -4,
+      "note": "粉笔圈里全是同一个日期。"
     }
   ],
   "soundscape": {

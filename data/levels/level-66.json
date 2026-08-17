@@ -77,6 +77,20 @@
       "text": "更衣室镜子上用雾气写着：『水温永远正好。你确定要走吗？』",
       "sanityEffect": -5,
       "note": "镜子上的雾字：水温永远正好。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "更衣室的镜子蒙着雾。你擦干净——镜子里的人穿着你不认识的衣服。",
+      "sanityEffect": -5,
+      "note": "镜子里的人穿着陌生的衣服。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "泳池边放着一双拖鞋，位置和你上次离开时一模一样。你上次来，是二十年前。",
+      "sanityEffect": -4,
+      "note": "二十年未动的拖鞋。"
     }
   ],
   "soundscape": {

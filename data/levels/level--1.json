@@ -79,6 +79,20 @@
       "text": "一具跪坐的遗体，双手合十，指尖嵌着一枚杏仁水瓶盖——像是握着最后的希望死的。",
       "sanityEffect": -8,
       "note": "一具祈祷姿势的遗体，握着杏仁水瓶盖。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "天花板有一块水渍，形状像一个倒立的人。",
+      "sanityEffect": -4,
+      "note": "天花板上倒立的人形水渍。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "墙角的裂缝里塞着一张纸条：『别跳』。",
+      "sanityEffect": -3,
+      "note": "纸条：别跳。"
     }
   ],
   "soundscape": {

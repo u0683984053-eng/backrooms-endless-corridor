@@ -81,6 +81,20 @@
       "text": "一台老式打印机吐出一张纸：『您已在本层停留 3 分 42 秒。这比平均停留时间短 5%。请继续。』",
       "sanityEffect": -5,
       "note": "打印机知道我待了多久。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "显示器上不是报错页面，而是一行字：『您访问的楼层已被删除。是否恢复？是 / 否』。没有光标。",
+      "sanityEffect": -4,
+      "note": "屏幕询问是否恢复。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "键盘的 4 键被磨得发亮。你按了一下——屏幕闪烁：『404：你』。",
+      "sanityEffect": -5,
+      "note": "404：你。"
     }
   ],
   "soundscape": {

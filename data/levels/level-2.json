@@ -80,6 +80,20 @@
       "text": "蒸汽在金属壁上凝成字迹：『不要跑。它们听得到奔跑。』",
       "sanityEffect": -4,
       "note": "金属壁上凝着水珠形成的字：『不要跑。』"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "管道接缝渗出的液体是温的，带着甜味。你尝了一滴——是糖浆。但工业管道不该是甜的。",
+      "sanityEffect": -5,
+      "note": "管道渗出温热的糖浆。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "墙上的阀门全部拧到『最大』。你数了数，四十七个，没有一个例外。",
+      "sanityEffect": -3,
+      "note": "四十七个阀门全部开到最大。"
     }
   ],
   "soundscape": {

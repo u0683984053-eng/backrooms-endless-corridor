@@ -84,6 +84,20 @@
       "text": "打印机吐出的纸上印着：『你们的工作成果很好。请继续。』",
       "sanityEffect": -3,
       "note": "打印机自己吐出一张纸：『请继续。』"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "工位上的便利贴叠了厚厚一沓。最上面那张写着：『今天是第 300 天』。下面的每一张，都是同一句。",
+      "sanityEffect": -4,
+      "note": "三百张便利贴写着同一句话。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "打印机自己吐出一张纸：『对不起，您查找的楼层不存在。』",
+      "sanityEffect": -3,
+      "note": "打印机：您查找的楼层不存在。"
     }
   ],
   "soundscape": {

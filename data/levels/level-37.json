@@ -85,6 +85,20 @@
       "text": "池边的躺椅上放着一本摊开的书，书页被水泡皱，标题已无法辨认，只有一句话被圈出来：『继续游。』",
       "sanityEffect": -3,
       "note": "一本泡皱的书，圈着一句话：『继续游。』"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "泳池的水面平静得像玻璃。你把手指伸进去——水是温的，像刚有人游过。",
+      "sanityEffect": -4,
+      "note": "池水是温的。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "池底的瓷砖拼成了一句话，只有水面平静时才能看清：『别抬头』。",
+      "sanityEffect": -5,
+      "note": "池底写着：别抬头。"
     }
   ],
   "soundscape": {

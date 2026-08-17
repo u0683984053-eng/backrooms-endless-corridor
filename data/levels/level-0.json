@@ -82,6 +82,20 @@
       "text": "一个倒扣的纸杯，下面压着一张写满数字的便签。",
       "sanityEffect": -2,
       "note": "纸杯下压着写满数字的便签。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "地毯的污渍拼成了字母——是你的名字首字母。你每走十步，它就在你身后换一个方向。",
+      "sanityEffect": -4,
+      "note": "地毯污渍拼成我的名字首字母。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "墙角的柜子门开着：里面的划痕全是同一个日期。你数了数，至少两百道，每一道都是同一天。",
+      "sanityEffect": -5,
+      "note": "柜子里两百多道划痕，全是同一个日期。"
     }
   ],
   "soundscape": {

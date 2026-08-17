@@ -485,6 +485,31 @@ section('5.6 无限层优化：出口指引 / 缓存上限 / 追击保持');
     }
   }
 
+  // 场景内容量：每层 ≥2 个定制场景，且大多数降低理智（"细思极恐"风格）
+  {
+    let totalScenes = 0;
+    let negative = 0;
+    let okCount = true;
+    for (const id of LEVEL_IDS) {
+      const sps = levels[id].setPieces || [];
+      totalScenes += sps.length;
+      if (sps.length < 2) okCount = false;
+      for (const sp of sps) {
+        if ((sp.sanityEffect || 0) < 0) negative++;
+      }
+    }
+    check('每层至少 2 个场景', okCount, `总场景 ${totalScenes}`);
+    check('多数场景降低理智（≥60% 负值）', negative / totalScenes >= 0.6, `${negative}/${totalScenes} 负理智`);
+    check('场景总量充足（≥80）', totalScenes >= 80, `${totalScenes}`);
+    // 无限层场景确定性生成（新场景同样在无限层可触）
+    const lv15 = createInfiniteLevel(levels['level-15'], 7);
+    check('Level 15 无限层场景生成 ≥2', lv15.setPieces.length >= 2, `${lv15.setPieces.length}`);
+    check(
+      'Level 15 场景坐标可行走',
+      lv15.setPieces.every((sp) => WALKABLE_TILES.has(lv15.getTile(sp.x, sp.y)))
+    );
+  }
+
   // 出生层级：createGame 支持 startLevel（F 版：90% Level 0，10% 随机层由前端决定）
   {
     const g11 = createGame({ levels, seed: 5, startLevel: 'level-11' });

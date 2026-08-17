@@ -82,6 +82,20 @@
       "text": "一具蜷缩的焦黑轮廓，手边画着一幅完整的出口地图——但地图上的所有路都通向这里。",
       "sanityEffect": -10,
       "note": "焦黑的身影画过一张地图，所有路都通向这里。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "墙上的温度计显示 666°C。你伸手摸了一下——是常温。它显示的是别的东西的温度。",
+      "sanityEffect": -5,
+      "note": "温度计显示的是别处的温度。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "灰烬里有一张完好的纸，画着这个房间。画里的房间，有一扇你身后没有的窗。",
+      "sanityEffect": -6,
+      "note": "画里有一扇不存在的窗。"
     }
   ],
   "soundscape": {

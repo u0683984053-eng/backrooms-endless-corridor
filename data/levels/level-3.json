@@ -82,6 +82,20 @@
       "text": "一块锈蚀的铁碑，上面刻着几百个名字，最新的名字下面没有日期。",
       "sanityEffect": -7,
       "note": "发现一块刻满名字的铁碑。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "变压器铭牌上的出厂日期——是下周。",
+      "sanityEffect": -4,
+      "note": "变压器出厂日期是下周。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "配电柜里躺着一副眼镜，一边镜片碎了。旁边用胶带贴着两个字：『别修』。",
+      "sanityEffect": -3,
+      "note": "眼镜旁贴着：别修。"
     }
   ],
   "soundscape": {

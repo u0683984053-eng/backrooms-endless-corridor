@@ -85,6 +85,20 @@
       "text": "一具蜷缩在板条箱后的遗体，怀里抱着一个空杏仁水瓶，口袋里有一张未寄出的信。",
       "sanityEffect": -6,
       "note": "发现一具遗体。信上写着：『如果我能回到 Level 0，我会重新开始。』"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "板条箱上的手写标签：『第 114 批：人类』。箱子是空的，但箱底有体温。",
+      "sanityEffect": -4,
+      "note": "标签：第 114 批：人类。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "柱子上有一道粉笔画的记号，旁边写着：『第 8 次路过这里』。你才第一次来。",
+      "sanityEffect": -3,
+      "note": "粉笔字：第 8 次路过这里。"
     }
   ],
   "soundscape": {

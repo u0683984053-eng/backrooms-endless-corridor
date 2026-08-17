@@ -77,6 +77,20 @@
       "text": "麦田里有一行脚印，从地平线那头一直延伸到你脚下，然后在你站的地方戛然而止——像是有人走到这里，然后消失了。",
       "sanityEffect": -4,
       "note": "一行脚印消失在脚下。这里不该有人。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "稻草人穿着的衬衫上写满同一个电话号码。你拨过去，接电话的是你的声音。",
+      "sanityEffect": -6,
+      "note": "稻草人身上的号码通向我自己。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "麦田里有一片圆形倒伏区，中心放着一双鞋。鞋还是温的。",
+      "sanityEffect": -5,
+      "note": "麦田中心的鞋还是温的。"
     }
   ],
   "soundscape": {

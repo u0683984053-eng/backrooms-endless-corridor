@@ -47,6 +47,20 @@
       "text": "房间正中的床上放着一本翻开的日记，最后一行写着：『它每天睡八小时。它从不起床。』",
       "sanityEffect": -4,
       "note": "日记最后一页：它每天睡八小时。它从不起床。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "床上的枕头上有一根头发。不是你的颜色。",
+      "sanityEffect": -3,
+      "note": "枕头上有一根陌生的头发。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "灯罩内侧写着一行小字：『它数到 1000 就会醒』。",
+      "sanityEffect": -5,
+      "note": "灯罩里：它数到 1000 就会醒。"
     }
   ],
   "soundscape": {

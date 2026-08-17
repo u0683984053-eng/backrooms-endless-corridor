@@ -64,6 +64,20 @@
       "text": "一扇半开的房门——里面摆着一桌没动过的晚餐，两只椅子，桌上有两套餐具。椅子上没有人，但餐具是湿的。",
       "sanityEffect": -4,
       "note": "一间摆着两人晚餐的空房间。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "走廊尽头的镜子。你走过去了，但镜子里的你还站在原地。",
+      "sanityEffect": -6,
+      "note": "镜子里的人没有跟着我走。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "某扇房门虚掩，门缝里透出电视的蓝光。你凑近听——里面在播天气预报，播的是明天的天气。",
+      "sanityEffect": -4,
+      "note": "门后电视在播明天的天气。"
     }
   ],
   "soundscape": {

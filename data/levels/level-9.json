@@ -78,6 +78,20 @@
       "text": "客厅的电视机亮着，屏幕上是满屏的雪花，沙沙声在空房间里格外清晰。电源线没有插进插座。",
       "sanityEffect": -7,
       "note": "没插电的电视，亮着雪花。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "每栋房子的邮箱里都插着同一封信，收件人是你的名字，邮戳是四十年前。",
+      "sanityEffect": -5,
+      "note": "四十年前寄给我的信。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "路边的秋千在没有风的时候自己摇着。你走近，它停了下来。",
+      "sanityEffect": -3,
+      "note": "秋千在我走近时停了。"
     }
   ],
   "soundscape": {

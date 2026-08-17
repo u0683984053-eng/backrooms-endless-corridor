@@ -83,6 +83,20 @@
       "text": "哈哈镜廊里，镜中的你比你先转身。现在你站在原地，不知道哪一个才是真的。",
       "sanityEffect": -8,
       "note": "哈哈镜里的我比我快。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "旋转木马的音乐停在一半。你数了数，它循环了四十七遍，每次都断在同一个音上。",
+      "sanityEffect": -4,
+      "note": "音乐永远断在同一个音上。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "摩天轮的某个轿厢里永远坐着一个人形。它从来不转过来。",
+      "sanityEffect": -5,
+      "note": "轿厢里的人形从不转身。"
     }
   ],
   "soundscape": {

@@ -63,6 +63,20 @@
       "text": "秋千还在自己荡。你走近时它慢慢停了下来——像是不想被你看见它刚才在动。",
       "sanityEffect": -4,
       "note": "秋千在自己荡，走近时停了。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "旋转木马在没有电的情况下慢慢转动着。你走近，它停了——音乐盒开始响。",
+      "sanityEffect": -5,
+      "note": "无电旋转的木马。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "路灯下的长椅，椅背刻着：『我们约好在这里见面。已经很久了。』",
+      "sanityEffect": -3,
+      "note": "长椅上的约定。"
     }
   ],
   "soundscape": {

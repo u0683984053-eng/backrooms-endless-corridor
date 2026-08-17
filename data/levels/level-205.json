@@ -47,6 +47,20 @@
       "text": "有人用指甲在墙上刻了一行字：『别从窗户往外看太久。』",
       "sanityEffect": -2,
       "note": "墙上刻着：别从窗户往外看太久。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "窗外的虚空里飘着一样东西，像一本书。你看了很久，它飘近了一点。",
+      "sanityEffect": -4,
+      "note": "虚空里的书在靠近。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "门框上有一道新刻的记号。你数了数墙上的旧记号——它们每天多一道，但你从没见人刻过。",
+      "sanityEffect": -5,
+      "note": "门框的记号每天增加。"
     }
   ],
   "soundscape": {

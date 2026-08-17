@@ -77,6 +77,20 @@
       "text": "走廊尽头的天花板灯倒映在水里，但倒影里的灯比头顶多了一盏——多出的那一盏沉在更深的水底，朝你眨了一下。",
       "sanityEffect": -6,
       "note": "水底的倒影里多了一盏灯。它在看你。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "水面的倒影比你慢半拍。你停下，它也停下；你低头看它，它还在看你。",
+      "sanityEffect": -5,
+      "note": "水中的倒影比我慢半拍。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "排水口被一把锁锁住了。锁很新，没有一丝锈迹。",
+      "sanityEffect": -3,
+      "note": "排水口锁着一把新锁。"
     }
   ],
   "soundscape": {

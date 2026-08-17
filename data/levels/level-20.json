@@ -73,6 +73,20 @@
       "text": "货柜缝隙里蜷着一具干枯的尸体，手里攥着一把生锈的钥匙。",
       "sanityEffect": -6,
       "note": "一具尸体，手里攥着钥匙。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "货柜里码着整整齐齐的罐头，标签全是手写的：『别吃』『别吃』『别吃』。",
+      "sanityEffect": -4,
+      "note": "整柜罐头写着：别吃。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "灰尘里有一条拖行的痕迹，末端是一双码放整齐的鞋。",
+      "sanityEffect": -6,
+      "note": "拖痕尽头的鞋。"
     }
   ],
   "soundscape": {

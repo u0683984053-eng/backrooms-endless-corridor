@@ -74,6 +74,20 @@
       "text": "走廊尽头绿色的 EXIT 标志下方，有人用炭笔写着：『别信它。它只想看你跑。』",
       "sanityEffect": -7,
       "note": "EXIT 标志下的炭笔字。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "跑道的终点线画在墙里。你跑到墙前——线在墙后面。",
+      "sanityEffect": -4,
+      "note": "终点线在墙里。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "饮水机贴着『冰水』，但水是温的。你喝了一口——是冰的。",
+      "sanityEffect": -3,
+      "note": "冰水是温的，喝起来是冰的。"
     }
   ],
   "soundscape": {

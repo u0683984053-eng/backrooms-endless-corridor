@@ -75,6 +75,20 @@
       "text": "地板上散落着一盒火柴，火柴头全部烧过，只剩焦黑的梗。盒子内侧用炭笔写着：『我数到十，然后跑了。』",
       "sanityEffect": -4,
       "note": "一盒烧过的火柴，盒内写着：我数到十，然后跑了。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "黑暗中你摸到墙上密密麻麻的刻痕——全是『不要开灯』。有些刻痕是新的。",
+      "sanityEffect": -5,
+      "note": "墙上刻满：不要开灯。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一只手电筒，没有电池，开关被拆掉了，像是怕有人打开它。",
+      "sanityEffect": -3,
+      "note": "一支被拆掉开关的手电筒。"
     }
   ],
   "soundscape": {

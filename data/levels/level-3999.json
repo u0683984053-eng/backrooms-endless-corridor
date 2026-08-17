@@ -84,6 +84,20 @@
       "text": "玩具店的橱窗里，一只发条小熊独自转圈，音乐盒的旋律永远卡在最后一个音符前。",
       "sanityEffect": -2,
       "note": "发条小熊的音乐盒永远差一个音符。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "街机屏幕突然切到一片空白，中间有一行字：『你玩够了没有？』",
+      "sanityEffect": -4,
+      "note": "街机问我玩够了没有。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "代币掉进投币口——你听到的不是弹簧声，是有人接住了它。",
+      "sanityEffect": -3,
+      "note": "投币口有人接住了代币。"
     }
   ],
   "soundscape": {

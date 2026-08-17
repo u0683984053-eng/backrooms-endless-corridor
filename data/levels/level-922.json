@@ -83,6 +83,20 @@
       "text": "园艺工具间里，一把铲子立在墙角，铲刃上沾着新鲜的土，但没有挖过的痕迹。",
       "sanityEffect": -4,
       "note": "沾着新土的铲子，没有挖过的痕迹。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "走廊尽头的自动售货机还在运作。你投了一枚硬币——掉出来的罐头，标签是你的名字。",
+      "sanityEffect": -5,
+      "note": "罐头标签是我的名字。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "地砖有一块是松的。你撬开——下面不是泥土，是另一层地砖。再撬，还是。",
+      "sanityEffect": -4,
+      "note": "地砖下面是地砖。"
     }
   ],
   "soundscape": {

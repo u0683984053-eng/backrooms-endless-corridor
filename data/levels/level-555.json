@@ -68,6 +68,20 @@
       "text": "促销海报：『今日特价：离开这里。全场五折，仅限今天。』印刷日期是三十年前。",
       "sanityEffect": -3,
       "note": "促销海报：『今日特价：离开这里。』"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "冰柜里有一盒没有标签的酸奶。生产日期是今天，保质期是昨天。",
+      "sanityEffect": -4,
+      "note": "今天生产，昨天过期。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "广播循环的同一首歌里，有一段你听不清的歌词。你把音量调到最大——里面在报你的名字。",
+      "sanityEffect": -6,
+      "note": "广播在报我的名字。"
     }
   ],
   "soundscape": {

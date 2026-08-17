@@ -69,6 +69,20 @@
       "text": "某层转角放着一双摆得整整齐齐的鞋，鞋尖朝下楼梯的方向。",
       "sanityEffect": -4,
       "note": "一双朝下的鞋。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "墙上的时钟和你的手表差了一分钟。你转身再看——差了两分钟。",
+      "sanityEffect": -3,
+      "note": "时钟越来越慢。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "角落里有一张课桌，桌肚里有一本作业本。每一页都写着同一句：『我醒着』。",
+      "sanityEffect": -4,
+      "note": "作业本每页都写着：我醒着。"
     }
   ],
   "soundscape": {

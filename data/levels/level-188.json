@@ -47,6 +47,20 @@
       "text": "门背后有人用铅笔写着一行小字：『把门关好。它不喜欢开着的门。』",
       "sanityEffect": -2,
       "note": "门后小字：把门关好。它不喜欢开着的门。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "每一间房的墙角都有一个硬币大小的孔。你趴下看——孔的另一边也有一只眼睛。",
+      "sanityEffect": -7,
+      "note": "墙孔的另一边有眼睛。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "墙纸揭开一角，下面是另一层墙纸。再揭开，还有一层。一共七层，每一层都是同一间房的照片。",
+      "sanityEffect": -4,
+      "note": "七层墙纸，七张同一间房的照片。"
     }
   ],
   "soundscape": {
