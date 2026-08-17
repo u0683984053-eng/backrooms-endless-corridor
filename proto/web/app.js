@@ -1424,7 +1424,7 @@ function drawGame() {
     }
   }
 
-  // ---- 场景锚点（未触发的 setPieces：微光 ✦，走近触发后消失） ----
+  // ---- 场景锚点（未触发的 setPieces：微光 ✦，走近触发后消失；致命场景为暗红微光） ----
   const seenSp = g.seenSetPieces[g.levelId] || new Set();
   for (let i = 0; i < level.setPieces.length; i++) {
     const sp = level.setPieces[i];
@@ -1436,13 +1436,14 @@ function drawGame() {
     const tx = ox + dx * tile;
     const ty = oy + dy * tile;
     const pulse = 0.5 + 0.5 * Math.sin(now * 0.002 + i * 2.7);
-    ctx.fillStyle = `rgba(180,140,90,${0.06 + pulse * 0.1})`;
+    const fatal = (sp.sanityEffect || 0) <= -50;
+    ctx.fillStyle = fatal ? `rgba(140,30,20,${0.08 + pulse * 0.14})` : `rgba(180,140,90,${0.06 + pulse * 0.1})`;
     ctx.fillRect(tx + tile * 0.12, ty + tile * 0.12, tile * 0.76, tile * 0.76);
-    ctx.fillStyle = `rgba(232,224,138,${0.3 + pulse * 0.35})`;
+    ctx.fillStyle = fatal ? `rgba(235,90,70,${0.4 + pulse * 0.4})` : `rgba(232,224,138,${0.3 + pulse * 0.35})`;
     ctx.font = `${Math.floor(tile * 0.55)}px "Segoe UI Emoji", "Noto Sans SC", sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('✦', tx + tile / 2, ty + tile / 2 + tile * 0.04);
+    ctx.fillText(fatal ? '✦' : '✦', tx + tile / 2, ty + tile / 2 + tile * 0.04);
     ctx.textAlign = 'start';
     ctx.textBaseline = 'alphabetic';
   }

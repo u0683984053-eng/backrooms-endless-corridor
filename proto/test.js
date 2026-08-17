@@ -510,6 +510,32 @@ section('5.6 无限层优化：出口指引 / 缓存上限 / 追击保持');
     );
   }
 
+  // 致命场景：极个别、触发即理智归零（被同化）
+  {
+    const fatalLayers = LEVEL_IDS.filter((id) =>
+      (levels[id].setPieces || []).some((sp) => (sp.sanityEffect || 0) <= -50)
+    );
+    check('致命场景极个别（3-6 层）', fatalLayers.length >= 3 && fatalLayers.length <= 6, fatalLayers.join(','));
+    // 无限层致命场景放置更远
+    const lv0 = createInfiniteLevel(levels['level-0'], 7);
+    const fatalSp = lv0.setPieces.find((sp) => (sp.sanityEffect || 0) <= -50);
+    if (fatalSp) {
+      const dist = Math.abs(fatalSp.x - lv0.spawn.x) + Math.abs(fatalSp.y - lv0.spawn.y);
+      check('无限层致命场景放置更远（≥20 格）', dist >= 20, `dist=${dist}`);
+    }
+    // 触发致命场景 → 理智归零 → 被同化
+    const stF = createGame({ levels, seed: 29, startLevel: 'level-0' });
+    const spF = stF.level.setPieces.find((sp) => (sp.sanityEffect || 0) <= -50);
+    if (spF) {
+      stF.player.x = spF.x + 1;
+      stF.player.y = spF.y;
+      stF.player.sanity = 80;
+      const res = step(stF, { type: 'search' });
+      check('致命场景触发后理智归零', stF.player.sanity === 0, `san=${stF.player.sanity}`);
+      check('致命场景触发后被同化', stF.over === 'assimilated', `over=${stF.over}`);
+    }
+  }
+
   // 出生层级：createGame 支持 startLevel（F 版：90% Level 0，10% 随机层由前端决定）
   {
     const g11 = createGame({ levels, seed: 5, startLevel: 'level-11' });

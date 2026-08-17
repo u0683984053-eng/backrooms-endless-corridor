@@ -96,6 +96,13 @@
       "text": "灰烬里有一张完好的纸，画着这个房间。画里的房间，有一扇你身后没有的窗。",
       "sanityEffect": -6,
       "note": "画里有一扇不存在的窗。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "你终于明白温度计为什么显示 666°C 了。它量的不是空气——它量的是你。而它还在升高。",
+      "sanityEffect": -100,
+      "note": "温度计量的是我。"
     }
   ],
   "soundscape": {

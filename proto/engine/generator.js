@@ -1782,11 +1782,13 @@ export function createInfiniteLevel(dna, runSeed) {
   level.entities = c0.entities.slice();
   level.items = c0.items.slice();
 
-  // 场景锚点（setPieces）：确定性放置在出生点附近 8-30 格（恐怖来自手作场景，无限层同样生效）
+  // 场景锚点（setPieces）：确定性放置在出生点附近（"细思极恐"场景 8-30 格；
+  // 致命场景 sanityEffect≤-50 放更远 24-48 格——极个别、可选择避开）
   const spRng = mulberry32(hashString(`${runSeed}|${dna.id}|setpieces`));
   for (const sp of dna.setPieces || []) {
     if (!sp || !sp.type) continue;
-    const d2 = randInt(spRng, 8, 30);
+    const fatal = (sp.sanityEffect || 0) <= -50;
+    const d2 = fatal ? randInt(spRng, 24, 48) : randInt(spRng, 8, 30);
     const ang2 = (randInt(spRng, 0, 7) * Math.PI) / 4;
     let x = Math.round(level.spawn.x + Math.cos(ang2) * d2);
     let y = Math.round(level.spawn.y + Math.sin(ang2) * d2);

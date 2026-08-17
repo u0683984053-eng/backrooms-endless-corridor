@@ -93,6 +93,13 @@
       "text": "墙角的裂缝里塞着一张纸条：『别跳』。",
       "sanityEffect": -3,
       "note": "纸条：别跳。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "天花板的人形水渍开始滴水。滴下来的不是水——是你的汗。你这才发现，自己正以同一个姿势倒立在天花板上，低头看着地上的自己。",
+      "sanityEffect": -100,
+      "note": "倒立在天花板上的是我。"
     }
   ],
   "soundscape": {
