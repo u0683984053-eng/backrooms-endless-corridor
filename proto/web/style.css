@@ -587,6 +587,59 @@ body {
   color: var(--text-dim);
 }
 
+/* 开始界面：难度选择 + 种子输入 */
+.start-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.start-label {
+  font-size: 13px;
+  color: var(--text-dim);
+  min-width: 34px;
+  text-align: left;
+}
+
+.diff-btn {
+  background: #2a2518;
+  color: var(--text-dim);
+  border: 1px solid #4a4230;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.diff-btn:hover {
+  border-color: #6a5a38;
+}
+
+.diff-btn.active {
+  background: #6a5a20;
+  border-color: var(--amber-dim);
+  color: #f0e8d0;
+}
+
+.seed-input {
+  flex: 1;
+  max-width: 240px;
+  background: #1a1712;
+  color: var(--text);
+  border: 1px solid #4a4230;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+
+.seed-input:focus {
+  border-color: var(--amber-dim);
+}
+
 /* 触屏控制（手机）：十字方向键 + 动作键 */
 #touch-pad {
   position: fixed;

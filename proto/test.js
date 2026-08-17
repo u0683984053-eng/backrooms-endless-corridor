@@ -1119,6 +1119,51 @@ section('5.13 群星：进入即死');
   check('666 提供危险入口到群星', !!ex && ex.danger === true);
 }
 
+// ---------- 5.14 难度系统 ----------
+section('5.14 难度系统：普通/困难/梦魇');
+{
+  // 难度状态
+  const sN = createGame({ levels, seed: 91 });
+  const sH = createGame({ levels, seed: 91, difficulty: 'hard' });
+  const sM = createGame({ levels, seed: 91, difficulty: 'nightmare' });
+  check('默认普通', sN.difficulty === 'normal' && sN.diffMult === 1);
+  check('困难 1.25 倍', sH.difficulty === 'hard' && sH.diffMult === 1.25);
+  check('梦魇 1.5 倍', sM.difficulty === 'nightmare' && sM.diffMult === 1.5);
+  // 梦魇：理智侵蚀 ×1.5（Level 15 无实体，sanDrain 0.04 → 0.06）
+  const stM = createGame({ levels, seed: 93, startLevel: 'level-15', difficulty: 'nightmare' });
+  stM.player.sanityMax = 100;
+  stM.player.sanity = 100;
+  step(stM, { type: 'search' });
+  check('梦魇侵蚀 ×1.5（0.04→0.06）', Math.abs(stM.player.sanity - (100 - 0.04 * 1.5)) < 0.001, `san=${stM.player.sanity}`);
+  // 梦魇：受击伤害 ×1.5（同 seed 对照）
+  const hit = (diff) => {
+    const st = createGame({ levels, seed: 95, startLevel: 'level-5', difficulty: diff });
+    st.player.hpMax = 100;
+    st.player.sanityMax = 100;
+    st.player.staminaMax = 100;
+    st.player.hp = 100;
+    st.entities = [
+      { x: st.player.x + 1, y: st.player.y, type: 'hound', hp: 999, aggression: 'hostile', state: 'idle', visible: true, alert: true, wait: 0, revealed: false },
+    ];
+    const evs = step(st, { type: 'rest' }).events;
+    const m = evs.map((e) => e.text).join(' ').match(/猎犬攻击了你（-(\d+) HP）/);
+    return m ? Number(m[1]) : null;
+  };
+  const dN = hit(null);
+  const dM = hit('nightmare');
+  check('梦魇受击伤害 ×1.5', dN !== null && dM === Math.ceil(dN * 1.5), `${dN}→${dM}`);
+  // 序列化保留难度
+  const stS = createGame({ levels, seed: 97, difficulty: 'nightmare' });
+  const data = JSON.parse(JSON.stringify(serializeState(stS)));
+  const stR = createGame({ levels, seed: 1 });
+  deserializeState(stR, data);
+  check('序列化保留难度', stR.difficulty === 'nightmare' && stR.diffMult === 1.5, stR.difficulty);
+  // 同种子同难度 → 同世界（难度不影响生成）
+  const g1 = createGame({ levels, seed: 99, difficulty: 'nightmare' });
+  const g2 = createGame({ levels, seed: 99, difficulty: 'hard' });
+  check('难度不改变生成（同种子同布局）', JSON.stringify(g1.level.spawn) === JSON.stringify(g2.level.spawn) && g1.level.exits.length === g2.level.exits.length);
+}
+
 // ---------- 6. 野性变体（wild 无尽生成） ----------
 section('6. wild 变异：确定性 + 10 个随机种子全部生成可达');
 {

@@ -663,6 +663,8 @@ function attackPlayer(world, events, dmg, name, def) {
   }
   let d = dmg;
   const t = player.talent;
+  // 难度倍率：困难/梦魇受击更痛（不改变 rng 序列）
+  d = Math.ceil(d * (world.diffMult || 1));
   if (t === 'armored') d = Math.ceil(d * 0.75);
   if (t === 'endure') d = Math.min(8, d);
   if (t === 'laststand' && player.hp <= (player.hpMax || 100) * 0.3) d = Math.ceil(d * 0.5);

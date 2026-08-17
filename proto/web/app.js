@@ -148,14 +148,21 @@ function mergeCodexIntoGame() {
     deaths: dedupe([...(codex.deaths || []), ...(game.codex.deaths || [])]),
     notes: dedupe([...(codex.notes || []), ...(game.codex.notes || [])]),
   };
+  // 跨局成就合并（称号数据源）
+  if (codex.achievements && game.achievements) {
+    for (const id of Object.keys(codex.achievements)) game.achievements.add(id);
+  }
 }
 
 function syncCodexFromGame() {
   if (!game || !game.codex) return;
+  const achievements = {};
+  for (const id of game.achievements || []) achievements[id] = true;
   codex = {
     levels: game.codex.levels,
     deaths: dedupe(game.codex.deaths || []),
     notes: dedupe(game.codex.notes || []),
+    achievements,
   };
   saveCodex();
 }
@@ -200,7 +207,10 @@ function saveGame() {
 }
 
 function newGame() {
-  const seed = Math.floor(Math.random() * 1e6);
+  // 种子：输入框提供固定种子（同一世界可分享）；留空则随机
+  const seedInput = $('seed-input');
+  const seedText = seedInput && seedInput.value != null ? String(seedInput.value).trim() : '';
+  const seed = seedText ? seedText : Math.floor(Math.random() * 1e6);
   // 出生层级（F 版设定：绝大多数人第一次卡出落在 Level 0，少数人直接出现在其它层级；
   // 排除进入即死的群星——你不会一出生就变成灰烬）
   let startLevel = 'level-0';
@@ -210,7 +220,7 @@ function newGame() {
     );
     startLevel = others.length ? others[Math.floor(Math.random() * others.length)] : 'level-0';
   }
-  game = createGame({ levels, seed, startLevel });
+  game = createGame({ levels, seed, startLevel, difficulty: selectedDifficulty });
   mergeCodexIntoGame();
   lastLevelId = game.levelId;
   hideOverlay('start-screen');
@@ -1664,7 +1674,7 @@ function renderHud() {
   $('sta-num').textContent = `${Math.round(p.stamina)}/${p.staminaMax || 100}`;
   $('level-name').textContent = level.name;
   const talentText = p.talent && TALENTS[p.talent] ? ` · 天赋:${TALENTS[p.talent].name}` : '';
-  $('level-meta').textContent = `难度 Class ${level.difficultyClass} · ${level.environment} · 光照:${level.light} · 空间:${level.spaceRules.join('/')} · 美学:${level.aesthetic || '默认'}${talentText}`;
+  $('level-meta').textContent = `难度 Class ${level.difficultyClass} · ${level.environment} · 光照:${level.light} · 空间:${level.spaceRules.join('/')} · 美学:${level.aesthetic || '默认'}${talentText}${g.difficulty && g.difficulty !== 'normal' ? ` · 模式:${g.difficulty === 'nightmare' ? '梦魇' : '困难'}` : ''}`;
   $('turn-info').textContent = `第 ${g.turn} 回合`;
   $('light-info').textContent = `手电:${p.flashlight ? '开' : '关'} 电量 ${Math.floor(p.battery)}% · 潜行:${p.sneak ? '开' : '关'} · 武器:${p.weapon ? (ITEM_META[p.weapon] ? ITEM_META[p.weapon].name : p.weapon) : '徒手'}`;
 
@@ -2413,11 +2423,23 @@ function logClick(id, extra) {
   dbg.textContent = `[${t}] 点击: ${id}${extra ? ' → ' + extra : ''}`;
 }
 
+// ---------- 难度选择（开始界面） ----------
+let selectedDifficulty = 'normal';
+
 function wireButtons() {
   // 静音开关（🔊/🔇，点击切换）
   $('btn-mute').addEventListener('click', toggleMute);
   $('btn-inv').addEventListener('click', toggleInvModal);
   wireVolumeSlider();
+  // 难度选择
+  const diffBtns = ['normal', 'hard', 'nightmare'].map((d) => $('diff-' + d));
+  const selectDiff = (d) => {
+    selectedDifficulty = d;
+    for (const b of diffBtns) b.classList.toggle('active', b.id === 'diff-' + d);
+  };
+  diffBtns.forEach((b, i) => {
+    b.addEventListener('click', () => selectDiff(['normal', 'hard', 'nightmare'][i]));
+  });
   $('btn-new').addEventListener('click', () => {
     logClick('btn-new', '开始新游戏');
     safeRun(newGame);
@@ -2511,17 +2533,39 @@ function wireButtons() {
     }
   });
 
-  // 开始界面 Codex 摘要
+  // 开始界面 Codex 摘要（含称号与跨局最佳）
   const discovered = Object.keys(codex.levels || {}).length;
   const deaths = (codex.deaths || []).length;
+  const bestTurn = (codex.deaths || []).reduce((m, d) => Math.max(m, d.turn || 0), 0);
+  const title = titleOf(codex.achievements ? Object.keys(codex.achievements).length : 0);
   $('start-codex').textContent = discovered
-    ? `Codex：已发现 ${discovered} 个层级 · 死亡 ${deaths} 次 · 笔记 ${(codex.notes || []).length} 条`
+    ? `Codex：已发现 ${discovered} 个层级 · 死亡 ${deaths} 次 · 笔记 ${(codex.notes || []).length} 条 · 最长存活 ${bestTurn} 回合\n称号：${title}`
     : '';
   // 首次运行自动展示操作说明（一次性，关闭后不再弹出）
   if (!loadJSON('backrooms.guide.v1', false)) {
     saveJSON('backrooms.guide.v1', true);
     showOverlay('help-modal');
   }
+}
+
+// ---------- 称号系统：按解锁成就数获得称号 ----------
+const TITLES = [
+  [0, '新坠入者'],
+  [3, '走廊常客'],
+  [6, '后室学徒'],
+  [10, '幸存者'],
+  [14, '探索者'],
+  [18, '流浪老手'],
+  [22, '阈限行家'],
+  [26, '无尽回廊的居民'],
+  [29, '传说'],
+];
+function titleOf(achCount) {
+  let t = TITLES[0][1];
+  for (const [n, name] of TITLES) {
+    if (achCount >= n) t = name;
+  }
+  return t;
 }
 
 // ---------- 启动 ----------

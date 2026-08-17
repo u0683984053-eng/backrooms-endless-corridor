@@ -19,8 +19,11 @@ function clamp(v, min, max) {
 }
 
 /** 创建一局游戏（默认从 Level 0 出生；startLevel 可指定出生层级） */
-export function createGame({ levels, seed, startLevel }) {
+export function createGame({ levels, seed, startLevel, difficulty }) {
   const runSeed = seed === undefined ? 1 : seed;
+  const diff = difficulty === 'hard' || difficulty === 'nightmare' ? difficulty : 'normal';
+  // 难度系数：侵蚀与受击伤害倍率（不改变生成，同种子同世界）
+  const diffMult = diff === 'nightmare' ? 1.5 : diff === 'hard' ? 1.25 : 1;
   // 属性波动与随机天赋：确定性派生（同一 runSeed 永远同一套属性/天赋）
   const prng = mulberry32(hashString('attrs:' + String(runSeed)));
   const playerAttrs = {
@@ -36,6 +39,8 @@ export function createGame({ levels, seed, startLevel }) {
   const state = {
     levels,
     runSeed,
+    difficulty: diff,
+    diffMult,
     levelId: null,
     previousLevelId: null,
     level: null,
@@ -366,6 +371,8 @@ function buildWorld(state) {
     turn: state.turn,
     noise: state.lastNoise,
     looking: false,
+    difficulty: state.difficulty || 'normal',
+    diffMult: state.diffMult || 1,
     recordAttack: (name) => {
       state.lastAttackerName = name;
     },
@@ -536,10 +543,11 @@ function endTurn(state, events) {
 
   // 理智：基础侵蚀（心如止水减半 / 无畏 -20%）；安全层（sanDrain<=0.03 且 bright）每回合 +1
   const talent = player.talent;
+  const diffMult = state.diffMult || 1;
   if (level.sanDrain <= 0.03 && level.light === 'bright') {
     player.sanity = Math.min(player.sanityMax || 100, player.sanity + 1);
   } else {
-    let drain = level.sanDrain || 0;
+    let drain = (level.sanDrain || 0) * diffMult;
     if (talent === 'calm') drain *= 0.5;
     else if (talent === 'fearless') drain *= 0.8;
     player.sanity -= drain;
@@ -695,6 +703,7 @@ export function serializeState(state) {
   const out = {
     v: 1,
     runSeed: state.runSeed,
+    difficulty: state.difficulty || 'normal',
     levelId: state.levelId,
     previousLevelId: state.previousLevelId,
     turn: state.turn,
@@ -729,6 +738,8 @@ export function serializeState(state) {
 /** 反序列化：state 必须已用 createGame 创建（含 levels 注册表） */
 export function deserializeState(state, data) {
   state.runSeed = data.runSeed;
+  state.difficulty = data.difficulty === 'hard' || data.difficulty === 'nightmare' ? data.difficulty : 'normal';
+  state.diffMult = state.difficulty === 'nightmare' ? 1.5 : state.difficulty === 'hard' ? 1.25 : 1;
   state.turn = data.turn;
   state.over = data.over;
   state.deathCause = data.deathCause || null;
