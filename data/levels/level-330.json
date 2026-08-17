@@ -1,0 +1,122 @@
+{
+  "id": "level-330",
+  "name": "Level 330 — 水上乐园",
+  "number": 330,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "aquatic",
+  "aesthetic": "poolcore",
+  "light": "flickering",
+  "sanDrain": 0.05,
+  "description": "一座永远无人游玩的水上乐园：蓝色与白色的瓷砖延伸到视线尽头，滑梯高耸入云，水池的水面平静得像镜子。水是温的，温得恰到好处——你泡了一会儿才想起来，这里不该有这么适合游泳的水。",
+  "palette": {
+    "primary": "#3a8ac8",
+    "secondary": "#2a5c8a",
+    "accent": "#b8e8f8",
+    "light": "#d8f0ff"
+  },
+  "terrain": {
+    "width": 36,
+    "height": 36,
+    "roomCount": 8,
+    "roomSizeMin": 5,
+    "roomSizeMax": 9,
+    "corridorWidth": 2,
+    "wallStyle": "tile",
+    "floorStyle": "water",
+    "extraFeatures": [
+      "puddles",
+      "columns",
+      "fountain",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "deathmoth",
+      "density": 0.005,
+      "aggression": "hostile"
+    },
+    {
+      "type": "clump",
+      "density": 0.005,
+      "aggression": "curious"
+    },
+    {
+      "type": "dweller",
+      "density": 0.004,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "救生员椅上的假人穿着制服，姿势端正。你走近才发现，它的眼睛在跟着你转——不，是整张脸都在朝向你。",
+      "sanityEffect": -5,
+      "note": "救生员假人的脸一直朝向我。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "泳池底的瓷砖拼着一行字，只有水足够平静时才能看清：『水温合适，水也合适。你也很合适。』",
+      "sanityEffect": -5,
+      "note": "池底：你也很合适。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "滑梯口放着一双小拖鞋，整整齐齐。你往滑梯里看——里面很暗，暗到看不出滑梯有多长。拖鞋是湿的。",
+      "sanityEffect": -4,
+      "note": "滑梯口湿漉漉的小拖鞋。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "水池中央有一个排水口，水正缓慢地打着旋。你盯着看了很久，漩涡里有一张脸——是你的，但你还在岸上。",
+      "sanityEffect": -6,
+      "note": "漩涡里的脸是我，但我还在岸上。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "水声的循环",
+      "远处滑梯水流的哗啦声（没有水在流）"
+    ],
+    "startles": [
+      "水面突然泛起一圈涟漪，没有来源",
+      "某条滑梯里传来很响的滑水声"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-7",
+      "hidden": true,
+      "danger": false,
+      "description": "更衣室的排水渠——你钻进去，浮上一片温热的水面。"
+    },
+    {
+      "kind": "door",
+      "target": "level-37",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇写着『泳池区』的门——门后是另一个泳池。"
+    }
+  ]
+}

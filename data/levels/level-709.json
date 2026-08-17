@@ -1,0 +1,118 @@
+{
+  "id": "level-709",
+  "name": "Level 709 — 卡通镇",
+  "number": 709,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "mixed",
+  "aesthetic": "cartooncore",
+  "light": "bright",
+  "sanDrain": 0.05,
+  "description": "一座永远停在下午三点的卡通小镇：房子像用蜡笔画出来的，太阳挂在天上咧嘴笑，草是亮绿色的，云朵像棉花糖。街道上没有人，但每一扇窗后都有一双画出来的眼睛在看你。你摸了摸墙——是纸。",
+  "palette": {
+    "primary": "#f8d878",
+    "secondary": "#e85a6a",
+    "accent": "#5ac8e8",
+    "light": "#fff8d8"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 10,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "wallpaper",
+    "floorStyle": "grass",
+    "topology": "city-grid",
+    "extraFeatures": [
+      "furniture",
+      "plants",
+      "posters",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "faceling",
+      "density": 0.008,
+      "aggression": "curious"
+    },
+    {
+      "type": "watcher",
+      "density": 0.005,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note",
+    "key"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一栋房子的窗户纸后面，有一双画出来的眼睛。你走近，它眨了眨——然后纸被从里面轻轻顶起一个角。",
+      "sanityEffect": -4,
+      "note": "窗户纸后面的眼睛眨了眨。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "路灯杆上贴着寻人启事，用的是蜡笔：『找：画我的那只手。』下面画着一只手的轮廓。",
+      "sanityEffect": -5,
+      "note": "寻人启事：找画我的那只手。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "一栋没有门的房子。你绕到后面，发现墙壁上画着一扇门——你试着推了推，门开了，里面是黑洞洞的，没有蜡笔画的家具。",
+      "sanityEffect": -5,
+      "note": "画在墙上的门能推开，里面是空的。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "街角有一只气球，没有绳子系着，悬浮在半空。气球上画着一张笑脸。你盯着它看，笑脸慢慢变成了哭脸。",
+      "sanityEffect": -4,
+      "note": "气球上的笑脸变成了哭脸。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "卡通风格的背景音乐（永远循环同一段）",
+      "蜡笔摩擦纸面的声音"
+    ],
+    "startles": [
+      "某扇窗后传来一声极短的笑声",
+      "你身后的蜡笔房子，轮廓轻微地移动了一下"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "door",
+      "target": "level-11",
+      "hidden": true,
+      "danger": false,
+      "description": "小镇尽头的公路——你走出去，霓虹灯取代了蜡笔。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-400",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇画出来的便利店门，推开是惨白的灯管。"
+    }
+  ]
+}

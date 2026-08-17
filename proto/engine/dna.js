@@ -70,6 +70,10 @@ export const LEVEL_IDS = [
   'level-100',
   'level-150',
   'level-999',
+  // 核类美学新增（poolcore / cartooncore / songcore）
+  'level-330',
+  'level-709',
+  'level-98',
 ];
 
 /** 默认值（合并时逐字段覆盖，保证任何残缺 DNA 都能得到完整结构） */

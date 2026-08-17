@@ -55,6 +55,11 @@
       "type": "glowfolk",
       "density": 0.004,
       "aggression": "passive"
+    },
+    {
+      "type": "deathmoth",
+      "density": 0.004,
+      "aggression": "hostile"
     }
   ],
   "items": [

@@ -46,6 +46,11 @@
       "type": "moth",
       "density": 0.008,
       "aggression": "passive"
+    },
+    {
+      "type": "mangled",
+      "density": 0.003,
+      "aggression": "hostile"
     }
   ],
   "items": [
@@ -120,6 +125,13 @@
       "hidden": false,
       "danger": false,
       "description": "更衣室通往旅馆大堂的门，门后是红色地毯。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-330",
+      "hidden": true,
+      "danger": false,
+      "description": "泳池边一扇通往户外区的门——门后是一座更大的水上乐园。"
     }
   ]
 }

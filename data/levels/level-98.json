@@ -1,0 +1,104 @@
+{
+  "id": "level-98",
+  "name": "Level 98 — 音乐室",
+  "number": 98,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "mixed",
+  "aesthetic": "songcore",
+  "light": "dim",
+  "sanDrain": 0.04,
+  "description": "一间永远在播放音乐的屋子。旋律轻柔、陌生，像是你听过但想不起来在哪听过。房间的四面墙挂满唱片，每一张的标签都是空白。音乐每隔一段就会停顿一瞬——停顿的长度，刚好够你听见自己的心跳。",
+  "palette": {
+    "primary": "#6a5a8a",
+    "secondary": "#463a5c",
+    "accent": "#c8a8e8",
+    "light": "#e8d8ff"
+  },
+  "terrain": {
+    "width": 28,
+    "height": 28,
+    "roomCount": 8,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "drywall",
+    "floorStyle": "wood",
+    "extraFeatures": [
+      "shelves",
+      "furniture",
+      "papers",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "faceling",
+      "density": 0.003,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "留声机的唱针落在一张没有标签的唱片上，缓缓转动。你凑近听——音乐里有一段极轻的呼吸声，和你的呼吸同步。",
+      "sanityEffect": -4,
+      "note": "唱片里的呼吸声和我的同步。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "墙上用铅笔写着一行字，字迹很小：『第 4 乐章：醒。』下面有一排划掉的字，每一行都是同一个词。",
+      "sanityEffect": -4,
+      "note": "墙上的字：第 4 乐章：醒。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "这间屋子的音乐突然停了。停得毫无预兆——然后从墙里传来一声很轻的『嘘』。音乐重新响起，这次比之前快了一点。",
+      "sanityEffect": -5,
+      "note": "音乐停了一瞬，墙里传来嘘声。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "循环播放的陌生旋律",
+      "唱针的沙沙声"
+    ],
+    "startles": [
+      "音乐里混进一声不属于旋律的咳嗽",
+      "某张唱片自己从架子上滑落，碎了"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "door",
+      "target": "level-555",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇隔音门——门后是超市广播的同一首歌。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-hub",
+      "hidden": true,
+      "danger": false,
+      "description": "唱片架背后的一处空隙——挤过去，是亮着暖光的房间。"
+    }
+  ]
+}

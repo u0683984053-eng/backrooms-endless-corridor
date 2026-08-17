@@ -133,6 +133,20 @@
       "hidden": true,
       "danger": false,
       "description": "水滑梯的尽头通向的不是水池，而是泳池层的回音。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-709",
+      "hidden": true,
+      "danger": false,
+      "description": "游乐园尽头的彩绘墙——你穿过去，站在蜡笔画的小镇上。"
+    },
+    {
+      "kind": "door",
+      "target": "level-98",
+      "hidden": true,
+      "danger": false,
+      "description": "游乐园广播室的隔音门——门后循环着一段陌生的旋律。"
     }
   ]
 }
