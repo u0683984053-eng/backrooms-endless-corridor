@@ -158,6 +158,34 @@
       "hidden": false,
       "danger": false,
       "description": "标着『205』的门：门后是红砖与安静。"
+    },
+    {
+      "target": "level-118",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "标着『118』的门：门缝里透出教室的荧光灯。"
+    },
+    {
+      "target": "level-330",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "标着『330』的门：门后飘来氯水的气味。"
+    },
+    {
+      "target": "level-474",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "标着『474』的门：门缝里是书脊排成的墙。"
+    },
+    {
+      "target": "level-975",
+      "kind": "door",
+      "hidden": false,
+      "danger": false,
+      "description": "标着『975』的门：门后是大理石地面的反光。"
     }
   ]
 }

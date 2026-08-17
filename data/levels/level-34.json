@@ -165,5 +165,8 @@
       "danger": false,
       "description": "一堵假墙——墙后是日光灯下的隔间海洋。"
     }
+  ],
+  "specialMechanisms": [
+    "color-shift"
   ]
 }

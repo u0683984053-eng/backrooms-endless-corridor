@@ -1853,16 +1853,22 @@ function fillLogModal() {
     .map((id) => c.levels[id].name || id)
     .join('、');
   const st = (game && game.stats) || {};
+  const earned = game.achievements || new Set();
+  const achList = ACHIEVEMENTS.map(
+    (a) =>
+      `<div class="ach-row ${earned.has(a.id) ? 'unlocked' : ''}">${earned.has(a.id) ? '🏆' : '○'} <b>${escapeHtml(a.name)}</b><span class="ach-desc">${escapeHtml(a.desc)}</span></div>`
+  ).join('');
   $('log-body').innerHTML =
     `<div class="codex-summary">` +
     `<div class="cs-title">行记 Codex</div>` +
     `<div class="cs-line">已发现 ${Object.keys(c.levels || {}).length} 个层级：${levelNames || '仅 Level 0'}</div>` +
-    `<div class="cs-line">笔记 ${(c.notes || []).length} 条 · 死亡 ${(c.deaths || []).length} 次 · 成就 ${(game.achievements ? game.achievements.size : 0)}/${ACHIEVEMENTS.length} 个</div>` +
+    `<div class="cs-line">笔记 ${(c.notes || []).length} 条 · 死亡 ${(c.deaths || []).length} 次 · 成就 ${earned.size}/${ACHIEVEMENTS.length} 个</div>` +
     `<div class="cs-line">统计：回合 ${(game && game.turn) || 0} · 移动 ${st.movesTotal || 0} 格 · 击杀 ${st.kills || 0} · 场景 ${st.scenesSeen || 0} · 无人机 ${st.dronesUsed || 0} · 手枪击杀 ${st.pistolKills || 0} · 黑暗回合 ${st.darkTurns || 0}</div>` +
     (c.notes && c.notes.length
       ? `<div class="cs-notes">${c.notes.map((n) => `「${escapeHtml(String(n))}」`).join(' ')}</div>`
       : '') +
     `</div>` +
+    `<div class="codex-summary"><div class="cs-title">成就（${earned.size}/${ACHIEVEMENTS.length}）</div>${achList}</div>` +
     renderBestiary(c) +
     game.log
       .map((e) => `<div class="ev k-${e.kind || 'system'}">[${e.turn}] ${escapeHtml(e.text)}</div>`)

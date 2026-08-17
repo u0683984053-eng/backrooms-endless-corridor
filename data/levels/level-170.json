@@ -108,5 +108,8 @@
       "danger": false,
       "description": "一部电梯，灯坏了，按钮摸上去是凉的——它停在黑暗里。"
     }
+  ],
+  "specialMechanisms": [
+    "heartbeat"
   ]
 }

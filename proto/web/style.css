@@ -1041,6 +1041,21 @@ body.in-game #touch-pad {
 .beast-emoji {
   margin-right: 4px;
 }
+
+/* 成就列表 */
+.ach-row {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+.ach-row.unlocked {
+  color: var(--amber);
+}
+.ach-desc {
+  margin-left: 6px;
+  color: var(--text-dim);
+  font-size: 11px;
+}
 .beast-desc {
   display: block;
   color: #8a8468;

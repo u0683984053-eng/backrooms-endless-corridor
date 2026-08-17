@@ -114,5 +114,8 @@
       "danger": false,
       "description": "教室后墙的储物柜——你挤进去，落在一间巨大的儿童卧室里。"
     }
+  ],
+  "specialMechanisms": [
+    "bell-ring"
   ]
 }

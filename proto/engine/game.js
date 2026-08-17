@@ -209,6 +209,10 @@ export const ACHIEVEMENTS = [
   { id: 'marathon', name: '长途跋涉', desc: '累计移动 500 格。', test: (s) => (s.stats.movesTotal || 0) >= 500 },
   { id: 'night-owl', name: '夜行者', desc: '在黑暗层级累计度过 100 回合。', test: (s) => (s.stats.darkTurns || 0) >= 100 },
   { id: 'survivor-500', name: '久居者', desc: '存活 500 回合。', test: (s) => s.turn >= 500 },
+  { id: 'aesthetic-collector', name: '核类收藏家', desc: '发现 8 种不同美学的层级。后室的风格，你都能认出来。', test: (s) => new Set(Object.keys(s.codex.levels || {}).map((id) => (s.levels[id] || {}).aesthetic).filter(Boolean)).size >= 8 },
+  { id: 'library-card', name: '借阅证', desc: '在无尽图书馆（Level 474）逗留 20 回合。你还没找到想读的那本书。', test: (s) => (s.stats.levelsTurns['level-474'] || 0) >= 20 },
+  { id: 'headmaster', name: '校长', desc: '从废弃学校（Level 118）逃到破损庇护所（Level 28）。铃响了，该下课了。', test: (s) => (s.stats.visited['level-118'] || 0) > 0 && (s.stats.visited['level-28'] || 0) > 0 },
+  { id: 'curator', name: '策展人', desc: '参观博物馆（Level 975）并存活超过 100 回合。你的藏品里，又多了一件。', test: (s) => (s.stats.visited['level-975'] || 0) > 0 && s.turn > 100 },
   { id: 'naturalist', name: '博物学家', desc: '目击全部 16 种实体。你是活的图鉴。', test: (s) => Object.keys((s.codex && s.codex.bestiary) || {}).length >= 16 },
 ];
 
@@ -479,6 +483,43 @@ function endTurn(state, events) {
       player.sanity = Math.max(0, player.sanity - 2);
       events.push({ text: '你几乎要飘走了。土里的客人们安静地躺着，骨头在月光下闪烁……（-2 理智）', kind: 'sanity' });
     }
+  }
+
+  // 特殊机制：color-shift（双色切换，Level 34）——每 15 回合走廊颜色切换，
+  // 轻微侵蚀理智；小概率空间错位（附近随机偏移 1 格）
+  if (mechs.includes('color-shift') && (state.turn + 1) % 15 === 0) {
+    events.push({ text: '走廊的灯光从红色切换成蓝色。你回头——你走过的走廊，也变成了蓝色。', kind: 'sanity' });
+    player.sanity = Math.max(0, player.sanity - 1);
+    if (state.rng() < 0.25) {
+      const dirsC = [
+        { dx: 0, dy: -1 },
+        { dx: -1, dy: 0 },
+        { dx: 0, dy: 1 },
+        { dx: 1, dy: 0 },
+      ];
+      const dC = dirsC[Math.floor(state.rng() * 4)];
+      const nx = player.x + dC.dx;
+      const ny = player.y + dC.dy;
+      if ((level.infinite || (nx >= 0 && ny >= 0 && nx < level.width && ny < level.height)) && tileAt(level, nx, ny) !== '#') {
+        player.x = nx;
+        player.y = ny;
+        events.push({ text: '空间在颜色切换的一瞬错位了——你发现自己站在几步之外。', kind: 'sanity' });
+      }
+    }
+  }
+  // 特殊机制：bell-ring（上课铃，Level 118）——每 12 回合铃声大作，附近实体警觉
+  if (mechs.includes('bell-ring') && (state.turn + 1) % 12 === 0) {
+    events.push({ text: '上课铃骤然响起，尖锐刺耳。走廊里的阴影停顿了一瞬——然后开始移动。', kind: 'entity' });
+    for (const e of state.entities) {
+      if (e.hp <= 0) continue;
+      if (Math.abs(e.x - player.x) + Math.abs(e.y - player.y) > 8) continue;
+      e.alert = true;
+    }
+  }
+  // 特殊机制：heartbeat（心电监护，Level 170）——每 10 回合监护仪的滴答声侵蚀理智
+  if (mechs.includes('heartbeat') && (state.turn + 1) % 10 === 0) {
+    player.sanity = Math.max(0, player.sanity - 1);
+    events.push({ text: '心电监护仪发出均匀的滴答声。你过了很久才发现——那是你的心跳（-1 理智）。', kind: 'sanity' });
   }
 
   // 理智：基础侵蚀（心如止水减半 / 无畏 -20%）；安全层（sanDrain<=0.03 且 bright）每回合 +1

@@ -1038,6 +1038,51 @@ section('5.11 血染森林：低语侵蚀 / 双重视角场景 / 真假出口');
   check('Level 13 提供入口到 14', (l13.exits || []).some((e) => e.target === 'level-14'));
 }
 
+// ---------- 5.12 新机制：双色切换 / 上课铃 / 心电监护 + 新成就 ----------
+section('5.12 新机制与新成就');
+{
+  // color-shift：Level 34，15 回合触发
+  const st1 = createGame({ levels, seed: 71, startLevel: 'level-34' });
+  st1.player.sanityMax = 100;
+  st1.player.sanity = 100;
+  let shifted = false;
+  for (let i = 0; i < 17; i++) {
+    const res = step(st1, { type: 'search' });
+    if (res.events.some((e) => e.text.includes('切换成蓝色'))) shifted = true;
+  }
+  check('color-shift：15 回合触发双色切换', shifted);
+  check('color-shift：侵蚀理智', st1.player.sanity < 100, `san=${st1.player.sanity}`);
+  // bell-ring：Level 118，12 回合铃声唤醒实体
+  const st2 = createGame({ levels, seed: 73, startLevel: 'level-118' });
+  st2.entities = [
+    { x: st2.player.x + 4, y: st2.player.y, type: 'scratcher', hp: 50, aggression: 'hostile', state: 'idle', visible: false, alert: false, wait: 0, revealed: false },
+  ];
+  let rang = false;
+  for (let i = 0; i < 14; i++) {
+    const res = step(st2, { type: 'search' });
+    if (res.events.some((e) => e.text.includes('上课铃'))) rang = true;
+  }
+  check('bell-ring：12 回合铃声大作', rang);
+  // heartbeat：Level 170，10 回合触发
+  const st3 = createGame({ levels, seed: 75, startLevel: 'level-170' });
+  st3.player.sanityMax = 100;
+  st3.player.sanity = 100;
+  let beat = false;
+  for (let i = 0; i < 12; i++) {
+    const res = step(st3, { type: 'search' });
+    if (res.events.some((e) => e.text.includes('心电监护仪'))) beat = true;
+  }
+  check('heartbeat：10 回合心电滴答', beat);
+  // 新成就注册
+  const ids = ACHIEVEMENTS.map((a) => a.id);
+  check('4 个新成就已注册', ['aesthetic-collector', 'library-card', 'headmaster', 'curator'].every((i) => ids.includes(i)));
+  check('成就总数 29', ACHIEVEMENTS.length === 29, `${ACHIEVEMENTS.length}`);
+  // 层级特定成就可达成
+  const st4 = createGame({ levels, seed: 77, startLevel: 'level-118' });
+  enterLevel(st4, 'level-28', {});
+  check('headmaster 成就条件可达成（118→28）', (st4.stats.visited['level-118'] || 0) > 0 && (st4.stats.visited['level-28'] || 0) > 0);
+}
+
 // ---------- 6. 野性变体（wild 无尽生成） ----------
 section('6. wild 变异：确定性 + 10 个随机种子全部生成可达');
 {
