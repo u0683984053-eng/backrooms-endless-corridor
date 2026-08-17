@@ -1,0 +1,63 @@
+{
+  "id": "level-599",
+  "name": "Level 599 — 群星",
+  "number": 599,
+  "category": "normal",
+  "difficultyClass": 5,
+  "environment": "mixed",
+  "aesthetic": "traumacore",
+  "light": "bright",
+  "sanDrain": 0,
+  "description": "这里没有地板，没有墙壁，没有空气——只有光。白热的光从四面八方涌来，温度高到概念本身都在熔化。你的皮肤在沸腾，你的骨头在发光，你的名字被烧成了灰。欢迎来到恒星内部。你不会在这里待太久。",
+  "palette": {
+    "primary": "#ffd870",
+    "secondary": "#ff8a30",
+    "accent": "#e83020",
+    "light": "#fff8d8"
+  },
+  "terrain": {
+    "width": 20,
+    "height": 20,
+    "roomCount": 4,
+    "roomSizeMin": 5,
+    "roomSizeMax": 9,
+    "corridorWidth": 2,
+    "wallStyle": "metal",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "columns",
+      "puddles"
+    ],
+    "infinite": false
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "specialMechanisms": [
+    "solar-burn"
+  ],
+  "entities": [],
+  "items": [],
+  "itemDensity": 0,
+  "setPieces": [],
+  "soundscape": {
+    "ambient": [
+      "白噪的轰鸣",
+      "你的皮肤沸腾的声音"
+    ],
+    "startles": [
+      "温度计爆裂的声音",
+      "你体内传来骨骼的爆响"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-hub",
+      "hidden": true,
+      "danger": false,
+      "description": "理论上的出口。你不会有时间用它。"
+    }
+  ]
+}

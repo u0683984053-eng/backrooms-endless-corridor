@@ -492,6 +492,8 @@ section('5.6 无限层优化：出口指引 / 缓存上限 / 追击保持');
     let negative = 0;
     let okCount = true;
     for (const id of LEVEL_IDS) {
+      // 群星（599）：进入即死的恒星内部，没有场景可言
+      if (id === 'level-599') continue;
       const sps = levels[id].setPieces || [];
       totalScenes += sps.length;
       if (sps.length < 2) okCount = false;
@@ -1081,6 +1083,40 @@ section('5.12 新机制与新成就');
   const st4 = createGame({ levels, seed: 77, startLevel: 'level-118' });
   enterLevel(st4, 'level-28', {});
   check('headmaster 成就条件可达成（118→28）', (st4.stats.visited['level-118'] || 0) > 0 && (st4.stats.visited['level-28'] || 0) > 0);
+}
+
+// ---------- 5.13 群星（Level 599）：进入瞬间死亡 ----------
+section('5.13 群星：进入即死');
+{
+  const d599 = levels['level-599'];
+  check('Level 599 存在且名为群星', !!d599 && d599.name.includes('群星'), d599 && d599.name);
+  check('含 solar-burn 机制', (d599.specialMechanisms || []).includes('solar-burn'));
+  check('难度等级 5（极端环境）', d599.difficultyClass === 5, `dc=${d599.difficultyClass}`);
+  // 进入即死（出口切换路径）
+  const st = createGame({ levels, seed: 81 });
+  st.player.hp = 100;
+  enterLevel(st, 'level-599', {});
+  check('进入群星后 hp 归零', st.player.hp === 0, `hp=${st.player.hp}`);
+  check('进入群星后立即死亡', st.over === 'dead', `over=${st.over}`);
+  check('死因是恒星高温', (st.deathCause || '').includes('高温'), st.deathCause);
+  // step 推进后死亡结算完整（死亡事件 + 场景笔记）
+  const st2 = createGame({ levels, seed: 83, startLevel: 'level-666' });
+  const ex599 = st2.level.exits.find((e) => e.target === 'level-599');
+  if (ex599) {
+    // hidden 出口需先发现（搜索/直接标记）
+    st2.discoveredExits['level-666'].add(st2.level.exits.indexOf(ex599));
+    st2.player.x = ex599.x;
+    st2.player.y = ex599.y;
+    const res = step(st2, { type: 'exit' });
+    check('从 666 踏入群星后死亡', st2.over === 'dead', `over=${st2.over}`);
+    check('死亡事件包含高温死因', res.events.some((e) => e.text.includes('高温') || e.text.includes('烧成灰烬')), res.events.map((e) => e.text).slice(0, 3).join('|'));
+    check('群星笔记写入 Codex', (st2.codex.levels['level-599'] || {}).notes.some((n) => n.includes('群星')), JSON.stringify((st2.codex.levels['level-599'] || {}).notes));
+  } else {
+    check('从 666 踏入群星后死亡', true, '未找到 599 出口');
+  }
+  // 入口存在：666 有 danger 出口指向 599
+  const ex = levels['level-666'].exits.find((e) => e.target === 'level-599');
+  check('666 提供危险入口到群星', !!ex && ex.danger === true);
 }
 
 // ---------- 6. 野性变体（wild 无尽生成） ----------

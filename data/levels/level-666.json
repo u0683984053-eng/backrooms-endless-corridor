@@ -132,6 +132,13 @@
       "hidden": true,
       "danger": true,
       "description": "地板上一道裂缝，下面是旋转木马的音乐——如果你能活着落地。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-599",
+      "hidden": true,
+      "danger": true,
+      "description": "一扇被熔化的门，门缝里涌出白热的光——不要推开它。"
     }
   ]
 }

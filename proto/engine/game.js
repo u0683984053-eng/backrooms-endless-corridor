@@ -307,6 +307,18 @@ export function enterLevel(state, levelId, opts = {}) {
     if (codex.visits === 1) pushLog(state, dna.description, 'level');
   }
 
+  // 特殊机制：solar-burn（群星，Level 599）——恒星内部，进入瞬间被高温烧毁。
+  // 没有挣扎，没有出口，只有光。（机制挂在 DNA 上，此处直接查 DNA）
+  if ((dna.specialMechanisms || []).includes('solar-burn')) {
+    state.player.hp = 0;
+    state.lastAttackerName = '恒星的高温';
+    state.over = 'dead';
+    state.deathCause = '被恒星的高温烧成灰烬';
+    const note = '你看见了群星——然后你成为了它的一部分。';
+    pushLog(state, `灼热的气浪吞没了一切。${note}`, 'death');
+    if (codex.notes && !codex.notes.includes(note)) codex.notes.push(note);
+  }
+
   updateExplored(state);
 }
 

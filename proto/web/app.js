@@ -201,10 +201,13 @@ function saveGame() {
 
 function newGame() {
   const seed = Math.floor(Math.random() * 1e6);
-  // 出生层级（F 版设定：绝大多数人第一次卡出落在 Level 0，少数人直接出现在其它层级）
+  // 出生层级（F 版设定：绝大多数人第一次卡出落在 Level 0，少数人直接出现在其它层级；
+  // 排除进入即死的群星——你不会一出生就变成灰烬）
   let startLevel = 'level-0';
   if (Math.random() < 0.1) {
-    const others = Object.keys(levels).filter((id) => id !== 'level-0');
+    const others = Object.keys(levels).filter(
+      (id) => id !== 'level-0' && !(levels[id].specialMechanisms || []).includes('solar-burn')
+    );
     startLevel = others.length ? others[Math.floor(Math.random() * others.length)] : 'level-0';
   }
   game = createGame({ levels, seed, startLevel });
@@ -256,6 +259,11 @@ function enterWild() {
   const baseId = baseIds[Math.floor(Math.random() * baseIds.length)];
   const base = levels[baseId];
   const dna = mutateDna(base, wildSeed);
+  // 野性变异让群星熄灭：以 Level 599 为基底的野性层不再进入即死（否则毫无意义）
+  if ((dna.specialMechanisms || []).includes('solar-burn')) {
+    dna.specialMechanisms = dna.specialMechanisms.filter((m) => m !== 'solar-burn');
+    dna.name = (dna.name || '野性层级').replace('群星', '熄灭的群星');
+  }
   levels[dna.id] = dna;
   wildRegistry[dna.id] = { baseId, seed: wildSeed };
   saveWildRegistry();

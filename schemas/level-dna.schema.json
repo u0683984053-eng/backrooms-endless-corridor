@@ -50,8 +50,8 @@
     },
     "specialMechanisms": {
       "type": "array",
-      "items": { "enum": ["endless-chase", "heat-drain", "phantom-noise", "dark-pulse", "whisper-drain", "color-shift", "bell-ring", "heartbeat"] },
-      "description": "特殊机制：endless-chase=实体永不冷静（!层）；heat-drain=高温灼烧（666层）；phantom-noise=幻影噪音惊散实体（16/169层）；dark-pulse=黑暗脉冲侵蚀理智（21层）；whisper-drain=森林低语侵蚀理智且停留越久越强（14层）；color-shift=双色切换（34层）；bell-ring=上课铃惊醒实体（118层）；heartbeat=心电监护侵蚀理智（170层）"
+      "items": { "enum": ["endless-chase", "heat-drain", "phantom-noise", "dark-pulse", "whisper-drain", "color-shift", "bell-ring", "heartbeat", "solar-burn"] },
+      "description": "特殊机制：endless-chase=实体永不冷静（!层）；heat-drain=高温灼烧（666层）；phantom-noise=幻影噪音惊散实体（16/169层）；dark-pulse=黑暗脉冲侵蚀理智（21层）；whisper-drain=森林低语侵蚀理智且停留越久越强（14层）；color-shift=双色切换（34层）；bell-ring=上课铃惊醒实体（118层）；heartbeat=心电监护侵蚀理智（170层）；solar-burn=恒星内部进入即死（599层）"
     },
     "entities": {
       "type": "array",
