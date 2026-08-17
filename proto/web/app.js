@@ -1351,6 +1351,24 @@ function drawGame() {
           ctx.drawImage(vc.props.get(prop.kind), tx, ty, tile, tile);
         }
 
+        // 楼梯/电梯（'S' 可走标记）：斜向阶梯线（Level 15 无尽楼梯间氛围）
+        if (t === 'S') {
+          ctx.strokeStyle = 'rgba(210,210,200,0.45)';
+          ctx.lineWidth = Math.max(2, tile * 0.07);
+          ctx.beginPath();
+          ctx.moveTo(tx + tile * 0.15, ty + tile * 0.85);
+          ctx.lineTo(tx + tile * 0.85, ty + tile * 0.15);
+          ctx.stroke();
+          for (let i = 1; i <= 3; i++) {
+            const bx = tx + tile * 0.15 + tile * 0.2 * i;
+            const by = ty + tile * 0.85 - tile * 0.2 * i;
+            ctx.beginPath();
+            ctx.moveTo(bx, by);
+            ctx.lineTo(bx + tile * 0.12, by);
+            ctx.stroke();
+          }
+        }
+
         // 传送门
         if (t === 'T') {
           const pulse = 0.5 + 0.5 * Math.sin(now * 0.004 + gx + gy);
