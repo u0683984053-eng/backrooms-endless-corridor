@@ -59,7 +59,10 @@
     "almond-water",
     "royal-ration",
     "note",
-    "crowbar"
+    "crowbar",
+    "pistol",
+    "ammo",
+    "drone"
   ],
   "itemDensity": 0.12,
   "setPieces": [

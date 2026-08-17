@@ -260,9 +260,17 @@ function enterWild() {
   enterLevel(game, dna.id, { keepPlayer: true });
   rebuildVisuals();
   document.body.classList.add('in-game');
-  if (game.levelId !== prev) {
-    showTransition(`你挤进一道墙缝……\n${dna.name}\n${dna.description}`, 3400);
+  let wildTalent = '';
+  // 野性变异：30% 概率天赋被野性层级扭曲成另一个随机天赋（F 版"野性会改变你"）
+  if (Math.random() < 0.3) {
+    const ids = Object.keys(TALENTS);
+    const newT = ids[Math.floor(Math.random() * ids.length)];
+    game.player.talent = newT;
+    const t = TALENTS[newT];
+    wildTalent = `\n野性变异：你的天赋扭曲成了【${t.name}】——${t.desc}`;
+    renderEvents([{ text: `野性变异：你的天赋扭曲成了 ${t.name}。`, kind: 'sanity' }]);
   }
+  showTransition(`你挤进一道墙缝……\n${dna.name}\n${dna.description}${wildTalent}`, 3800);
   renderAll();
   saveGame();
 }
@@ -1622,7 +1630,7 @@ function renderHud() {
   const talentText = p.talent && TALENTS[p.talent] ? ` · 天赋:${TALENTS[p.talent].name}` : '';
   $('level-meta').textContent = `难度 Class ${level.difficultyClass} · ${level.environment} · 光照:${level.light} · 空间:${level.spaceRules.join('/')} · 美学:${level.aesthetic || '默认'}${talentText}`;
   $('turn-info').textContent = `第 ${g.turn} 回合`;
-  $('light-info').textContent = `手电:${p.flashlight ? '开' : '关'} 电量 ${Math.floor(p.battery)}% · 潜行:${p.sneak ? '开' : '关'} · 武器:${p.weapon ? '撬棍' : '徒手'}`;
+  $('light-info').textContent = `手电:${p.flashlight ? '开' : '关'} 电量 ${Math.floor(p.battery)}% · 潜行:${p.sneak ? '开' : '关'} · 武器:${p.weapon ? (ITEM_META[p.weapon] ? ITEM_META[p.weapon].name : p.weapon) : '徒手'}`;
 
   // 背包：仅更新按钮角标与弹窗内容（不常驻 HUD，避免挤压画面）
   updateInvUI();
@@ -2001,6 +2009,9 @@ function handleKey(e) {
       break;
     case 'f':
       doAction({ type: 'light' });
+      break;
+    case 'c':
+      doAction({ type: 'fight' });
       break;
     case ' ':
       e.preventDefault();
@@ -2398,7 +2409,7 @@ function wireButtons() {
       });
       for (const ev of upEvs) btn.addEventListener(ev, stopHold);
     } else if (btn.dataset.act) {
-      const acts = { rest: { type: 'rest' }, search: { type: 'interact' }, light: { type: 'light' }, log: { type: 'log' }, exit: { type: 'exit' } };
+      const acts = { rest: { type: 'rest' }, search: { type: 'interact' }, light: { type: 'light' }, log: { type: 'log' }, exit: { type: 'exit' }, fight: { type: 'fight' } };
       const a = acts[btn.dataset.act];
       btn.addEventListener('click', () => {
         if (a.type === 'log') {

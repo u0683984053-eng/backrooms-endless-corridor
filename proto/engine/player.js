@@ -13,6 +13,9 @@ export const ITEM_META = {
   battery: { name: '电池', emoji: '🔋', desc: '为手电补充 50 电量。' },
   flashlight: { name: '手电筒', emoji: '🔦', desc: '打开后照亮周围，视野半径 +2。' },
   crowbar: { name: '撬棍', emoji: '🔧', desc: '战斗伤害提升至 20-30（体力消耗 20/次）。' },
+  pistol: { name: '手枪', emoji: '🔫', desc: '战斗伤害 30-45，每次射击消耗 1 发弹药；无弹药时枪托砸击 10-15。' },
+  ammo: { name: '弹药', emoji: '🎯', desc: '手枪子弹。后室的子弹打一颗少一颗。' },
+  drone: { name: '无人机', emoji: '🛸', desc: '放飞后自动游走探索约 24 格区域，补全地图并标记附近实体（一次性）。' },
   medkit: { name: '医疗包', emoji: '🩹', desc: '恢复 40 生命。' },
   note: { name: '便签', emoji: '📝', desc: '一张泛黄的便签，读后会写进探索日志。' },
   key: { name: '钥匙', emoji: '🗝️', desc: '一把旧钥匙。锁着的门也许用得上。' },
@@ -561,7 +564,26 @@ function doFight(state, world, events) {
   }
   player.stamina -= 20;
   const def = ENTITY_DEFS[target.type] || {};
-  let dmg = player.weapon === 'crowbar' ? randInt(world.rng, 20, 30) : randInt(world.rng, 5, 10);
+  // 武器伤害：手枪 30-45（每发耗 1 弹药，无弹药枪托 10-15）/ 撬棍 20-30 / 徒手 5-10
+  // 注意：每种武器只消耗一次 rng（保持确定性序列稳定）
+  let weaponName = '徒手';
+  let dmg;
+  if (player.weapon === 'crowbar') {
+    weaponName = '撬棍';
+    dmg = randInt(world.rng, 20, 30);
+  } else if (player.weapon === 'pistol') {
+    const ammoIdx = player.inventory.indexOf('ammo');
+    if (ammoIdx >= 0) {
+      player.inventory.splice(ammoIdx, 1);
+      weaponName = '手枪';
+      dmg = randInt(world.rng, 30, 45);
+    } else {
+      weaponName = '手枪（枪托）';
+      dmg = randInt(world.rng, 10, 15);
+    }
+  } else {
+    dmg = randInt(world.rng, 5, 10);
+  }
   let crit = false;
   if (player.talent === 'fighter') dmg = Math.floor(dmg * 1.5);
   if (player.talent === 'hunter' && chance(world.rng, 0.15)) {
@@ -569,7 +591,6 @@ function doFight(state, world, events) {
     crit = true;
   }
   target.hp -= dmg;
-  const weaponName = player.weapon === 'crowbar' ? '撬棍' : '徒手';
   events.push({
     text: `你用${weaponName}攻击${def.name || target.type}（-${dmg} HP）${crit ? '——致命一击！' : ''}。`,
     kind: 'combat',
@@ -610,7 +631,7 @@ function doFight(state, world, events) {
 
 /** 使用物品 */
 function useItem(state, world, events, itemName, invIdx) {
-  const { player } = state;
+  const { player, level } = state;
   // 铁胃天赋：食物与药品恢复 +50%（整数向下取整）
   const healMul = player.talent === 'hardy' ? 1.5 : 1;
   const clampMax = (v, max) => Math.max(0, Math.min(max || 100, v));
@@ -659,6 +680,71 @@ function useItem(state, world, events, itemName, invIdx) {
     case 'crowbar': {
       player.weapon = 'crowbar';
       events.push({ text: '你握紧了撬棍，战斗伤害提升至 20-30。', kind: 'item' });
+      break;
+    }
+    case 'pistol': {
+      player.weapon = 'pistol';
+      events.push({ text: '你检查了手枪，子弹上膛。战斗伤害提升至 30-45（每发耗 1 弹药）。', kind: 'item' });
+      break;
+    }
+    case 'ammo': {
+      events.push({ text: '一盒弹药。你的枪又有了底气。', kind: 'system' });
+      break;
+    }
+    case 'drone': {
+      // 无人机：自动游走探索——从玩家位置出发贪心游走最多 24 步（未探索格优先），
+      // 沿途记录每步 3×3 视野（补全地图）、标记发现的实体，随后返回并报告。一次性。
+      player.inventory.splice(invIdx, 1);
+      const set = state.explored[state.levelId] || (state.explored[state.levelId] = new Set());
+      const before = set.size;
+      const foundNames = new Set();
+      const DIR4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+      const markAround = (x, y) => {
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            if (tileAt(level, x + dx, y + dy) !== '#') {
+              // explored 体积保护：超限时 FIFO 淘汰最旧
+              if (set.size >= 30000) {
+                const it = set.values().next();
+                if (!it.done) set.delete(it.value);
+              }
+              set.add(x + dx + ',' + (y + dy));
+            }
+          }
+        }
+        for (const e of state.entities) {
+          if (e.hp <= 0) continue;
+          if (Math.max(Math.abs(e.x - x), Math.abs(e.y - y)) > 1) continue;
+          if (!e.visible) e.visible = true;
+          const d = ENTITY_DEFS[e.type] || {};
+          foundNames.add(d.name || e.type);
+        }
+      };
+      markAround(player.x, player.y);
+      let dx = player.x;
+      let dy = player.y;
+      const seen = new Set([dx + ',' + dy]);
+      let steps = 0;
+      while (steps < 24) {
+        // 优先未走过的可走格；全走过则随机选可走格（沿墙游走）；无路可走则返航
+        const fresh = DIR4.filter(
+          ([ox, oy]) => tileAt(level, dx + ox, dy + oy) !== '#' && !seen.has(dx + ox + ',' + (dy + oy))
+        );
+        const pool = fresh.length > 0 ? fresh : DIR4.filter(([ox, oy]) => tileAt(level, dx + ox, dy + oy) !== '#');
+        if (pool.length === 0) break;
+        const [ox, oy] = pick(state.rng, pool);
+        dx += ox;
+        dy += oy;
+        seen.add(dx + ',' + dy);
+        markAround(dx, dy);
+        steps++;
+      }
+      const newCells = set.size - before;
+      const foundTxt = foundNames.size > 0 ? `，画面里出现了：${[...foundNames].join('、')}` : '';
+      events.push({
+        text: `无人机起飞，自动游走探索了 ${steps} 格，传回 ${newCells} 处新区域${foundTxt}。它带着画面回到你手中，随即报废。`,
+        kind: 'item',
+      });
       break;
     }
     case 'note': {

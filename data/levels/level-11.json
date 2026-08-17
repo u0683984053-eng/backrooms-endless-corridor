@@ -68,7 +68,10 @@
     "battery",
     "flashlight",
     "note",
-    "key"
+    "key",
+    "pistol",
+    "ammo",
+    "drone"
   ],
   "itemDensity": 0.3,
   "setPieces": [

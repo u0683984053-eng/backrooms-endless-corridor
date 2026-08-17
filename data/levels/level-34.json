@@ -53,7 +53,9 @@
     "almond-water",
     "key",
     "note",
-    "crowbar"
+    "crowbar",
+    "pistol",
+    "ammo"
   ],
   "itemDensity": 0.22,
   "setPieces": [

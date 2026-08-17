@@ -60,7 +60,7 @@
         }
       }
     },
-    "items": { "type": "array", "items": { "enum": ["almond-water", "royal-ration", "battery", "flashlight", "crowbar", "medkit", "note", "key", "liquid-pain"] } },
+    "items": { "type": "array", "items": { "enum": ["almond-water", "royal-ration", "battery", "flashlight", "crowbar", "pistol", "ammo", "drone", "medkit", "note", "key", "liquid-pain"] } },
     "itemDensity": { "type": "number", "minimum": 0, "maximum": 1, "description": "物品丰富度 0-1" },
     "setPieces": {
       "type": "array",

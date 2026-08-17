@@ -55,7 +55,10 @@
     "flashlight",
     "crowbar",
     "medkit",
-    "note"
+    "note",
+    "pistol",
+    "ammo",
+    "drone"
   ],
   "itemDensity": 0.025,
   "setPieces": [

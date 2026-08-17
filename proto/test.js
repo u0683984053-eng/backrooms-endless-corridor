@@ -775,6 +775,58 @@ section('5.7 属性波动与随机天赋');
       const evs = step(stI, { type: 'rest' }).events;
       check('instinct：危险预警事件', evs.some((e) => e.text.includes('第六感')), evs.map((e) => e.text).slice(0, 3).join('|'));
     }
+
+    // ---------- 武器与探测工具（手枪/弹药/无人机） ----------
+    // 手枪：装备后伤害 30-45，射击消耗 1 发弹药；无弹药枪托 10-15
+    {
+      const stP = createGame({ levels, seed: 23, startLevel: 'level-5' });
+      stP.player.weapon = 'pistol';
+      stP.player.inventory.push('ammo');
+      stP.entities = [
+        { x: stP.player.x + 1, y: stP.player.y, type: 'hound', hp: 999, aggression: 'hostile', state: 'idle', visible: true, alert: false, wait: 0, revealed: false },
+      ];
+      const evs = step(stP, { type: 'fight' }).events;
+      const m = evs.map((e) => e.text).join(' ').match(/用手枪攻击猎犬（-(\d+) HP）/);
+      const ammoAfter = stP.player.inventory.filter((i) => i === 'ammo').length;
+      check('pistol：装备后射击消耗弹药', ammoAfter === 0 && m !== null, `ammo=${ammoAfter} dmg=${m && m[1]}`);
+      check('pistol：伤害 30-45', m !== null && Number(m[1]) >= 30 && Number(m[1]) <= 45, m ? m[1] : '无事件');
+      // 无弹药：枪托 10-15（重置实体位置避免游走脱离）
+      stP.entities[0].x = stP.player.x + 1;
+      stP.entities[0].y = stP.player.y;
+      const evs2 = step(stP, { type: 'fight' }).events;
+      const m2 = evs2.map((e) => e.text).join(' ').match(/手枪（枪托）攻击猎犬（-(\d+) HP）/);
+      check('pistol：无弹药枪托 10-15', m2 !== null && Number(m2[1]) >= 10 && Number(m2[1]) <= 15, m2 ? m2[1] : '无事件');
+      // 徒手对照伤害范围 5-10
+      const stH = createGame({ levels, seed: 23, startLevel: 'level-5' });
+      stH.entities = [
+        { x: stH.player.x + 1, y: stH.player.y, type: 'hound', hp: 999, aggression: 'hostile', state: 'idle', visible: true, alert: false, wait: 0, revealed: false },
+      ];
+      const evs3 = step(stH, { type: 'fight' }).events;
+      const m3 = evs3.map((e) => e.text).join(' ').match(/用徒手攻击猎犬（-(\d+) HP）/);
+      check('徒手伤害仍为 5-10', m3 !== null && Number(m3[1]) >= 5 && Number(m3[1]) <= 10, m3 ? m3[1] : '无事件');
+    }
+    // 无人机：自动游走探索（贪心游走最多 24 步），起点 3×3 内实体必被发现
+    {
+      const stD = createGame({ levels, seed: 25, startLevel: 'level-5' });
+      stD.player.inventory.push('drone');
+      stD.explored['level-5'] = new Set();
+      const sx = stD.player.x;
+      const sy = stD.player.y;
+      stD.entities = [
+        { x: sx + 1, y: sy, type: 'scratcher', hp: 50, aggression: 'hostile', state: 'idle', visible: false, alert: false, wait: 0, revealed: false },
+      ];
+      const evs = step(stD, { type: 'use', item: 'drone' }).events;
+      check('drone：游走探索补全地图（≥40 格）', stD.explored['level-5'].size >= 40, `explored=${stD.explored['level-5'].size}`);
+      check('drone：发现并现形起点附近实体', stD.entities.some((e) => e.visible));
+      check('drone：事件报告实体名', evs.some((e) => e.text.includes('抓挠者')), evs.map((e) => e.text).slice(0, 2).join('|'));
+      check('drone：一次性消耗', !stD.player.inventory.includes('drone'));
+      // 无人机游走确定性：同 seed 同位置 → 探索结果一致
+      const stD2 = createGame({ levels, seed: 25, startLevel: 'level-5' });
+      stD2.player.inventory.push('drone');
+      stD2.explored['level-5'] = new Set();
+      step(stD2, { type: 'use', item: 'drone' });
+      check('drone：游走路径确定性（同 seed 结果一致）', stD.explored['level-5'].size === stD2.explored['level-5'].size, `${stD.explored['level-5'].size} vs ${stD2.explored['level-5'].size}`);
+    }
   }
 }
 

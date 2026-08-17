@@ -56,7 +56,9 @@
     "crowbar",
     "medkit",
     "note",
-    "key"
+    "key",
+    "pistol",
+    "ammo"
   ],
   "itemDensity": 0.02,
   "setPieces": [

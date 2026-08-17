@@ -56,7 +56,9 @@
     "battery",
     "flashlight",
     "almond-water",
-    "note"
+    "note",
+    "pistol",
+    "ammo"
   ],
   "itemDensity": 0.12,
   "setPieces": [
