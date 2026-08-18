@@ -1096,6 +1096,14 @@ body.in-game #touch-pad {
 }
 
 /* 成就列表 */
+.cs-title2 {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--amber-dim);
+  letter-spacing: 2px;
+}
+
 .ach-row {
   font-size: 12px;
   line-height: 1.7;

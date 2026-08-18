@@ -287,6 +287,8 @@ function enterWild() {
     const ids = Object.keys(TALENTS);
     const newT = ids[Math.floor(Math.random() * ids.length)];
     game.player.talent = newT;
+    game.stats.talentsSeen = game.stats.talentsSeen || [];
+    if (!game.stats.talentsSeen.includes(newT)) game.stats.talentsSeen.push(newT);
     const t = TALENTS[newT];
     wildTalent = `\n野性变异：你的天赋扭曲成了【${t.name}】——${t.desc}`;
     renderEvents([{ text: `野性变异：你的天赋扭曲成了 ${t.name}。`, kind: 'sanity' }]);
@@ -1872,10 +1874,38 @@ function fillLogModal() {
     .join('、');
   const st = (game && game.stats) || {};
   const earned = game.achievements || new Set();
-  const achList = ACHIEVEMENTS.map(
-    (a) =>
-      `<div class="ach-row ${earned.has(a.id) ? 'unlocked' : ''}">${earned.has(a.id) ? '🏆' : '○'} <b>${escapeHtml(a.name)}</b><span class="ach-desc">${escapeHtml(a.desc)}</span></div>`
-  ).join('');
+  // 成就分类：生存 / 探索 / 战斗 / 收集 / 隐藏
+  const CATS = [
+    ['生存', ['first-steps', 'l0-survivor', 'survivor-200', 'survivor-500', 'survivor-1000', 'night-owl', 'first-death', 'pacifist']],
+    ['探索', ['noclip-master', 'explorer-5', 'explorer-10', 'explorer-20', 'layers-50', 'deep-diver', 'hub-visitor', 'hub-regular', 'sprinter', 'codex-24', 'codex-40', 'aesthetic-collector', 'library-card', 'headmaster', 'curator', 'dream-walker']],
+    ['战斗', ['gunslinger', 'ghost', 'pistol-expert', 'slayer']],
+    ['收集', ['hoarder', 'hoarder-50', 'scholar', 'keymaster', 'scene-collector', 'scout', 'marathon', 'gifted', 'naturalist']],
+  ];
+  const achList = CATS.map(
+    ([cat, ids]) =>
+      `<div class="cs-title2">${cat}</div>` +
+      ids
+        .map((id) => ACHIEVEMENTS.find((a) => a.id === id))
+        .filter(Boolean)
+        .map((a) => {
+          const got = earned.has(a.id);
+          if (!got && a.hidden) {
+            return `<div class="ach-row"><b>？？？</b><span class="ach-desc">秘密成就</span></div>`;
+          }
+          return `<div class="ach-row ${got ? 'unlocked' : ''}">${got ? '🏆' : '○'} <b>${escapeHtml(a.name)}</b><span class="ach-desc">${escapeHtml(a.desc)}</span></div>`;
+        })
+        .join('')
+  ).join('') +
+    `<div class="cs-title2">隐藏</div>` +
+    ACHIEVEMENTS.filter((a) => a.hidden)
+      .map((a) => {
+        const got = earned.has(a.id);
+        if (got) {
+          return `<div class="ach-row unlocked">🏆 <b>${escapeHtml(a.name)}</b><span class="ach-desc">${escapeHtml(a.desc)}</span></div>`;
+        }
+        return `<div class="ach-row"><b>？？？</b><span class="ach-desc">秘密成就</span></div>`;
+      })
+      .join('');
   $('log-body').innerHTML =
     `<div class="codex-summary">` +
     `<div class="cs-title">行记 Codex</div>` +

@@ -68,6 +68,7 @@ export function createGame({ levels, seed, startLevel, difficulty }) {
       exitsUsed: 0,
       levelsTurns: {}, // levelId -> 累计回合
       visited: {}, // levelId -> 进入次数
+      talentsSeen: playerAttrs.talent ? [playerAttrs.talent] : [], // 单局经历过的天赋（含野性变异）
     },
     rng: mulberry32(hashString('game:' + String(runSeed))),
     playerAttrs,
@@ -219,6 +220,32 @@ export const ACHIEVEMENTS = [
   { id: 'headmaster', name: '校长', desc: '从废弃学校（Level 118）逃到破损庇护所（Level 28）。铃响了，该下课了。', test: (s) => (s.stats.visited['level-118'] || 0) > 0 && (s.stats.visited['level-28'] || 0) > 0 },
   { id: 'curator', name: '策展人', desc: '参观博物馆（Level 975）并存活超过 100 回合。你的藏品里，又多了一件。', test: (s) => (s.stats.visited['level-975'] || 0) > 0 && s.turn > 100 },
   { id: 'naturalist', name: '博物学家', desc: '目击全部 16 种实体。你是活的图鉴。', test: (s) => Object.keys((s.codex && s.codex.bestiary) || {}).length >= 16 },
+  // ===== 进阶成就（v0.4）=====
+  // 生存
+  { id: 'survivor-1000', name: '千年老妖', desc: '存活 1000 回合。后室开始习惯你了。', test: (s) => s.turn >= 1000 },
+  { id: 'pacifist', name: '和平主义者', desc: '存活 100 回合且从未击杀任何实体。它们也在观察你。', test: (s) => s.turn >= 100 && !(s.stats.kills || 0) },
+  // 探索
+  { id: 'layers-50', name: '测绘大师', desc: '发现 50 个层级。你的地图比后室本身还大。', test: (s) => Object.keys(s.codex.levels || {}).length >= 50 },
+  { id: 'hub-regular', name: '常驻旅客', desc: '访问枢纽 3 次。你开始把那里当作家了。', test: (s) => (s.stats.visited['level-hub'] || 0) >= 3 },
+  { id: 'dream-walker', name: '逐梦者', desc: '到访 3 种不同的梦幻系美学层级。你分得清梦和现实吗？', test: (s) => {
+    const dreamy = new Set(['dreamcore', 'cartooncore', 'songcore', 'poolcore', 'kidcore', 'darkcore']);
+    const got = new Set(Object.keys(s.codex.levels || {}).map((id) => (s.levels[id] || {}).aesthetic).filter((a) => dreamy.has(a)));
+    return got.size >= 3;
+  } },
+  { id: 'all-finite', name: '边界行者', hidden: true, desc: '到访过全部有限层级。你摸到了后室的边界。', test: (s) => Object.keys(s.levels || {}).filter((id) => !((s.levels[id] || {}).terrain || {}).infinite).every((id) => (s.stats.visited[id] || 0) > 0) },
+  // 战斗
+  { id: 'pistol-expert', name: '神枪手', desc: '用手枪击杀 10 个实体。每一发都算数。', test: (s) => (s.stats.pistolKills || 0) >= 10 },
+  { id: 'slayer', name: '实体猎手', desc: '击杀 20 个实体。它们开始避开你了。', test: (s) => (s.stats.kills || 0) >= 20 },
+  // 收集
+  { id: 'hoarder-50', name: '囤积者', desc: '拾取 50 件物品。背包比命重。', test: (s) => (s.stats.itemsPicked || 0) >= 50 },
+  { id: 'talent-shifter', name: '天赋实验体', hidden: true, desc: '在同一局内经历过 3 种不同的天赋。野性改变的不只是层级。', test: (s) => (s.stats.talentsSeen || []).length >= 3 },
+  // 隐藏成就（Codex 中以 ??? 显示）
+  { id: 'seen-stars', name: '群星见证者', hidden: true, desc: '进入过 Level 599——哪怕只有一瞬间。你看见了群星。', test: (s) => (s.stats.visited['level-599'] || 0) > 0 },
+  { id: 'moon-howlers', name: '月下嚎叫', hidden: true, desc: '在血染森林（Level 14）找到了孩子们。', test: (s) => ((s.codex.levels['level-14'] || {}).notes || []).some((n) => n.includes('嚎叫')) },
+  { id: 'cartoon-stay', name: '蜡笔居民', hidden: true, desc: '在卡通镇（Level 709）度过 30 回合。你开始习惯纸做的房子。', test: (s) => (s.stats.levelsTurns['level-709'] || 0) >= 30 },
+  { id: 'operatic', name: '歌剧魅影', hidden: true, desc: '在废弃歌剧院（Level 88）停留 20 回合。掌声永远在等你。', test: (s) => (s.stats.levelsTurns['level-88'] || 0) >= 20 },
+  { id: 'gallery-watcher', name: '被注视者', hidden: true, desc: '在艺术画廊（Level 902）看到了画中画里的自己。', test: (s) => ((s.codex.levels['level-902'] || {}).notes || []).some((n) => n.includes('画中画')) },
+  { id: 'deep-basement', name: '地窖探客', hidden: true, desc: '在无尽地下室（Level 707）待满 30 回合。你还在往下走。', test: (s) => (s.stats.levelsTurns['level-707'] || 0) >= 30 },
 ];
 
 function checkAchievements(state, events) {

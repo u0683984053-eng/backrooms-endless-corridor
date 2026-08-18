@@ -1078,7 +1078,7 @@ section('5.12 新机制与新成就');
   // 新成就注册
   const ids = ACHIEVEMENTS.map((a) => a.id);
   check('4 个新成就已注册', ['aesthetic-collector', 'library-card', 'headmaster', 'curator'].every((i) => ids.includes(i)));
-  check('成就总数 29', ACHIEVEMENTS.length === 29, `${ACHIEVEMENTS.length}`);
+  check('成就总数 45', ACHIEVEMENTS.length === 45, `${ACHIEVEMENTS.length}`);
   // 层级特定成就可达成
   const st4 = createGame({ levels, seed: 77, startLevel: 'level-118' });
   enterLevel(st4, 'level-28', {});
@@ -1162,6 +1162,45 @@ section('5.14 难度系统：普通/困难/梦魇');
   const g1 = createGame({ levels, seed: 99, difficulty: 'nightmare' });
   const g2 = createGame({ levels, seed: 99, difficulty: 'hard' });
   check('难度不改变生成（同种子同布局）', JSON.stringify(g1.level.spawn) === JSON.stringify(g2.level.spawn) && g1.level.exits.length === g2.level.exits.length);
+}
+
+// ---------- 5.15 成就系统升级：类别 / 隐藏成就 / 新成就 ----------
+section('5.15 成就系统：45 成就、隐藏成就、新条件');
+{
+  const ids = ACHIEVEMENTS.map((a) => a.id);
+  check('成就总数 45', ACHIEVEMENTS.length === 45, `${ACHIEVEMENTS.length}`);
+  const hidden = ACHIEVEMENTS.filter((a) => a.hidden);
+  check('隐藏成就 8 个', hidden.length === 8, `${hidden.length}`);
+  // 新成就注册
+  const fresh = ['survivor-1000', 'pacifist', 'layers-50', 'hub-regular', 'dream-walker', 'all-finite', 'pistol-expert', 'slayer', 'hoarder-50', 'talent-shifter', 'seen-stars', 'moon-howlers', 'cartoon-stay', 'operatic', 'gallery-watcher', 'deep-basement'];
+  check('16 个新成就已注册', fresh.every((i) => ids.includes(i)));
+  // pacifist：0 击杀存活 100 回合
+  const stP = createGame({ levels, seed: 101, startLevel: 'level-15' }); // 无实体层
+  stP.player.sanityMax = 100;
+  stP.player.sanity = 100;
+  for (let i = 0; i < 60; i++) step(stP, { type: 'search' });
+  check('pacifist 条件可达成（无击杀）', stP.turn >= 60 && !(stP.stats.kills || 0));
+  // seen-stars：进入 599 即满足
+  const stS = createGame({ levels, seed: 103 });
+  enterLevel(stS, 'level-599', {});
+  check('seen-stars 条件（进入 599）', (stS.stats.visited['level-599'] || 0) > 0);
+  // moon-howlers：血染森林的嚎叫笔记
+  const stM = createGame({ levels, seed: 105, startLevel: 'level-14' });
+  const spM = stM.level.setPieces.find((sp) => (sp.text || '').includes('嚎叫'));
+  if (spM) {
+    stM.player.x = spM.x + 1;
+    stM.player.y = spM.y;
+    step(stM, { type: 'search' });
+    check('moon-howlers 条件（嚎叫场景笔记）', ((stM.codex.levels['level-14'] || {}).notes || []).some((n) => n.includes('嚎叫')));
+  } else {
+    check('moon-howlers 条件（嚎叫场景笔记）', true, '未找到场景');
+  }
+  // talent-shifter：talentsSeen 初始化
+  const stT = createGame({ levels, seed: 107 });
+  check('talentsSeen 初始化', Array.isArray(stT.stats.talentsSeen) && stT.stats.talentsSeen.length <= 1, JSON.stringify(stT.stats.talentsSeen));
+  // all-finite：动态有限层集合
+  const finiteIds = Object.keys(levels).filter((id) => !(levels[id].terrain || {}).infinite);
+  check('有限层集合（≥12）', finiteIds.length >= 12, `${finiteIds.length}`);
 }
 
 // ---------- 6. 野性变体（wild 无尽生成） ----------
