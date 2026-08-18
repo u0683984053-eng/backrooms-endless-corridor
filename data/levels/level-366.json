@@ -1,0 +1,109 @@
+{
+  "id": "level-366",
+  "name": "Level 366 — 天文台",
+  "number": 366,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "mixed",
+  "aesthetic": "dreamcore",
+  "light": "dim",
+  "sanDrain": 0.05,
+  "description": "一座巨大的天文台：穹顶缓缓旋转，望远镜指向星空。这里的星星比你见过的任何夜空都亮——亮到你能看清每一颗星都在缓慢地移动，像在重新排列成某种图案。你终于看懂了那个图案：那是一只手，正朝你伸来。",
+  "palette": {
+    "primary": "#2e3a5a",
+    "secondary": "#1c2438",
+    "accent": "#8aa0c8",
+    "light": "#c8d8f0"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 8,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "concrete",
+    "floorStyle": "tile",
+    "extraFeatures": [
+      "columns",
+      "furniture",
+      "papers",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "watcher",
+      "density": 0.006,
+      "aggression": "hostile"
+    },
+    {
+      "type": "moth",
+      "density": 0.006,
+      "aggression": "passive"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.018,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "望远镜对准了一颗特别亮的星。你凑近看——那颗星在慢慢变大，然后你意识到它不是星，是一扇发光的窗。窗里有人朝你挥了挥手。你也挥了挥手。窗里的人停了下来。",
+      "sanityEffect": -6,
+      "note": "望远镜里的窗，有人朝我挥手。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "观测日志摊开在桌上，最新一页写着：『第 365 夜。星星排成了它上一次排成的形状。它又近了一点。』",
+      "sanityEffect": -5,
+      "note": "观测日志：它又近了一点。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "穹顶下方的环形走廊，墙上的星座图被重新画过——所有的星座都指向同一个点。你顺着看过去，那个点在你头顶正上方，穹顶在那里开了一个洞，洞里是另一片星空，正对着你。",
+      "sanityEffect": -5,
+      "note": "所有星座都指向头顶那个洞。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "穹顶转动的低沉摩擦声",
+      "远处仪器的滴答声"
+    ],
+    "startles": [
+      "穹顶突然停止转动，发出一声金属的呻吟",
+      "望远镜自己转了一下，对准了你"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-40",
+      "hidden": true,
+      "danger": false,
+      "description": "观测室的暗梯——你走下去，落在发光的水晶洞穴里。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-150",
+      "hidden": true,
+      "danger": false,
+      "description": "天文台的侧门——门外是冰原的白色荒原。"
+    }
+  ]
+}

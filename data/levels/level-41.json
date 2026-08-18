@@ -107,6 +107,13 @@
       "hidden": true,
       "danger": false,
       "description": "地毯翘起的一角——你掀开，下面是另一条红地毯走廊。"
+    },
+    {
+      "kind": "stairwell",
+      "target": "level-707",
+      "hidden": true,
+      "danger": false,
+      "description": "酒店电梯井旁边的楼梯——向下，是无尽的地下室。"
     }
   ]
 }

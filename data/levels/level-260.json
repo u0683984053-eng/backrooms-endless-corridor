@@ -1,0 +1,109 @@
+{
+  "id": "level-260",
+  "name": "Level 260 — 深夜影院",
+  "number": 260,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "mixed",
+  "aesthetic": "weirdcore",
+  "light": "dim",
+  "sanDrain": 0.05,
+  "description": "一座散场后的电影院：走廊的红地毯吸走所有脚步声，放映厅的门虚掩，银幕还亮着。银幕上在放一部电影——主角是你。你昨天做过的事，正一帧一帧地出现在银幕上。你身后的座位传来爆米花的咀嚼声。",
+  "palette": {
+    "primary": "#4a2e4a",
+    "secondary": "#2e1c2e",
+    "accent": "#c87858",
+    "light": "#e8b8a8"
+  },
+  "terrain": {
+    "width": 30,
+    "height": 30,
+    "roomCount": 10,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "wallpaper",
+    "floorStyle": "carpet",
+    "extraFeatures": [
+      "columns",
+      "furniture",
+      "posters",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "faceling",
+      "density": 0.005,
+      "aggression": "curious"
+    },
+    {
+      "type": "deathmoth",
+      "density": 0.004,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "放映厅的银幕上正在播放你刚才走进这间放映厅的画面。你转身想走——银幕上的你也转身了，但比你快半秒。它停在你身后，看着你。",
+      "sanityEffect": -6,
+      "note": "银幕上的我比我快半秒。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "走廊的海报写着片名：『无人区：第 2 部』。下面一行小字：『主演：你。上映日期：昨天。』",
+      "sanityEffect": -4,
+      "note": "海报：主演是我，上映日期是昨天。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "地上散落着半桶爆米花，还是温的。你捡起一粒——它突然爆开，变成一小张胶片，上面是一帧画面：你在捡这粒爆米花。",
+      "sanityEffect": -5,
+      "note": "爆米花变成了一帧我正在捡它的画面。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "银幕的电流声",
+      "远处爆米花机的声音（没有通电）"
+    ],
+    "startles": [
+      "放映厅的门在你身后缓缓关上",
+      "某个座位上传来一声很轻的『嘘』"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-555",
+      "hidden": true,
+      "danger": false,
+      "description": "影院的员工通道——门后是亮着惨白灯的超市。"
+    },
+    {
+      "kind": "door",
+      "target": "level-400",
+      "hidden": true,
+      "danger": false,
+      "description": "售票处的后门——门后是一家便利店。"
+    }
+  ]
+}

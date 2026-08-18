@@ -1,0 +1,109 @@
+{
+  "id": "level-44",
+  "name": "Level 44 — 植物园温室",
+  "number": 44,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "outdoors",
+  "aesthetic": "dreamcore",
+  "light": "bright",
+  "sanDrain": 0.04,
+  "description": "一座巨大的玻璃温室：阳光透过穹顶洒下来，植物茂密得不真实——花朵比你的脸还大，藤蔓沿着玻璃爬满整面墙。空气温暖潮湿，像永远不会结束的春天。你听见水声，却找不到喷泉；你闻到花香，却找不到花。它们都在你转头时安静下来。",
+  "palette": {
+    "primary": "#4a8a5a",
+    "secondary": "#2e5c3a",
+    "accent": "#8ac89a",
+    "light": "#e8f8e0"
+  },
+  "terrain": {
+    "width": 36,
+    "height": 36,
+    "roomCount": 8,
+    "roomSizeMin": 5,
+    "roomSizeMax": 9,
+    "corridorWidth": 2,
+    "wallStyle": "glass",
+    "floorStyle": "grass",
+    "extraFeatures": [
+      "plants",
+      "fountain",
+      "puddles",
+      "columns"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "moth",
+      "density": 0.008,
+      "aggression": "passive"
+    },
+    {
+      "type": "clump",
+      "density": 0.004,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "花坛里有一株向日葵，花盘朝着你转动，比你见过的任何向日葵都快。你走近，它的花盘里没有籽——只有一张脸，闭着眼睛，像在睡觉。你退开，它又慢慢转回阳光的方向。",
+      "sanityEffect": -5,
+      "note": "向日葵的花盘里有一张睡着的脸。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "温室玻璃上用雾气写着一行字，字迹像是用手指画的：『这里的花不会凋谢。它们只是在等。』",
+      "sanityEffect": -4,
+      "note": "玻璃上的雾字：它们只是在等。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "小径尽头有一尊人形雕像，半身埋在泥土里，表面长满青苔。你走近细看——雕像的手指微微动了。它正在慢慢地、极慢地，把自己从土里拔出来。",
+      "sanityEffect": -6,
+      "note": "埋在土里的雕像在缓慢地把自己拔出来。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "温室的风机声",
+      "植物生长时极轻微的噼啪声"
+    ],
+    "startles": [
+      "某株藤蔓在你经过时突然伸长了一截",
+      "花丛深处传来一声很轻的叹息"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-14",
+      "hidden": true,
+      "danger": false,
+      "description": "温室后门——门外是猩红色的夜晚森林。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-10",
+      "hidden": true,
+      "danger": false,
+      "description": "排水渠——你滑下去，落在温热的麦田里。"
+    }
+  ]
+}

@@ -95,6 +95,13 @@
       "hidden": true,
       "danger": false,
       "description": "一扇本不存在的窗户，窗外是城市的路灯。"
+    },
+    {
+      "kind": "door",
+      "target": "level-260",
+      "hidden": true,
+      "danger": false,
+      "description": "便利店深处的暗门——门后是散场的影院。"
     }
   ]
 }

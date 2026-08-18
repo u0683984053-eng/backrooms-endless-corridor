@@ -147,6 +147,20 @@
       "hidden": true,
       "danger": false,
       "description": "游乐园广播室的隔音门——门后循环着一段陌生的旋律。"
+    },
+    {
+      "kind": "door",
+      "target": "level-82",
+      "hidden": true,
+      "danger": false,
+      "description": "游乐场体育区的门——门后是空无一人的体育馆。"
+    },
+    {
+      "kind": "door",
+      "target": "level-88",
+      "hidden": true,
+      "danger": false,
+      "description": "游乐园剧场区的入口——门后是废弃歌剧院。"
     }
   ]
 }

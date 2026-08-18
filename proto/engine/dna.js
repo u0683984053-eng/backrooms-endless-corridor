@@ -83,6 +83,17 @@ export const LEVEL_IDS = [
   'level-975',
   // 群星（进入即死的恒星内部）
   'level-599',
+  // 第五轮新增（核类美学优先）
+  'level-82',
+  'level-111',
+  'level-155',
+  'level-88',
+  'level-260',
+  'level-44',
+  'level-366',
+  'level-707',
+  'level-902',
+  'level-388',
 ];
 
 /** 默认值（合并时逐字段覆盖，保证任何残缺 DNA 都能得到完整结构） */

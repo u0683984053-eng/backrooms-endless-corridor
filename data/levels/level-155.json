@@ -1,0 +1,109 @@
+{
+  "id": "level-155",
+  "name": "Level 155 — 无尽公路",
+  "number": 155,
+  "category": "normal",
+  "difficultyClass": 3,
+  "environment": "outdoors",
+  "aesthetic": "dreamcore",
+  "light": "dim",
+  "sanDrain": 0.06,
+  "description": "一条在夜色中延伸至天边的公路：沥青路面、白色标线、每隔很远一盏的路灯。没有车，没有出口，没有路牌。你走了很久，发现路灯的影子一直指向同一个方向——不是你的前方，是你身后。",
+  "palette": {
+    "primary": "#3a4a5a",
+    "secondary": "#262e3a",
+    "accent": "#c8a858",
+    "light": "#d8c878"
+  },
+  "terrain": {
+    "width": 40,
+    "height": 40,
+    "roomCount": 4,
+    "roomSizeMin": 6,
+    "roomSizeMax": 10,
+    "corridorWidth": 2,
+    "wallStyle": "concrete",
+    "floorStyle": "gravel",
+    "topology": "fields",
+    "extraFeatures": [
+      "furniture",
+      "columns",
+      "puddles"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "vapor",
+      "density": 0.006,
+      "aggression": "curious"
+    },
+    {
+      "type": "smiler",
+      "density": 0.005,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.016,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "路边停着一辆没熄火的车，引擎盖还是温的，车门虚掩。车里放着一杯咖啡，还是热的。后视镜上挂着一张全家福——照片里没有你，但车里只有一个座位，椅子上有你的指纹。",
+      "sanityEffect": -6,
+      "note": "路边温热的车里，只有一个座位，椅上有我的指纹。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "路面用荧光漆画着一行巨大的字：『前方 500 米：出口。』你走了十公里，它还在前方 500 米。",
+      "sanityEffect": -4,
+      "note": "路面上的出口标志永远在前方 500 米。"
+    },
+    {
+      "type": "object",
+      "position": "random",
+      "text": "路灯下立着一只行李箱，拉链半开。你路过时，它自己合上了。你回头看——它又慢慢拉开，像在等你往里放点什么。",
+      "sanityEffect": -4,
+      "note": "路灯下的行李箱自己开合。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "夜风掠过路面的声音",
+      "远处某个引擎怠速的声响（没有车）"
+    ],
+    "startles": [
+      "一辆车从你身边无声驶过，没有车灯，没有倒影",
+      "路肩的警示柱在你经过后集体倒下"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-90",
+      "hidden": true,
+      "danger": false,
+      "description": "公路尽头一座停车楼——你走进去，是昏暗的车库。"
+    },
+    {
+      "kind": "hole",
+      "target": "level-10",
+      "hidden": true,
+      "danger": false,
+      "description": "护栏的缺口——你翻过去，落进温热的麦田。"
+    }
+  ]
+}

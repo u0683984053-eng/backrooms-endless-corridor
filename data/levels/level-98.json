@@ -99,6 +99,13 @@
       "hidden": true,
       "danger": false,
       "description": "唱片架背后的一处空隙——挤过去，是亮着暖光的房间。"
+    },
+    {
+      "kind": "door",
+      "target": "level-88",
+      "hidden": true,
+      "danger": false,
+      "description": "音乐室舞台侧的暗门——门后是歌剧院。"
     }
   ]
 }

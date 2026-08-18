@@ -1,0 +1,109 @@
+{
+  "id": "level-902",
+  "name": "Level 902 — 艺术画廊",
+  "number": 902,
+  "category": "normal",
+  "difficultyClass": 1,
+  "environment": "mixed",
+  "aesthetic": "weirdcore",
+  "light": "bright",
+  "sanDrain": 0.04,
+  "description": "一间纯白的画廊：聚光灯下的画作一幅接一幅，地板亮得能映出倒影。你走近一幅画——画里是一片森林，森林里站着一个人，背对着你。你换到下一幅，还是同一片森林，那个人转过身了一点。你走完了整条走廊，再回头看：那个人已经站在画框边缘，一只脚迈了出来。",
+  "palette": {
+    "primary": "#e8e8e0",
+    "secondary": "#b0b0a8",
+    "accent": "#6a6a64",
+    "light": "#ffffff"
+  },
+  "terrain": {
+    "width": 28,
+    "height": 28,
+    "roomCount": 9,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "drywall",
+    "floorStyle": "tile",
+    "extraFeatures": [
+      "columns",
+      "posters",
+      "furniture",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "watcher",
+      "density": 0.005,
+      "aggression": "hostile"
+    },
+    {
+      "type": "faceling",
+      "density": 0.004,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "一幅巨大的油画：一间和画廊一样的白色房间，房间的墙上挂着一幅画，画里还是这间房间。你数了数，画里的房间一共七层。第七层里，画框前站着一个人，正看着你。",
+      "sanityEffect": -6,
+      "note": "画中画中画……第七层里有人看着我。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "画廊的墙上贴着一张标签，只有一行字：『作品 0 号：观展者。』旁边有一个空画框，画框的玻璃上，映出你的倒影。",
+      "sanityEffect": -5,
+      "note": "作品 0 号：观展者。空画框里映着我。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "角落里有一幅很小的画，画布是空白的。你盯着它看了几秒，画布上慢慢浮现出你刚才看它的样子。你移开视线，画面定格在你移开视线的瞬间。",
+      "sanityEffect": -4,
+      "note": "空白画布在画我看它的样子。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "聚光灯的电流声",
+      "脚步在大理石上的回响"
+    ],
+    "startles": [
+      "某幅画的画框轻轻震动了一下",
+      "你转身时，看到一幅画正缓缓转过来，画面对着你的方向"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "door",
+      "target": "level-975",
+      "hidden": true,
+      "danger": false,
+      "description": "画廊的侧门——门后是博物馆的大理石大厅。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-11",
+      "hidden": true,
+      "danger": false,
+      "description": "一扇画在墙上的门，推开门，是城市的街道。"
+    }
+  ]
+}

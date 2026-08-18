@@ -140,6 +140,13 @@
       "hidden": true,
       "danger": false,
       "description": "地下三层往下的楼梯——门后是另一座更旧的车库。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-155",
+      "hidden": true,
+      "danger": false,
+      "description": "停车楼顶层的出口——外面是一条无尽公路。"
     }
   ]
 }

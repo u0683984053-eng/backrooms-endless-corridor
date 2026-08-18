@@ -113,6 +113,13 @@
       "hidden": true,
       "danger": false,
       "description": "教室后墙的储物柜——你挤进去，落在一间巨大的儿童卧室里。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-82",
+      "hidden": true,
+      "danger": false,
+      "description": "学校操场的围墙缺口——你翻过去，落在木地板上。"
     }
   ],
   "specialMechanisms": [

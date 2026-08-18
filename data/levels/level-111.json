@@ -1,0 +1,110 @@
+{
+  "id": "level-111",
+  "name": "Level 111 — 废弃机场",
+  "number": 111,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "mixed",
+  "aesthetic": "liminal",
+  "light": "flickering",
+  "sanDrain": 0.05,
+  "description": "一座废弃的机场航站楼：落地窗外是永远的白昼，登机口的屏幕上滚动着航班信息——全是同一个航班号，目的地栏是空的。广播每隔一会儿响起：『请乘客 XX 前往登机口。』你听了很久，才发现它报的是你的名字。",
+  "palette": {
+    "primary": "#6a7a8a",
+    "secondary": "#46525c",
+    "accent": "#9ab0c8",
+    "light": "#d8e8f8"
+  },
+  "terrain": {
+    "width": 34,
+    "height": 34,
+    "roomCount": 10,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "glass",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "columns",
+      "counters",
+      "furniture",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "faceling",
+      "density": 0.006,
+      "aggression": "curious"
+    },
+    {
+      "type": "watcher",
+      "density": 0.005,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note",
+    "key"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "行李传送带还在运转，传送带上只有一件行李——一只旧行李箱，贴着你的名字。箱子很轻，你打开，里面是一张机票，日期是昨天，座位号是 13A。",
+      "sanityEffect": -5,
+      "note": "传送带上贴着我的名字的行李箱，里面有一张昨天的机票。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "登机口的屏幕滚动着：『请乘客：你 前往登机口。』下面一行小字：『航班已延误。延误时长：你的余生。』",
+      "sanityEffect": -5,
+      "note": "登机口屏幕：航班延误时长是你的余生。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "候机区的椅子上坐满了人，全都一动不动，面向落地窗。窗外不是跑道——是另一座一模一样的航站楼，里面的人也面朝这边。",
+      "sanityEffect": -6,
+      "note": "候机的人一动不动，窗外是另一个同样的航站楼。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "机场广播的循环播报",
+      "远处行李传送带的运转声"
+    ],
+    "startles": [
+      "广播突然报了你的名字，然后沉默了很久",
+      "某扇登机门自己打开又关上"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "stairwell",
+      "target": "level-169",
+      "hidden": true,
+      "danger": false,
+      "description": "员工通道的楼梯——走下去，是瓷砖隧道。"
+    },
+    {
+      "kind": "door",
+      "target": "level-11",
+      "hidden": true,
+      "danger": false,
+      "description": "到达大厅的自动门——门外是城市的街道。"
+    }
+  ]
+}

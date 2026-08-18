@@ -109,6 +109,13 @@
       "hidden": true,
       "danger": false,
       "description": "一道冰缝，你滑下去，落在温热的麦田里。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-366",
+      "hidden": true,
+      "danger": false,
+      "description": "冰原尽头的圆顶建筑。"
     }
   ]
 }

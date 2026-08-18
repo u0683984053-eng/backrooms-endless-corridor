@@ -105,6 +105,13 @@
       "hidden": true,
       "danger": false,
       "description": "一扇标着『藏品库』的门——门后是旋转木马的音乐。"
+    },
+    {
+      "kind": "door",
+      "target": "level-902",
+      "hidden": true,
+      "danger": false,
+      "description": "博物馆特展厅的门——门后是纯白的画廊。"
     }
   ]
 }

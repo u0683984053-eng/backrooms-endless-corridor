@@ -1625,11 +1625,21 @@ function buildFieldsChunk(tiles, rng) {
   for (let ly = 0; ly < CHUNK; ly++) {
     for (let lx = 0; lx < CHUNK; lx++) tiles[ly][lx] = '.';
   }
-  const n = randInt(rng, 2, 5);
+  // 障碍簇：小半径（1-2）且中心互不相邻（≥5 曼哈顿）——保证不会围出封闭圈
+  const n = randInt(rng, 2, 4);
+  const centers = [];
   for (let i = 0; i < n; i++) {
-    const cx = randInt(rng, 3, CHUNK - 4);
-    const cy = randInt(rng, 3, CHUNK - 4);
-    const r = randInt(rng, 1, 3);
+    let cx = 0;
+    let cy = 0;
+    let ok = false;
+    for (let t = 0; t < 20 && !ok; t++) {
+      cx = randInt(rng, 3, CHUNK - 4);
+      cy = randInt(rng, 3, CHUNK - 4);
+      ok = centers.every(([ux, uy]) => Math.abs(ux - cx) + Math.abs(uy - cy) >= 5);
+    }
+    if (!ok) continue;
+    centers.push([cx, cy]);
+    const r = randInt(rng, 1, 2);
     for (let yy = cy - r; yy <= cy + r; yy++) {
       for (let xx = cx - r; xx <= cx + r; xx++) {
         if (xx >= 2 && yy >= 2 && xx < CHUNK - 2 && yy < CHUNK - 2 && (xx - cx) ** 2 + (yy - cy) ** 2 <= r * r) {
@@ -1641,15 +1651,19 @@ function buildFieldsChunk(tiles, rng) {
   if (chance(rng, 0.6)) {
     const hx = randInt(rng, 3, CHUNK - 7);
     const hy = randInt(rng, 3, CHUNK - 7);
+    // 农舍：三面墙 + 北面全敞开（永不封闭；此前四面墙可能被障碍围成死口袋）
     for (let yy = hy; yy < hy + 4; yy++) {
       for (let xx = hx; xx < hx + 4; xx++) {
-        const edge = xx === hx || xx === hx + 3 || yy === hy || yy === hy + 3;
+        if (yy === hy) {
+          tiles[yy][xx] = '.';
+          continue;
+        }
+        const edge = yy === hy + 3 || xx === hx || xx === hx + 3;
         tiles[yy][xx] = edge ? '#' : '.';
       }
     }
-    const dx = hx + randInt(rng, 0, 3);
-    const dy = hy - 1;
-    if (dy >= 2 && tiles[dy][dx] === '#') tiles[dy][dx] = 'D';
+    const dx = hx + randInt(rng, 1, 2);
+    if (tiles[hy][dx] === '.') tiles[hy][dx] = 'D';
   }
 }
 

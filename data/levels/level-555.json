@@ -116,6 +116,13 @@
       "hidden": true,
       "danger": false,
       "description": "超市员工通道——尽头是一家小便利店。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-260",
+      "hidden": true,
+      "danger": false,
+      "description": "超市的观影区——尽头是一间放映厅。"
     }
   ]
 }

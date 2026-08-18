@@ -127,6 +127,20 @@
       "hidden": true,
       "danger": false,
       "description": "麦田尽头一道白线——跨过去，是冻结的荒野。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-155",
+      "hidden": true,
+      "danger": false,
+      "description": "麦田尽头的沥青路——你踏上去，是夜色中的公路。"
+    },
+    {
+      "kind": "door",
+      "target": "level-44",
+      "hidden": true,
+      "danger": false,
+      "description": "麦田中央的玻璃穹顶建筑。"
     }
   ]
 }

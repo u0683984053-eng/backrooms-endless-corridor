@@ -179,6 +179,13 @@
       "hidden": true,
       "danger": false,
       "description": "酒店后门的防火通道——门后是褪色地毯的走廊。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-707",
+      "hidden": true,
+      "danger": false,
+      "description": "酒店地下车库的入口——通往更深的楼层。"
     }
   ]
 }

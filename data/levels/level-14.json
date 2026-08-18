@@ -141,6 +141,13 @@
       "hidden": true,
       "danger": false,
       "description": "树根盘错的洞穴，越往里越暗。「别去！往里跑！那里是出口！=(」石头上写着。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-44",
+      "hidden": true,
+      "danger": false,
+      "description": "森林边缘的玻璃墙——穿过去，是温暖的温室。"
     }
   ]
 }

@@ -1,0 +1,110 @@
+{
+  "id": "level-82",
+  "name": "Level 82 — 废弃体育馆",
+  "number": 82,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "rooms",
+  "aesthetic": "liminal",
+  "light": "flickering",
+  "sanDrain": 0.05,
+  "description": "一座废弃的体育馆：木质地板反射着昏暗的灯光，记分牌停在 3:0，球网在无风的空气中微微晃动。你听见一声哨响——短促、清晰，来自空无一人的看台。球从你脚边滚过，你低头，它停在你面前，等你把它踢回去。",
+  "palette": {
+    "primary": "#8a7a5a",
+    "secondary": "#5c5040",
+    "accent": "#c8b878",
+    "light": "#e8d8a8"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 8,
+    "roomSizeMin": 5,
+    "roomSizeMax": 9,
+    "corridorWidth": 2,
+    "wallStyle": "concrete",
+    "floorStyle": "wood",
+    "extraFeatures": [
+      "columns",
+      "doors",
+      "puddles",
+      "wires"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "clump",
+      "density": 0.005,
+      "aggression": "curious"
+    },
+    {
+      "type": "dweller",
+      "density": 0.005,
+      "aggression": "curious"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "更衣室的长凳上放着一套叠好的运动服，号码是你生日。名字栏写着你的名字。衣服是湿的，像刚被人换下来。",
+      "sanityEffect": -5,
+      "note": "更衣室里的运动服写着我的名字，是湿的。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "记分牌旁边用马克笔写着：『比分：3:0。第三局：永远。』",
+      "sanityEffect": -4,
+      "note": "记分牌：第三局：永远。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "看台的最后一排坐着一个人形，穿着运动服，一动不动。你绕场走了一圈——不管你在哪个方向，它都正对着你。",
+      "sanityEffect": -5,
+      "note": "看台上的人形永远正对着我。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "木地板的吱呀声",
+      "远处球弹跳的声音"
+    ],
+    "startles": [
+      "记分牌突然跳了一下：3:1",
+      "看台上传来整齐的鼓掌"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-69",
+      "hidden": true,
+      "danger": false,
+      "description": "器材室的铁门——门后是旋转木马的音乐。"
+    },
+    {
+      "kind": "door",
+      "target": "level-118",
+      "hidden": true,
+      "danger": false,
+      "description": "操场通道的门——门后是废弃学校的走廊。"
+    }
+  ]
+}

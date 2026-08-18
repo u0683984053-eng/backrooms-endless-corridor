@@ -107,6 +107,13 @@
       "hidden": true,
       "danger": false,
       "description": "一扇写满错误代码的玻璃门。"
+    },
+    {
+      "kind": "stairwell",
+      "target": "level-111",
+      "hidden": true,
+      "danger": false,
+      "description": "地铁站直达航站楼的通道。"
     }
   ],
   "specialMechanisms": [

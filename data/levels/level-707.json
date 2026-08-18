@@ -1,0 +1,110 @@
+{
+  "id": "level-707",
+  "name": "Level 707 — 无尽地下室",
+  "number": 707,
+  "category": "normal",
+  "difficultyClass": 3,
+  "environment": "mixed",
+  "aesthetic": "darkcore",
+  "light": "dark",
+  "sanDrain": 0.07,
+  "description": "一座延伸到地心方向的地下室：低矮的天花板、裸露的水管、积灰的锅炉。楼梯一层又一层向下，每一层的布局几乎一样，只有墙上的编号在变——B1、B2、B3……你走了很久，编号变成了你出生的年份。",
+  "palette": {
+    "primary": "#3a3a30",
+    "secondary": "#262620",
+    "accent": "#8a7a4a",
+    "light": "#c8b878"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 10,
+    "roomSizeMin": 4,
+    "roomSizeMax": 7,
+    "corridorWidth": 2,
+    "wallStyle": "concrete",
+    "floorStyle": "concrete",
+    "extraFeatures": [
+      "pipes",
+      "columns",
+      "crates",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "dweller",
+      "density": 0.008,
+      "aggression": "curious"
+    },
+    {
+      "type": "scratcher",
+      "density": 0.005,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.018,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "锅炉的炉门虚掩着，里面透出暗红的光。你凑近——炉膛里没有火，只有一张折叠整齐的床单，和一排码放整齐的鞋。鞋尖全部朝外。",
+      "sanityEffect": -5,
+      "note": "锅炉里有一张床单和一双双朝外摆的鞋。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "墙上的编号 B12 下面，有人用指甲刻着一行字：『往下走。往下走。往下走。』字的顺序是倒着刻的。",
+      "sanityEffect": -4,
+      "note": "B12 的墙字：往下走，倒着刻的。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "某一层的楼梯间比其他层多了一级台阶。你数了三遍——第一遍十二级，第二遍十三级，第三遍十二级。你第四次走上去，台阶在你脚下数了十三级。",
+      "sanityEffect": -5,
+      "note": "楼梯的级数每次数都不一样。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "锅炉的嗡鸣",
+      "水管里液体流动的声音"
+    ],
+    "startles": [
+      "楼梯下方传来一声闷响，像什么东西滚落",
+      "水管突然爆裂，喷出的水是温的"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "stairwell",
+      "target": "level-41",
+      "hidden": true,
+      "danger": false,
+      "description": "一段向上的楼梯——尽头是褪色地毯的酒店走廊。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-5",
+      "hidden": true,
+      "danger": false,
+      "description": "锅炉房的暗门——门后是酒店的员工区。"
+    }
+  ]
+}

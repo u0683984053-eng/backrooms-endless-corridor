@@ -180,6 +180,20 @@
       "hidden": true,
       "danger": false,
       "description": "街角一栋庄重的大楼，门牌写着『博物馆』。"
+    },
+    {
+      "kind": "door",
+      "target": "level-111",
+      "hidden": true,
+      "danger": false,
+      "description": "城市边缘的机场入口。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-902",
+      "hidden": true,
+      "danger": false,
+      "description": "街角一栋纯白建筑——画廊入口。"
     }
   ]
 }

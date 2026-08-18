@@ -1,0 +1,117 @@
+{
+  "id": "level-388",
+  "name": "Level 388 — 实验室",
+  "number": 388,
+  "category": "normal",
+  "difficultyClass": 3,
+  "environment": "industrial",
+  "aesthetic": "traumacore",
+  "light": "flickering",
+  "sanDrain": 0.07,
+  "description": "一座废弃的实验室：培养皿、离心机、贴满标签的冷藏柜。标签上写着编号，没有名字。你打开一台冷藏柜——里面是一排排贴着你名字的样本瓶，日期从今天往回数，一瓶比一瓶旧，最后一瓶的日期，是你出生之前。",
+  "palette": {
+    "primary": "#5a6a6a",
+    "secondary": "#3a4646",
+    "accent": "#8ab8b8",
+    "light": "#d8f0f0"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 10,
+    "roomSizeMin": 4,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "tile",
+    "floorStyle": "linoleum",
+    "extraFeatures": [
+      "counters",
+      "shelves",
+      "papers",
+      "wires",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "mangled",
+      "density": 0.006,
+      "aggression": "hostile"
+    },
+    {
+      "type": "dweller",
+      "density": 0.005,
+      "aggression": "curious"
+    },
+    {
+      "type": "insanity",
+      "density": 0.004,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "crowbar",
+    "medkit",
+    "note",
+    "key"
+  ],
+  "itemDensity": 0.022,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "冷藏柜里的样本瓶全部贴着你的名字，日期从今天往回数。最后一瓶的标签上只有一行小字：『原始样本。』瓶子里是空的。",
+      "sanityEffect": -6,
+      "note": "贴着我的名字的样本瓶，最后一瓶标着原始样本。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "实验记录本摊开在桌上：『受试者 X：第 1 天，正常。第 7 天，开始相信走廊尽头有门。第 30 天，声称门后是更早的实验记录。第 100 天：受试者 X 报告自己从未出生。』",
+      "sanityEffect": -6,
+      "note": "实验记录：受试者 X 报告自己从未出生。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "观察室里有一面单向玻璃。你站在玻璃前，看到里面坐着一个人——你。你挥了挥手，里面的你也挥了挥手。你转身想走，玻璃后面传来一声很轻的敲击。",
+      "sanityEffect": -5,
+      "note": "单向玻璃后面，另一个我敲了敲玻璃。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "离心机运转的嗡鸣（没有通电）",
+      "培养皿里液体冒泡的声音"
+    ],
+    "startles": [
+      "某个冷藏柜的门自己弹开了一条缝",
+      "仪器突然全部亮起，又同时熄灭"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "noclip",
+      "target": "level-170",
+      "hidden": true,
+      "danger": false,
+      "description": "消毒通道的门——门后是消毒水的味道。"
+    },
+    {
+      "kind": "door",
+      "target": "level-96",
+      "hidden": true,
+      "danger": false,
+      "description": "档案室的门——门后是日光灯下的办公楼。"
+    }
+  ]
+}

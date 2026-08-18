@@ -1,0 +1,109 @@
+{
+  "id": "level-88",
+  "name": "Level 88 — 废弃歌剧院",
+  "number": 88,
+  "category": "normal",
+  "difficultyClass": 2,
+  "environment": "mixed",
+  "aesthetic": "songcore",
+  "light": "dim",
+  "sanDrain": 0.05,
+  "description": "一座废弃的歌剧院：天鹅绒座椅蒙着灰，舞台的幕布低垂，乐池里散落着乐谱。你踩到一块松动的木板，整个剧场响起一声空旷的咳嗽——来自你头顶的包厢，那里没有人。幕布自己拉开了一条缝。",
+  "palette": {
+    "primary": "#6a2e3a",
+    "secondary": "#461e28",
+    "accent": "#c8a858",
+    "light": "#e8d8a8"
+  },
+  "terrain": {
+    "width": 32,
+    "height": 32,
+    "roomCount": 10,
+    "roomSizeMin": 5,
+    "roomSizeMax": 8,
+    "corridorWidth": 2,
+    "wallStyle": "wallpaper",
+    "floorStyle": "wood",
+    "extraFeatures": [
+      "columns",
+      "furniture",
+      "papers",
+      "doors"
+    ],
+    "infinite": true
+  },
+  "spaceRules": [
+    "euclidean"
+  ],
+  "entities": [
+    {
+      "type": "faceling",
+      "density": 0.004,
+      "aggression": "curious"
+    },
+    {
+      "type": "watcher",
+      "density": 0.005,
+      "aggression": "hostile"
+    }
+  ],
+  "items": [
+    "almond-water",
+    "royal-ration",
+    "battery",
+    "flashlight",
+    "medkit",
+    "note"
+  ],
+  "itemDensity": 0.02,
+  "setPieces": [
+    {
+      "type": "object",
+      "position": "random",
+      "text": "舞台中央放着一支麦克风，通着电。你经过时，它发出一声极轻的『喂』。你再经过，它又说了一次——这次，它叫了你的名字。",
+      "sanityEffect": -5,
+      "note": "舞台的麦克风叫了我的名字。"
+    },
+    {
+      "type": "writing",
+      "position": "random",
+      "text": "乐池里的乐谱摊开在某一页，谱面上用红笔圈着一行：『此处应有掌声。』下面有人加了一行：『他们还在鼓掌。』",
+      "sanityEffect": -4,
+      "note": "乐谱上的批注：他们还在鼓掌。"
+    },
+    {
+      "type": "weird-room",
+      "position": "random",
+      "text": "包厢里的天鹅绒座椅上有一层薄灰，但正中间有一个清晰的坐痕，像刚有人起身。你坐下——坐痕完美地贴合你的轮廓。幕布后的掌声响了起来。",
+      "sanityEffect": -6,
+      "note": "包厢的坐痕和我的轮廓完全吻合。"
+    }
+  ],
+  "soundscape": {
+    "ambient": [
+      "远处排练的钢琴声（没有人在弹）",
+      "幕布摩擦的声音"
+    ],
+    "startles": [
+      "全场同时响起一声掌声，又同时停下",
+      "管风琴突然奏响一个长音"
+    ],
+    "silenceEvents": true
+  },
+  "exits": [
+    {
+      "kind": "door",
+      "target": "level-98",
+      "hidden": true,
+      "danger": false,
+      "description": "后台的隔音门——门后循环着一首陌生的旋律。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-69",
+      "hidden": true,
+      "danger": false,
+      "description": "舞台的暗门——你钻进去，落在游乐园的彩灯下。"
+    }
+  ]
+}

@@ -116,6 +116,13 @@
       "hidden": true,
       "danger": false,
       "description": "货运电梯下到一层——全是贴着标签的收纳间。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-388",
+      "hidden": true,
+      "danger": false,
+      "description": "办公楼地下实验室的入口。"
     }
   ]
 }

@@ -116,6 +116,13 @@
       "hidden": true,
       "danger": false,
       "description": "洞底的水潭，潜下去，浮上来时是没过脚踝的积水。"
+    },
+    {
+      "kind": "stairwell",
+      "target": "level-366",
+      "hidden": true,
+      "danger": false,
+      "description": "洞穴顶部的天窗——你爬上去，站在天文台的穹顶下。"
     }
   ]
 }

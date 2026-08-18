@@ -107,6 +107,13 @@
       "hidden": true,
       "danger": false,
       "description": "一部电梯，灯坏了，按钮摸上去是凉的——它停在黑暗里。"
+    },
+    {
+      "kind": "noclip",
+      "target": "level-388",
+      "hidden": true,
+      "danger": false,
+      "description": "医院地下研究区的门——门后是实验室。"
     }
   ],
   "specialMechanisms": [
