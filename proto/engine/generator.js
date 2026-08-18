@@ -1505,21 +1505,17 @@ function buildHallwayChunk(tiles, rng, gx0, gy0) {
 function buildCityChunk(tiles, gx0, gy0, dna, runSeed) {
   const stride = 12;
   const streetW = 3;
+  // 1) 街道网格 + 块内先全部置墙
   for (let ly = 0; ly < CHUNK; ly++) {
     for (let lx = 0; lx < CHUNK; lx++) {
       const gx = gx0 + lx;
       const gy = gy0 + ly;
-      if (posmod(gx, stride) < streetW || posmod(gy, stride) < streetW) {
-        tiles[ly][lx] = '.';
-        continue;
-      }
-      const xm = posmod(gx, stride);
-      const ym = posmod(gy, stride);
-      const edge = xm === 3 || xm === 11 || ym === 3 || ym === 11;
-      tiles[ly][lx] = edge ? '#' : '.';
+      tiles[ly][lx] = posmod(gx, stride) < streetW || posmod(gy, stride) < streetW ? '.' : '#';
     }
   }
-  // 门：由"街区种子"决定（与 chunk 无关），每个街区 1-2 扇店门，位置确定
+  // 2) 每个街区由"街区种子"决定形态（确定性，与 chunk 无关，跨 chunk 一致）：
+  //    - 20% 公园/广场（整块空地 + 喷泉/树丛）
+  //    - 其余为建筑：尺寸 5-9 变化、位置偏移、偶有 L 形或缺角/内院
   const bx0 = Math.floor(gx0 / stride);
   const bx1 = Math.floor((gx0 + CHUNK - 1) / stride);
   const by0 = Math.floor(gy0 / stride);
@@ -1527,10 +1523,80 @@ function buildCityChunk(tiles, gx0, gy0, dna, runSeed) {
   for (let by = by0; by <= by1; by++) {
     for (let bx = bx0; bx <= bx1; bx++) {
       const br = mulberry32(hashString(`${runSeed}|${dna.id}|blk:${bx},${by}`));
-      const x0 = bx * stride + streetW;
-      const y0 = by * stride + streetW;
-      const x1 = bx * stride + stride - 1;
-      const y1 = by * stride + stride - 1;
+      const gbx = bx * stride + streetW; // 街区内容起点（全局）
+      const gby = by * stride + streetW;
+      const kind = br();
+      if (kind < 0.2) {
+        // 公园/广场：整块清空 + 1-2 个树丛/喷泉（单格 '#'，不堵路）
+        for (let yy = 0; yy < 9; yy++) {
+          for (let xx = 0; xx < 9; xx++) {
+            const lx = gbx + xx - gx0;
+            const ly = gby + yy - gy0;
+            if (lx >= 0 && lx < CHUNK && ly >= 0 && ly < CHUNK) tiles[ly][lx] = '.';
+          }
+        }
+        const n = randInt(br, 1, 2);
+        for (let i = 0; i < n; i++) {
+          const px = gbx + randInt(br, 1, 7);
+          const py = gby + randInt(br, 1, 7);
+          const lx = px - gx0;
+          const ly = py - gy0;
+          if (lx >= 0 && lx < CHUNK && ly >= 0 && ly < CHUNK) tiles[ly][lx] = '#';
+        }
+        continue;
+      }
+      // 建筑：尺寸与位置变化（块内 3..11，建筑不越块 → 不跨 chunk）
+      const size = randInt(br, 5, 9);
+      const ox = randInt(br, 0, 9 - size);
+      const oy = randInt(br, 0, 9 - size);
+      const x0 = gbx + ox;
+      const y0 = gby + oy;
+      const x1 = x0 + size - 1;
+      const y1 = y0 + size - 1;
+      // 画建筑（外墙 + 内部）
+      for (let y = y0; y <= y1; y++) {
+        for (let x = x0; x <= x1; x++) {
+          const lx = x - gx0;
+          const ly = y - gy0;
+          if (lx < 0 || lx >= CHUNK || ly < 0 || ly >= CHUNK) continue;
+          const edge = x === x0 || x === x1 || y === y0 || y === y1;
+          tiles[ly][lx] = edge ? '#' : '.';
+        }
+      }
+      // 建筑外围 1 格小巷（moat）：保证门永远通向空地/街道，
+      // 且相邻建筑之间自然留出 2 格巷子（城市更真实）
+      for (let y = y0 - 1; y <= y1 + 1; y++) {
+        for (let x = x0 - 1; x <= x1 + 1; x++) {
+          const lx = x - gx0;
+          const ly = y - gy0;
+          if (lx < 0 || lx >= CHUNK || ly < 0 || ly >= CHUNK) continue;
+          const onRing = x === x0 - 1 || x === x1 + 1 || y === y0 - 1 || y === y1 + 1;
+          if (onRing) tiles[ly][lx] = '.';
+        }
+      }
+      // 形状变化：L 形（左上角缺 3×3）或 双楼（中央留 2 格巷）
+      const shape = br();
+      if (shape < 0.2 && size >= 6) {
+        for (let y = y0; y < y0 + 3; y++) {
+          for (let x = x0; x < x0 + 3; x++) {
+            const lx = x - gx0;
+            const ly = y - gy0;
+            if (lx >= 0 && lx < CHUNK && ly >= 0 && ly < CHUNK && tiles[ly][lx] === '#') {
+              tiles[ly][lx] = '.';
+            }
+          }
+        }
+      } else if (shape < 0.4 && size >= 7) {
+        const cx = x0 + Math.floor(size / 2) - 1;
+        for (let y = y0; y < y0 + size; y++) {
+          for (let x = cx; x < cx + 2; x++) {
+            const lx = x - gx0;
+            const ly = y - gy0;
+            if (lx >= 0 && lx < CHUNK && ly >= 0 && ly < CHUNK) tiles[ly][lx] = '.';
+          }
+        }
+      }
+      // 门：建筑外墙 1-2 扇（避开角落，确保通向街道/空地）
       const doorCount = randInt(br, 1, 2);
       for (let i = 0; i < doorCount; i++) {
         const side = pick(br, ['top', 'bottom', 'left', 'right']);
